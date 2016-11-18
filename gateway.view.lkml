@@ -1,8 +1,5 @@
 view: gateway {
-  derived_table: {
-    sql: select * from audince_llcrm.gateway
-      ;;
-  }
+  sql_table_name: audince_llcrm.gateway;;
 
   measure: count {
     type: count

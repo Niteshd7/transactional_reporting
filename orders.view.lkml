@@ -17,6 +17,14 @@ view: orders {
     sql: ${TABLE}.AFFID ;;
   }
 
+  dimension: affiliate_breakdown {
+    sql: ${TABLE}.campaign_order_id ;;
+    link: {
+      label: "Affiliate Breakdown"
+      url: "https://demo.limelightcrm.com/admin/report/custom/index.php?r=6&f={{value}}&aff=1"
+      icon_url: "https://www.limelightcrm.com/css/images/temp/logo-large@2x.png"
+    }
+  }
   dimension: afid {
     type: string
     sql: ${TABLE}.AFID ;;
@@ -739,6 +747,20 @@ view: orders {
   measure: order_count {
     type: count
     drill_fields: [orders_id]
+  }
+
+  measure: initial_orders {
+    type: count
+    label: "Initial Orders"
+    filters: {
+      field: rebill_depth
+      value: "0"
+    }
+  }
+
+  dimension: is_subscription {
+    type: yesno
+    sql: ${subscription_id} IS NOT NULL ;;
   }
 
   # ----- Sets of fields for drilling ------

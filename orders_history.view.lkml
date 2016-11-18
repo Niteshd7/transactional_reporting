@@ -1,8 +1,6 @@
 view: orders_history {
-  derived_table: {
-    sql: select * from audince_llcrm.orders_history
+  sql_table_name:audince_llcrm.orders_history
       ;;
-  }
 
   measure: count {
     type: count

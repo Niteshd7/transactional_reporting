@@ -47,7 +47,7 @@ explore: orders {
   join: orders_history {
     type: left_outer
     relationship: many_to_one
-    sql_on: ${orders_history.orders_id} = ${orders.common_ancestor_order_id};;
+    sql_on: ${orders_history.orders_id} = ${orders.orders_id};;
   }
 
   join: orders_first_try {
@@ -66,5 +66,20 @@ explore: orders {
     type: left_outer
     relationship: many_to_one
     sql_on: ${declined_ccs.orders_id} = ${orders.common_ancestor_order_id};;
+  }
+  join: gateway {
+    type: left_outer
+    relationship: many_to_one
+    sql_on: ${gateway.gateway_id} = ${orders.gateway_id};;
+  }
+  join: gateway_accounts {
+    type: left_outer
+    relationship: many_to_one
+    sql_on: ${gateway_accounts.ga_id} = ${orders.gateway_id};;
+  }
+  join: check_provider_accounts {
+    type: left_outer
+    relationship: many_to_one
+    sql_on: ${check_provider_accounts.check_account_id} = ${orders.gateway_id};;
   }
 }
