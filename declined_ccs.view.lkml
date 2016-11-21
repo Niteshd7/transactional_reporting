@@ -1,8 +1,6 @@
 view: declined_ccs {
-  derived_table: {
-    sql: select * from audince_llcrm.declined_ccs
+  sql_table_name: audince_llcrm.declined_ccs
       ;;
-  }
 
   measure: count {
     type: count
@@ -11,6 +9,7 @@ view: declined_ccs {
 
   dimension: id {
     type: number
+    primary_key: yes
     sql: ${TABLE}.id ;;
   }
 
@@ -28,6 +27,7 @@ view: declined_ccs {
     type: number
     sql: ${TABLE}.is_order_or_upsell ;;
   }
+
 
   set: detail {
     fields: [id, orders_id, attempt_no, is_order_or_upsell]

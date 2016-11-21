@@ -1,8 +1,6 @@
 view: orders_decline_salvage {
-  derived_table: {
-    sql: select * from audince_llcrm.v_orders_decline_salvage
+  sql_table_name: audince_llcrm.v_orders_decline_salvage
       ;;
-  }
 
   measure: count {
     type: count
@@ -16,6 +14,7 @@ view: orders_decline_salvage {
 
   dimension: orders_id {
     type: number
+    primary_key: yes
     sql: ${TABLE}.orders_id ;;
   }
 
@@ -38,6 +37,7 @@ view: orders_decline_salvage {
     type: string
     sql: ${TABLE}.campaign_order_id ;;
   }
+
 
   set: detail {
     fields: [recurring_date, orders_id, is_recurring, parent_order_id, was_reprocessed, campaign_order_id]

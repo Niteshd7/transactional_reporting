@@ -13,7 +13,14 @@ explore: gateway{}
 
 explore: orders_first_try{}
 
-explore: orders_decline_salvage{}
+explore: orders_decline_salvage{
+
+  join: declined_ccs {
+    type: left_outer
+    relationship: many_to_one
+    sql_on: ${declined_ccs.orders_id} = ${orders_decline_salvage.orders_id};;
+  }
+}
 
 explore: upsell_orders{}
 
@@ -59,13 +66,13 @@ explore: orders {
   join: orders_decline_salvage {
     type: left_outer
     relationship: many_to_one
-    sql_on: ${orders_decline_salvage.parent_order_id} = ${orders.common_ancestor_order_id};;
+    sql_on: ${orders_decline_salvage.parent_order_id} = ${orders.orders_id};;
   }
 
   join: declined_ccs {
     type: left_outer
     relationship: many_to_one
-    sql_on: ${declined_ccs.orders_id} = ${orders.common_ancestor_order_id};;
+    sql_on: ${declined_ccs.orders_id} = ${orders.orders_id};;
   }
   join: gateway {
     type: left_outer

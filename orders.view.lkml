@@ -749,13 +749,100 @@ view: orders {
     drill_fields: [orders_id]
   }
 
-  measure: initial_orders {
+  dimension: order_status_name {
+    type: string
+    sql: CASE WHEN ${orders_status} in (2,6,8) THEN 'Approved' WHEN ${orders_status} = 7 THEN 'Declined' WHEN ${orders_status} = 3 THEN 'Archived' WHEN ${orders_status} = 9 THEN 'On-Hold' ELSE 'Pending' END ;;
+  }
+
+  dimension: is_approved {
+    type: yesno
+    sql: ${orders_status} in (2, 6, 8) ;;
+  }
+
+  measure: net_order_total {
+    label: "Gross Revenue"
+    description: "This is the total amount of all orders"
+    type: sum
+    value_format_name: usd_0
+    sql: ${order_total} ;;
+  }
+
+  measure:  initial_orders {
     type: count
     label: "Initial Orders"
     filters: {
       field: rebill_depth
       value: "0"
     }
+    drill_fields: [orders_id]
+  }
+
+
+  measure:  initial_revenue {
+    type: sum
+    label: "Initial Revenue"
+    filters: {
+      field: rebill_depth
+      value: "0"
+    }
+    value_format_name: usd_0
+    sql: ${order_total} ;;
+  }
+
+  measure:  total_revenue {
+    type: sum
+    label: "Total Revenue"
+    value_format_name: usd_0
+    sql: ${order_total} ;;
+  }
+
+  measure: count_approved {
+    type: count
+    label: "Successful Transactions"
+    filters: {
+      field: is_approved
+      value: "yes"
+    }
+
+    drill_fields: [detail*]
+  }
+
+  measure: count_salvaged {
+    type: count
+    label: "Salvaged Orders"
+    filters: {
+      field: was_salvaged
+      value: "Yes"
+    }
+
+    drill_fields: [detail*]
+  }
+
+  measure: order_statuses {
+    type: count
+    drill_fields: [orders_id]
+  }
+
+
+  measure: percent_approved {
+    type: number
+    value_format_name: percent_2
+    sql: ${count_approved} / NULLIF(${count},0) ;;
+    html: {% if value < 0.3 %}
+      <div style="color:Black; background-color:red; font-size:100%; text-align:center">{{ rendered_value }}</div>
+      {% elsif value >= 0.3 and value < 0.7 %}
+      <div style="color:Black; background-color:yellow; font-size:100%; text-align:center">{{ rendered_value }}</div>
+      {% elsif value >= 0.7 %}
+      <div style="color:Black; background-color:green; font-size:100%; text-align:center">{{ rendered_value }}</div>
+      {% endif %}
+      ;;
+  }
+
+  measure:  tax_revenue {
+    type: sum
+    label: "Tax Revenue"
+    value_format_name: usd_0
+    sql: ${order_tax} ;;
   }
 
   dimension: is_subscription {
