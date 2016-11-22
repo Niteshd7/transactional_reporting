@@ -1,5 +1,5 @@
 view: gateway {
-  sql_table_name: audince_llcrm.gateway;;
+  sql_table_name: {{ _access_filters["client.schema_name"] }}.gateway;;
 
   measure: count {
     type: count

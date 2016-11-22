@@ -1,6 +1,6 @@
 view: orders_first_try {
   derived_table: {
-    sql: select * from audince_llcrm.v_orders_first_try
+    sql: {{ _access_filters["client.schema_name"] }}.v_orders_first_try
       ;;
   }
 

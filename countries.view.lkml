@@ -1,6 +1,6 @@
 view: countries {
   derived_table: {
-    sql: select * from audince_llcrm.countries
+    sql: {{ _access_filters["client.schema_name"] }}.countries
       ;;
   }
 

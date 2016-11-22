@@ -1,6 +1,6 @@
 view: sessions {
   derived_table: {
-    sql: select * from audince_llcrm.sessions
+    sql: {{ _access_filters["client.schema_name"] }}.sessions
       ;;
   }
 

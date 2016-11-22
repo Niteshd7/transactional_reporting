@@ -1,5 +1,5 @@
 view: orders {
-  sql_table_name: audince_llcrm.orders ;;
+  sql_table_name: {{ _access_filters["client.schema_name"] }}.orders ;;
 
   dimension: common_ancestor_order_id {
     primary_key: yes

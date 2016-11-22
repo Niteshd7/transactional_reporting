@@ -1,6 +1,6 @@
 view: upsell_orders_decline_salvage {
   derived_table: {
-    sql: select * from audince_llcrm.v_upsell_orders_decline_salvage
+    sql: {{ _access_filters["client.schema_name"] }}.v_upsell_orders_decline_salvage
       ;;
   }
 

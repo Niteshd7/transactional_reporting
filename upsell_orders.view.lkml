@@ -1,6 +1,6 @@
 view: upsell_orders {
   derived_table: {
-    sql: select * from audince_llcrm.upsell_orders
+    sql: {{ _access_filters["client.schema_name"] }}.upsell_orders
       ;;
   }
 

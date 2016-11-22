@@ -1,5 +1,5 @@
 view: gateway_accounts {
-  sql_table_name: all_clients_limelight.gateway_accounts
+  sql_table_name: {{ _access_filters["client.schema_name"] }}.gateway_accounts
       ;;
 
   measure: count {

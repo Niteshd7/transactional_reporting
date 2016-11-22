@@ -1,6 +1,6 @@
 view: campaigns {
   derived_table: {
-    sql: select * from audince_llcrm.campaigns
+    sql: {{ _access_filters["client.schema_name"] }}.campaigns
       ;;
   }
 

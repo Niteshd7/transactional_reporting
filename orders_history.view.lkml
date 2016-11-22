@@ -1,5 +1,5 @@
 view: orders_history {
-  sql_table_name:audince_llcrm.orders_history
+  sql_table_name:{{ _access_filters["client.schema_name"] }}.orders_history
       ;;
 
   measure: count {
