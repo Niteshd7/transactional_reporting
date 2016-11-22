@@ -4,11 +4,6 @@ view: upsell_orders_decline_salvage {
       ;;
   }
 
-  measure: count {
-    type: count
-    drill_fields: [detail*]
-  }
-
   dimension: recurring_date {
     type: date
     sql: ${TABLE}.recurring_date ;;
@@ -32,6 +27,11 @@ view: upsell_orders_decline_salvage {
   dimension: campaign_order_id {
     type: string
     sql: ${TABLE}.campaign_order_id ;;
+  }
+
+  measure: count {
+    type: count
+    drill_fields: [detail*]
   }
 
   set: detail {

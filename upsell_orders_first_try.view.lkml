@@ -4,10 +4,6 @@ view: upsell_orders_first_try {
       ;;
   }
 
-  measure: count {
-    type: count
-    drill_fields: [detail*]
-  }
 
   dimension: recurring_date {
     type: date
@@ -32,6 +28,11 @@ view: upsell_orders_first_try {
   dimension: campaign_order_id {
     type: string
     sql: ${TABLE}.campaign_order_id ;;
+  }
+
+  measure: count {
+    type: count
+    drill_fields: [detail*]
   }
 
   set: detail {

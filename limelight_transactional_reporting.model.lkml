@@ -11,8 +11,6 @@ explore: countries{}
 
 explore: gateway{}
 
-explore: orders_first_try{}
-
 explore: orders_decline_salvage{
 
   join: declined_ccs {
@@ -22,22 +20,16 @@ explore: orders_decline_salvage{
   }
 }
 
-explore: upsell_orders{}
-
-explore: upsell_orders_first_try{}
-
-explore: upsell_orders_decline_salvage{}
-
-explore: sessions{}
+explore: orders_first_try{}
 
 explore: orders_history{}
 
 explore: orders {
   join: upsell_orders {
-     type: left_outer
-     relationship: many_to_one
-     sql_on: ${upsell_orders.main_orders_id} = ${orders.common_ancestor_order_id};;
-    }
+    type: left_outer
+    relationship: many_to_one
+    sql_on: ${upsell_orders.main_orders_id} = ${orders.common_ancestor_order_id};;
+  }
 
   join: upsell_orders_first_try {
     type: left_outer
@@ -90,3 +82,12 @@ explore: orders {
     sql_on: ${check_provider_accounts.check_account_id} = ${orders.gateway_id};;
   }
 }
+
+
+explore: sessions{}
+
+explore: upsell_orders{}
+
+explore: upsell_orders_first_try{}
+
+explore: upsell_orders_decline_salvage{}

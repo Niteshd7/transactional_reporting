@@ -739,6 +739,11 @@ view: orders {
     sql: ${TABLE}.wasSalvaged ;;
   }
 
+  dimension: is_subscription {
+    type: yesno
+    sql: ${subscription_id} IS NOT NULL ;;
+  }
+
   measure: count {
     type: count
     drill_fields: [detail*]
@@ -845,10 +850,6 @@ view: orders {
     sql: ${order_tax} ;;
   }
 
-  dimension: is_subscription {
-    type: yesno
-    sql: ${subscription_id} IS NOT NULL ;;
-  }
 
   # ----- Sets of fields for drilling ------
   set: detail {

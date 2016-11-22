@@ -2,11 +2,6 @@ view: orders_history {
   sql_table_name:{{ _access_filters["client.schema_name"] }}.orders_history
       ;;
 
-  measure: count {
-    type: count
-    drill_fields: [detail*]
-  }
-
   dimension: h_id {
     type: number
     sql: ${TABLE}.hID ;;
@@ -45,6 +40,12 @@ view: orders_history {
   dimension: campaign_id {
     type: number
     sql: ${TABLE}.campaign_id ;;
+  }
+
+
+  measure: count {
+    type: count
+    drill_fields: [detail*]
   }
 
   set: detail {

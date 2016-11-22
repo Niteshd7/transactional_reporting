@@ -4,11 +4,6 @@ view: sessions {
       ;;
   }
 
-  measure: count {
-    type: count
-    drill_fields: [detail*]
-  }
-
   dimension: sesskey {
     type: string
     sql: ${TABLE}.sesskey ;;
@@ -22,6 +17,12 @@ view: sessions {
   dimension: value {
     type: string
     sql: ${TABLE}.value ;;
+  }
+
+
+  measure: count {
+    type: count
+    drill_fields: [detail*]
   }
 
   set: detail {

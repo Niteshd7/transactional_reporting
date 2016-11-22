@@ -4,10 +4,6 @@ view: upsell_orders {
       ;;
   }
 
-  measure: count {
-    type: count
-    drill_fields: [detail*]
-  }
 
   dimension: upsell_orders_id {
     type: number
@@ -402,6 +398,11 @@ view: upsell_orders {
   measure: upsell_order_count {
     type: count
     drill_fields: [upsell_orders_id]
+  }
+
+  measure: count {
+    type: count
+    drill_fields: [detail*]
   }
 
   set: detail {
