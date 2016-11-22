@@ -1,4 +1,4 @@
-connection: "pair2_all_clients"
+connection: "pair2-aws"
 
 # include all the views
 include: "*.view"
