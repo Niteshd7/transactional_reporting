@@ -22,7 +22,7 @@ view: orders {
     link: {
       label: "Affiliate Breakdown"
       url: "https://demo.limelightcrm.com/admin/report/custom/index.php?r=6&f={{value}}&aff=1"
-      icon_url: "https://www.limelightcrm.com/css/images/temp/logo-large@2x.png"
+      icon_url: "https://cdn.limelightcrm.com/logo1.png"
     }
   }
   dimension: afid {
