@@ -68,7 +68,7 @@ explore: orders {
   }
   join: gateway {
     type: left_outer
-    relationship: many_to_one
+    relationship: one_to_one
     sql_on: ${gateway.gateway_id} = ${orders.gateway_id};;
   }
   join: gateway_accounts {

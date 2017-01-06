@@ -424,6 +424,12 @@ view: orders {
     sql: ${TABLE}.gatewayId ;;
   }
 
+  dimension: gateway {
+    full_suggestions: yes
+    type: string
+    sql: CONCAT(${gateway.gateway_alias},' ','(',' ',${gateway_id},' ',')') ;;
+  }
+
   dimension: gateway_preserve {
     type: yesno
     sql: ${TABLE}.gatewayPreserve ;;
