@@ -251,6 +251,15 @@ view: orders {
     sql: ${TABLE}.currency_value ;;
   }
 
+  dimension: currency_symbol {
+  hidden: yes
+  sql:
+    CASE
+    WHEN ${currency_value} ='0' THEN '£'
+    ELSE '$'
+    END ;;
+  }
+
   dimension: customers_address_format_id {
     type: number
     sql: ${TABLE}.customers_address_format_id ;;
@@ -775,7 +784,8 @@ view: orders {
     label: "Gross Revenue"
     description: "This is the total amount of all orders"
     type: sum
-    value_format_name: usd_0
+    html: {{ currency_symbol._value }}{{ rendered_value }};;
+    value_format_name: decimal_2
     sql: ${order_total} ;;
   }
 
@@ -850,7 +860,8 @@ view: orders {
       field: order_status_name
       value: "Declined"
     }
-    value_format_name: usd
+    html: {{ currency_symbol._value }}{{ rendered_value }};;
+    value_format_name: decimal_2
     sql: ${order_total} ;;
   }
 
@@ -865,7 +876,8 @@ view: orders {
       field: is_hold
       value: "1"
     }
-    value_format_name: usd
+    html: {{ currency_symbol._value }}{{ rendered_value }};;
+    value_format_name: decimal_2
     sql: ${order_total} ;;
   }
 
@@ -876,7 +888,8 @@ view: orders {
       field: rebill_depth
       value: "0"
     }
-    value_format_name: usd
+    html: {{ currency_symbol._value }}{{ rendered_value }};;
+    value_format_name: decimal_2
     sql: ${order_total} ;;
   }
 
@@ -887,7 +900,7 @@ view: orders {
       field: order_status_name
       value: "Pending"
     }
-    value_format_name: usd
+    value_format_name: decimal_2
     sql: ${order_total} ;;
   }
 
@@ -898,7 +911,8 @@ view: orders {
       field: rebill_depth
       value: ">0"
     }
-    value_format_name: usd
+    html: {{ currency_symbol._value }}{{ rendered_value }};;
+    value_format_name: decimal_2
     sql: ${order_total} ;;
   }
 
@@ -921,14 +935,16 @@ view: orders {
       field: is_approved
       value: "1"
     }
-    value_format_name: usd
+    html: {{ currency_symbol._value }}{{ rendered_value }};;
+    value_format_name: decimal_2
     sql: ${v_main_order_total.shipping_amount} ;;
   }
 
   measure:  total_revenue {
     type: sum
     label: "Total Revenue"
-    value_format_name: usd
+    html: {{ currency_symbol._value }}{{ rendered_value }};;
+    value_format_name: decimal_2
     sql: ${order_total} ;;
   }
 
@@ -939,7 +955,8 @@ view: orders {
       field: order_status_name
       value: "Void/Refunded"
     }
-    value_format_name: usd
+    html: {{ currency_symbol._value }}{{ rendered_value }};;
+    value_format_name: decimal_2
     sql: ${order_total} ;;
   }
 
@@ -1002,7 +1019,8 @@ view: orders {
   measure:  tax_revenue {
     type: sum
     label: "Tax Revenue"
-    value_format_name: usd_0
+    html: {{ currency_symbol._value }}{{ rendered_value }};;
+    value_format_name: decimal_2
     sql: ${order_tax} ;;
   }
 
