@@ -25,6 +25,7 @@ view: orders {
       icon_url: "https://cdn.limelightcrm.com/logo1.png"
     }
   }
+
   dimension: afid {
     type: string
     sql: ${TABLE}.AFID ;;
@@ -757,7 +758,7 @@ view: orders {
 
   measure: order_count {
     type: count
-    drill_fields: [orders_id]
+    drill_fields: [orders_id, orders_status,order_status_name, order_total]
   }
 
   dimension: order_status_name {
@@ -778,6 +779,30 @@ view: orders {
     sql: ${order_total} ;;
   }
 
+  measure:  declined_orders {
+    type: count
+    label: "Declines"
+    filters: {
+      field: order_status_name
+      value: "Declined"
+    }
+    drill_fields: [orders_id, orders_status,order_status_name, order_total]
+  }
+
+  measure:  hold_cancel_orders {
+    type: count
+    label: "Holds/Cancels"
+    filters: {
+      field: is_archived
+      value: "0"
+    }
+    filters: {
+      field: is_hold
+      value: "1"
+    }
+    drill_fields: [orders_id, orders_status,order_status_name, order_total]
+  }
+
   measure:  initial_orders {
     type: count
     label: "Initial Orders"
@@ -785,9 +810,64 @@ view: orders {
       field: rebill_depth
       value: "0"
     }
-    drill_fields: [orders_id]
+    drill_fields: [orders_id, orders_status,order_status_name, order_total]
   }
 
+  measure:  pending_orders {
+    type: count
+    label: "Pending Orders"
+    filters: {
+      field: order_status_name
+      value: "Pending"
+    }
+    drill_fields: [orders_id, orders_status,order_status_name, order_total]
+  }
+
+  measure:  subscription_orders {
+    type: count
+    label: "Subscriptions"
+    filters: {
+      field: rebill_depth
+      value: ">0"
+    }
+    drill_fields: [orders_id, orders_status,order_status_name, order_total]
+  }
+
+  measure:  void_refund_orders {
+    type: count
+    label: "Void/Refund Orders"
+    filters: {
+      field: order_status_name
+      value: "Void/Refunded"
+    }
+    drill_fields: [orders_id, orders_status,order_status_name, order_total]
+  }
+
+  measure: decline_revenue {
+    type: sum
+    label: "Decline Revenue"
+    filters: {
+      field: order_status_name
+      value: "Declined"
+    }
+    value_format_name: usd
+    sql: ${order_total} ;;
+  }
+
+  measure:  hold_cancel_revenue {
+    type: sum
+    label: "Holds/Cancels Revenue"
+    filters: {
+      field: is_archived
+      value: "0"
+    }
+    filters: {
+      field: is_hold
+      value: "1"
+    }
+    value_format_name: usd
+    sql: ${order_total} ;;
+  }
 
   measure:  initial_revenue {
     type: sum
@@ -796,14 +876,47 @@ view: orders {
       field: rebill_depth
       value: "0"
     }
-    value_format_name: usd_0
+    value_format_name: usd
+    sql: ${order_total} ;;
+  }
+
+  measure: pending_revenue {
+    type: sum
+    label: "Pending Revenue"
+    filters: {
+      field: order_status_name
+      value: "Pending"
+    }
+    value_format_name: usd
+    sql: ${order_total} ;;
+  }
+
+  measure:  subscription_revenue {
+    type: sum
+    label: "Subscription Revenue"
+    filters: {
+      field: rebill_depth
+      value: ">0"
+    }
+    value_format_name: usd
     sql: ${order_total} ;;
   }
 
   measure:  total_revenue {
     type: sum
     label: "Total Revenue"
-    value_format_name: usd_0
+    value_format_name: usd
+    sql: ${order_total} ;;
+  }
+
+  measure:  void_refund_revenue {
+    type: sum
+    label: "Void/Refunded Revenue"
+    filters: {
+      field: order_status_name
+      value: "Void/Refunded"
+    }
+    value_format_name: usd
     sql: ${order_total} ;;
   }
 
@@ -855,7 +968,6 @@ view: orders {
     value_format_name: usd_0
     sql: ${order_tax} ;;
   }
-
 
   # ----- Sets of fields for drilling ------
   set: detail {
