@@ -181,6 +181,11 @@ view: orders {
     sql: ${TABLE}.cc_type ;;
   }
 
+  dimension: cc_type_fmt {
+    type: string
+    sql: CASE WHEN ${cc_type} != 'checking' THEN 'Credit Card / Other' ELSE ${cc_type} END  ;;
+  }
+
   dimension: charge_c {
     type: string
     sql: ${TABLE}.charge_c ;;
