@@ -49,6 +49,18 @@ explore: orders {
     sql_on: ${orders_history.orders_id} = ${orders.orders_id};;
   }
 
+  join: campaigns {
+    type: left_outer
+    relationship: many_to_one
+    sql_on: ${orders.campaign_order_id} = ${campaigns.c_id};;
+  }
+
+  join: orders_products {
+    type: left_outer
+    relationship: many_to_one
+    sql_on: ${orders.orders_id} = ${orders_products.orders_id};;
+  }
+
   join: orders_first_try {
     type: left_outer
     relationship: many_to_one

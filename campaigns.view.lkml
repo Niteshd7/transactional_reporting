@@ -1,8 +1,5 @@
 view: campaigns {
-  derived_table: {
-    sql: {{ _access_filters["client.schema_name"] }}.campaigns
-      ;;
-  }
+  sql_table_name: {{ _access_filters["client.schema_name"] }}.campaigns ;;
 
   measure: count {
     type: count
