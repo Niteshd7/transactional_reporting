@@ -18,10 +18,10 @@ view: orders {
   }
 
   dimension: affiliate_breakdown {
-    sql: ${TABLE}.campaign_order_id ;;
+    sql: "Affiliate Breakdown" ;;
     link: {
-      label: "Affiliate Breakdown"
-      url: "https://demo.limelightcrm.com/admin/report/custom/index.php?r=6&f={{value}}&aff=1"
+      label: "Affiliate ID"
+      url: "https://analytics.limelightcrm.com/looks/406"
       icon_url: "https://cdn.limelightcrm.com/logo1.png"
     }
   }
@@ -902,6 +902,29 @@ view: orders {
     sql: ${order_total} ;;
   }
 
+  measure:  shipping_revenue {
+    type: sum
+    label: "Shipping Revenue"
+    filters: {
+      field: refund_type
+      value: "<2"
+    }
+    filters: {
+      field: refund_type
+      value: "<2"
+    }
+    filters: {
+      field: payment_module_code
+      value: "1"
+    }
+    filters: {
+      field: is_approved
+      value: "1"
+    }
+    value_format_name: usd
+    sql: ${v_main_order_total.shipping_amount} ;;
+  }
+
   measure:  total_revenue {
     type: sum
     label: "Total Revenue"
@@ -946,12 +969,12 @@ view: orders {
     type: count
     label: "Shipping"
     filters: {
-      field: payment_module_code
-      value: "1"
+      field: order_status_name
+      value: "-Decline"
     }
     filters: {
-      field: is_approved
-      value: "1"
+      field: order_status_name
+      value: "-Pending"
     }
     drill_fields: [detail*]
   }
