@@ -18,9 +18,9 @@ view: orders {
   }
 
   dimension: affiliate_breakdown {
-    sql: "Affiliate Breakdown" ;;
+    sql: "Affiliate ID" ;;
     link: {
-      label: "Affiliate ID"
+      label: "Affiliate Breakdown"
       url: "https://analytics.limelightcrm.com/looks/406"
       icon_url: "https://cdn.limelightcrm.com/logo1.png"
     }
