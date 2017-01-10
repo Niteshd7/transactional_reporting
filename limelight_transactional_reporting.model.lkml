@@ -81,6 +81,11 @@ explore: orders {
     relationship: many_to_one
     sql_on: ${check_provider_accounts.check_account_id} = ${orders.gateway_id};;
   }
+  join: v_main_order_total {
+    type: left_outer
+    relationship: one_to_one
+    sql_on: ${v_main_order_total.orders_id} = ${orders.orders_id};;
+  }
 }
 
 

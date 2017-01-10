@@ -942,6 +942,20 @@ view: orders {
     drill_fields: [detail*]
   }
 
+  measure: count_shipped {
+    type: count
+    label: "Shipping"
+    filters: {
+      field: payment_module_code
+      value: "1"
+    }
+    filters: {
+      field: is_approved
+      value: "1"
+    }
+    drill_fields: [detail*]
+  }
+
   measure: order_statuses {
     type: count
     drill_fields: [orders_id]

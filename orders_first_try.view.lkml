@@ -1,8 +1,5 @@
 view: orders_first_try {
-  derived_table: {
-    sql: {{ _access_filters["client.schema_name"] }}.v_orders_first_try
-      ;;
-  }
+  sql_table_name: {{ _access_filters["client.schema_name"] }}.v_orders_first_try;;
 
   dimension: recurring_date {
     type: date
