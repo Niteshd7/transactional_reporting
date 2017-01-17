@@ -26,7 +26,6 @@ explore: orders_history{}
 
 explore: orders {
   join: upsell_orders {
-    type: left_outer
     relationship: many_to_one
     sql_on: ${upsell_orders.main_orders_id} = ${orders.common_ancestor_order_id};;
   }
@@ -47,6 +46,18 @@ explore: orders {
     type: left_outer
     relationship: many_to_one
     sql_on: ${orders_history.orders_id} = ${orders.orders_id};;
+  }
+
+  join: order_report {
+    type: left_outer
+    relationship: many_to_one
+    sql_on: ${order_report.order_id} = ${orders.orders_id};;
+     }
+
+  join: products_description {
+    type: left_outer
+    relationship: one_to_one
+    sql_on: ${orders.products_id} = ${products_description.products_id};;
   }
 
   join: campaigns {
@@ -99,7 +110,6 @@ explore: orders {
     sql_on: ${v_main_order_total.orders_id} = ${orders.orders_id};;
   }
 }
-
 
 explore: sessions{}
 

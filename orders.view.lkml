@@ -246,6 +246,33 @@ view: orders {
     sql: ${TABLE}.coupon_code ;;
   }
 
+  dimension: currency_fmt {
+    hidden: no
+    full_suggestions: yes
+    type: string
+    sql: CASE WHEN ${order_report.currency_id} = 1 THEN 'USD'
+              WHEN ${order_report.currency_id} = 2 THEN 'EUR'
+              WHEN ${order_report.currency_id} = 3 THEN 'GPB'
+              WHEN ${order_report.currency_id} = 4 THEN 'CAD'
+              WHEN ${order_report.currency_id} = 5 THEN 'AUD'
+              WHEN ${order_report.currency_id} = 6 THEN 'ZAR'
+              WHEN ${order_report.currency_id} = 7 THEN 'JPY'
+              WHEN ${order_report.currency_id} = 8 THEN 'DKK'
+              WHEN ${order_report.currency_id} = 9 THEN 'NOK'
+              WHEN ${order_report.currency_id} = 10 THEN 'SEK'
+              WHEN ${order_report.currency_id} = 11 THEN 'BRL'
+              WHEN ${order_report.currency_id} = 12 THEN 'CLP'
+              WHEN ${order_report.currency_id} = 13 THEN 'MXN'
+              WHEN ${order_report.currency_id} = 14 THEN 'KRW'
+              WHEN ${order_report.currency_id} = 15 THEN 'NZD'
+              WHEN ${order_report.currency_id} = 16 THEN 'PLN'
+              WHEN ${order_report.currency_id} = 17 THEN 'SGD'
+              WHEN ${order_report.currency_id} = 18 THEN 'HKD'
+              WHEN ${order_report.currency_id} = 19 THEN 'ARS'
+              ELSE 'CUR ' || ${order_report.currency_id}
+         END ;;
+  }
+
   dimension: currency {
     type: string
     sql: ${TABLE}.currency ;;
@@ -257,12 +284,8 @@ view: orders {
   }
 
   dimension: currency_symbol {
-  hidden: yes
-  sql:
-    CASE
-    WHEN ${currency_value} ='0' THEN '£'
-    ELSE '$'
-    END ;;
+    type: string
+    sql: ${order_report.currency_symbol} ;;
   }
 
   dimension: customers_address_format_id {
@@ -637,6 +660,18 @@ view: orders {
     sql: ${TABLE}.prospects_id ;;
   }
 
+  dimension: products_id {
+    type: number
+    # hidden: true
+    sql: ${orders_products.products_id} ;;
+  }
+
+  dimension: products_quantity {
+    type: number
+    # hidden: true
+    sql: ${orders_products.products_quantity} ;;
+  }
+
   dimension: rebill_depth {
     type: number
     sql: ${TABLE}.rebillDepth ;;
@@ -772,7 +807,18 @@ view: orders {
 
   measure: order_count {
     type: count
-    drill_fields: [orders_id, orders_status,order_status_name, order_total]
+    filters: {
+      field: order_status_name
+      value: "Approved, Pending"
+    }
+    label: "Total"
+    drill_fields: [detail*]
+  }
+
+  measure:  average_order_total {
+    type: average
+    label: "Average Order Value"
+    sql: ${order_total} ;;
   }
 
   dimension: order_status_name {
@@ -801,7 +847,7 @@ view: orders {
       field: order_status_name
       value: "Declined"
     }
-    drill_fields: [orders_id, orders_status,order_status_name, order_total]
+    drill_fields: [detail*]
   }
 
   measure:  hold_cancel_orders {
@@ -815,7 +861,7 @@ view: orders {
       field: is_hold
       value: "1"
     }
-    drill_fields: [orders_id, orders_status,order_status_name, order_total]
+    drill_fields: [detail*]
   }
 
   measure:  initial_orders {
@@ -825,7 +871,7 @@ view: orders {
       field: rebill_depth
       value: "0"
     }
-    drill_fields: [orders_id, orders_status,order_status_name, order_total]
+    drill_fields: [detail*]
   }
 
   measure:  pending_orders {
@@ -835,7 +881,7 @@ view: orders {
       field: order_status_name
       value: "Pending"
     }
-    drill_fields: [orders_id, orders_status,order_status_name, order_total]
+    drill_fields: [detail*]
   }
 
   measure:  subscription_orders {
@@ -845,7 +891,15 @@ view: orders {
       field: rebill_depth
       value: ">0"
     }
-    drill_fields: [orders_id, orders_status,order_status_name, order_total]
+    filters: {
+      field: parent_order_id
+      value: ">0"
+    }
+    filters: {
+      field: order_status_name
+      value: "Approved, Pending"
+    }
+    drill_fields: [detail*]
   }
 
   measure:  void_refund_orders {
@@ -867,7 +921,7 @@ view: orders {
     }
     html: {{ currency_symbol._value }}{{ rendered_value }};;
     value_format_name: decimal_2
-    sql: ${order_total} ;;
+    sql: ${order_report.subtotal_amt} ;;
   }
 
   measure:  hold_cancel_revenue {
@@ -883,7 +937,7 @@ view: orders {
     }
     html: {{ currency_symbol._value }}{{ rendered_value }};;
     value_format_name: decimal_2
-    sql: ${order_total} ;;
+    sql: ${order_report.subtotal_amt} ;;
   }
 
   measure:  initial_revenue {
@@ -895,7 +949,7 @@ view: orders {
     }
     html: {{ currency_symbol._value }}{{ rendered_value }};;
     value_format_name: decimal_2
-    sql: ${order_total} ;;
+    sql: ${order_report.subtotal_amt} ;;
   }
 
   measure: pending_revenue {
@@ -906,7 +960,7 @@ view: orders {
       value: "Pending"
     }
     value_format_name: decimal_2
-    sql: ${order_total} ;;
+    sql: ${order_report.subtotal_amt} ;;
   }
 
   measure:  subscription_revenue {
@@ -916,9 +970,13 @@ view: orders {
       field: rebill_depth
       value: ">0"
     }
+    filters: {
+      field: order_status_name
+      value: "Approved, Pending"
+    }
     html: {{ currency_symbol._value }}{{ rendered_value }};;
     value_format_name: decimal_2
-    sql: ${order_total} ;;
+    sql: ${order_report.subtotal_amt} ;;
   }
 
   measure:  shipping_revenue {
@@ -942,15 +1000,19 @@ view: orders {
     }
     html: {{ currency_symbol._value }}{{ rendered_value }};;
     value_format_name: decimal_2
-    sql: ${v_main_order_total.shipping_amount} ;;
+    sql: ${order_report.shipping_amt} ;;
   }
 
   measure:  total_revenue {
     type: sum
     label: "Total Revenue"
+    filters: {
+      field: order_status_name
+      value: "Approved, Pending"
+    }
     html: {{ currency_symbol._value }}{{ rendered_value }};;
     value_format_name: decimal_2
-    sql: ${order_total} ;;
+    sql: ${order_report.subtotal_amt} ;;
   }
 
   measure:  void_refund_revenue {
@@ -1001,11 +1063,6 @@ view: orders {
     drill_fields: [detail*]
   }
 
-  measure: order_statuses {
-    type: count
-    drill_fields: [orders_id]
-  }
-
 
   measure: percent_approved {
     type: number
@@ -1029,8 +1086,14 @@ view: orders {
     sql: ${order_tax} ;;
   }
 
+  dimension: prior_hold_filter {
+    type: yesno
+    sql: ${hold_date} IS NOT NULL;;
+  }
+
+
   # ----- Sets of fields for drilling ------
   set: detail {
-    fields: [common_ancestor_order_id, customers_fname, customers_lname, delivery_fname, delivery_lname, billing_fname, billing_lname, orders.customers_fname, orders.customers_lname, orders.delivery_fname, orders.delivery_lname, orders.billing_fname, orders.billing_lname, orders.common_ancestor_order_id, customers.customers_id, customers.customers_fname, customers.customers_lname, prospects.prospects_id, prospects.p_first_name, prospects.p_last_name, gateway.gateway_id, account_updater_audit.count, declined_ccs.count, decline_salvage_preserve.count, decline_salvage_queue.count, emailprovider_temp_removal.count, fraudprovider_transactions_fraudlogic.count, fraudprovider_transactions_fraudshield.count, fraudprovider_transactions_kount.count, fraudprovider_transactions_maxmind.count, fraudprovider_transactions_phoenix.count, fraudprovider_transactions_pinpoint.count, gateway_cascade_orders_preserved.count, gateway_cascade_orders_salvaged.count, gateway_force_preserved.count, gateway_salvage_skip_log.count, gateway_transactions_a1payments.count, gateway_transactions_acquired.count, gateway_transactions_actum.count, gateway_transactions_admeris.count, gateway_transactions_allied.count, gateway_transactions_alternativepayments.count, gateway_transactions_altoglobal.count, gateway_transactions_amazon.count, gateway_transactions_anytrans.count, gateway_transactions_arguspayment.count, gateway_transactions_authorize.count, gateway_transactions_baian.count, gateway_transactions_basecommerce.count, gateway_transactions_beanstream.count, gateway_transactions_betapay.count, gateway_transactions_bill1st.count, gateway_transactions_billpro.count, gateway_transactions_binaryfolder.count, gateway_transactions_binaryfolder.count, gateway_transactions_bitcoin_pg.count, gateway_transactions_braintree.count, gateway_transactions_braspag.count, gateway_transactions_brightspeed.count, gateway_transactions_cardready.count, gateway_transactions_cartconnect.count, gateway_transactions_cascadebill.count, gateway_transactions_cashflows.count, gateway_transactions_ccbill.count, gateway_transactions_chargeback_guardian.count, gateway_transactions_chargeback_guardian_previous.count, gateway_transactions_chargeback_sentinel.count, gateway_transactions_check21.count, gateway_transactions_checkout_dot_com.count, gateway_transactions_chequebot.count, gateway_transactions_citigate.count, gateway_transactions_cobrebem.count, gateway_transactions_codiumpro.count, gateway_transactions_crctotal.count, gateway_transactions_curepay.count, gateway_transactions_cwbpay.count, gateway_transactions_da_data.count, gateway_transactions_debitunit.count, gateway_transactions_denarii.count, gateway_transactions_digitsecure.count, gateway_transactions_docdata.count, gateway_transactions_easypayments.count, gateway_transactions_ecomm.count, gateway_transactions_edatafinancial.count, gateway_transactions_edatarealcharge.count, gateway_transactions_egatepay.count, gateway_transactions_emerchantpay.count, gateway_transactions_emerchantpay.count, gateway_transactions_epayapp.count, gateway_transactions_epay_machine.count, gateway_transactions_epro.count, gateway_transactions_epx.count, gateway_transactions_evosnap.count, gateway_transactions_eway.count, gateway_transactions_ezic.count, gateway_transactions_fifth_dimension.count, gateway_transactions_first_data.count, gateway_transactions_gatewayserve.count, gateway_transactions_genesis.count, gateway_transactions_globalcollect.count, gateway_transactions_globalpaymentsnow.count, gateway_transactions_gocoin.count, gateway_transactions_gpndata.count, gateway_transactions_groupiso.count, gateway_transactions_hypercharge.count, gateway_transactions_icepay.count, gateway_transactions_ics.count, gateway_transactions_intelpayments.count, gateway_transactions_libill.count, gateway_transactions_limelight.count, gateway_transactions_lixpay.count, gateway_transactions_maverick.count, gateway_transactions_maxpay.count, gateway_transactions_maxxmerchants.count, gateway_transactions_mconline.count, gateway_transactions_meikopay.count, gateway_transactions_meritus.count, gateway_transactions_mes.count, gateway_transactions_micropayment.count, gateway_transactions_mifinity.count, gateway_transactions_migs.count, gateway_transactions_multisafepay.count, gateway_transactions_nationalbankcard.count, gateway_transactions_netbilling.count, gateway_transactions_networkmerchantinc.count, gateway_transactions_ogone.count, gateway_transactions_omnipayment.count, gateway_transactions_optimal.count, gateway_transactions_orbital.count, gateway_transactions_orbitalpay.count, gateway_transactions_pacnet.count, gateway_transactions_pagamentsegur.count, gateway_transactions_pago.count, gateway_transactions_paybox.count, gateway_transactions_payhub.count, gateway_transactions_paykings.count, gateway_transactions_paymentserv.count, gateway_transactions_paymentworld.count, gateway_transactions_paymentz.count, gateway_transactions_payment_flow.count, gateway_transactions_paynet.count, gateway_transactions_payon.count, gateway_transactions_paypal.count, gateway_transactions_paypalexpress.count, gateway_transactions_payscout.count, gateway_transactions_payspace.count, gateway_transactions_paytheon.count, gateway_transactions_paytoo.count, gateway_transactions_pbs.count, gateway_transactions_ppw_partners.count, gateway_transactions_prismpay.count, gateway_transactions_processingcom.count, gateway_transactions_profitorius.count, gateway_transactions_protectpay.count, gateway_transactions_protex.count, gateway_transactions_quickpay.count, gateway_transactions_qwipi.count, gateway_transactions_rancho.count, gateway_transactions_rocketgate.count, gateway_transactions_romit.count, gateway_transactions_salt_payments_2.count, gateway_transactions_securenet.count, gateway_transactions_securepay.count, gateway_transactions_sirix.count, gateway_transactions_stripe.count, gateway_transactions_suite_pay.count, gateway_transactions_systempay.count, gateway_transactions_todur.count, gateway_transactions_transactpro.count, gateway_transactions_transready.count, gateway_transactions_tripayments.count, gateway_transactions_twokcharge.count, gateway_transactions_txassist.count, gateway_transactions_usaepay.count, gateway_transactions_vantiv.count, gateway_transactions_verifi.count, gateway_transactions_versatilepay.count, gateway_transactions_vitalpay.count, gateway_transactions_webpay.count, gateway_transactions_webstreetmedia.count, gateway_transactions_wiretrust.count, gateway_transactions_worldpay.count, gateway_transactions_ziripay.count, gpndata_notification_queue.count, load_balance_configuration_gateway_order_preserved.count, load_balance_configuration_log.count, membership_fields.count, module_decline_audit.count, orders.count, orders_features_overrides.count, orders_history.count, orders_processing_queue.count, orders_products.count, orders_status_history.count, orders_total.count, orders_to_delete.count, order_actions_history.count, order_attribute.count, order_documents.count, order_emails_to_send.count, order_import_temp.count, order_notification_history.count, order_parents.count, order_report.count, order_report_log.count, order_report_sync_queue.count, order_temp_orders_created.count, order_tracking_import.count, prospects.count, provider_batch_entry.count, retention_ancestors.count, return_import_queue.count, three_d_secure.count, v_approved_orders_decline_salvage_v2.count, v_approved_orders_initials_v2.count, v_main_order_total.count, v_orders.count, v_orders_decline_salvage.count, v_orders_first_try.count, v_orders_history.count, v_order_attribute_all.count, v_order_non_taxable.count, v_order_report.count, v_order_sales_tax.count, v_order_shipping.count, v_order_taxable.count, v_order_tax_factor.count, v_order_total.count, v_prospects.count, v_upsell_orders_count.count, v_upsell_unique_order_id_active_recurring.count]
+    fields: [orders_id,orders_status, order_status_name, products_quantity, order_total, order_total_complete_reporting,order_report.currency_id, currency, gateway, gateway_id,is_test_cc, is_archived, deleted, parent_order_id,common_ancestor_order_id, customers_fname, customers_lname, delivery_fname, delivery_lname, billing_fname, billing_lname, orders.customers_fname, orders.customers_lname, orders.delivery_fname, orders.delivery_lname, orders.billing_fname, orders.billing_lname, orders.common_ancestor_order_id, customers.customers_id, customers.customers_fname, customers.customers_lname, prospects.prospects_id, prospects.p_first_name, prospects.p_last_name, gateway.gateway_id, account_updater_audit.count, declined_ccs.count, decline_salvage_preserve.count, decline_salvage_queue.count, emailprovider_temp_removal.count, fraudprovider_transactions_fraudlogic.count, fraudprovider_transactions_fraudshield.count, fraudprovider_transactions_kount.count, fraudprovider_transactions_maxmind.count, fraudprovider_transactions_phoenix.count, fraudprovider_transactions_pinpoint.count, gateway_cascade_orders_preserved.count, gateway_cascade_orders_salvaged.count, gateway_force_preserved.count, gateway_salvage_skip_log.count, gateway_transactions_a1payments.count, gateway_transactions_acquired.count, gateway_transactions_actum.count, gateway_transactions_admeris.count, gateway_transactions_allied.count, gateway_transactions_alternativepayments.count, gateway_transactions_altoglobal.count, gateway_transactions_amazon.count, gateway_transactions_anytrans.count, gateway_transactions_arguspayment.count, gateway_transactions_authorize.count, gateway_transactions_baian.count, gateway_transactions_basecommerce.count, gateway_transactions_beanstream.count, gateway_transactions_betapay.count, gateway_transactions_bill1st.count, gateway_transactions_billpro.count, gateway_transactions_binaryfolder.count, gateway_transactions_binaryfolder.count, gateway_transactions_bitcoin_pg.count, gateway_transactions_braintree.count, gateway_transactions_braspag.count, gateway_transactions_brightspeed.count, gateway_transactions_cardready.count, gateway_transactions_cartconnect.count, gateway_transactions_cascadebill.count, gateway_transactions_cashflows.count, gateway_transactions_ccbill.count, gateway_transactions_chargeback_guardian.count, gateway_transactions_chargeback_guardian_previous.count, gateway_transactions_chargeback_sentinel.count, gateway_transactions_check21.count, gateway_transactions_checkout_dot_com.count, gateway_transactions_chequebot.count, gateway_transactions_citigate.count, gateway_transactions_cobrebem.count, gateway_transactions_codiumpro.count, gateway_transactions_crctotal.count, gateway_transactions_curepay.count, gateway_transactions_cwbpay.count, gateway_transactions_da_data.count, gateway_transactions_debitunit.count, gateway_transactions_denarii.count, gateway_transactions_digitsecure.count, gateway_transactions_docdata.count, gateway_transactions_easypayments.count, gateway_transactions_ecomm.count, gateway_transactions_edatafinancial.count, gateway_transactions_edatarealcharge.count, gateway_transactions_egatepay.count, gateway_transactions_emerchantpay.count, gateway_transactions_emerchantpay.count, gateway_transactions_epayapp.count, gateway_transactions_epay_machine.count, gateway_transactions_epro.count, gateway_transactions_epx.count, gateway_transactions_evosnap.count, gateway_transactions_eway.count, gateway_transactions_ezic.count, gateway_transactions_fifth_dimension.count, gateway_transactions_first_data.count, gateway_transactions_gatewayserve.count, gateway_transactions_genesis.count, gateway_transactions_globalcollect.count, gateway_transactions_globalpaymentsnow.count, gateway_transactions_gocoin.count, gateway_transactions_gpndata.count, gateway_transactions_groupiso.count, gateway_transactions_hypercharge.count, gateway_transactions_icepay.count, gateway_transactions_ics.count, gateway_transactions_intelpayments.count, gateway_transactions_libill.count, gateway_transactions_limelight.count, gateway_transactions_lixpay.count, gateway_transactions_maverick.count, gateway_transactions_maxpay.count, gateway_transactions_maxxmerchants.count, gateway_transactions_mconline.count, gateway_transactions_meikopay.count, gateway_transactions_meritus.count, gateway_transactions_mes.count, gateway_transactions_micropayment.count, gateway_transactions_mifinity.count, gateway_transactions_migs.count, gateway_transactions_multisafepay.count, gateway_transactions_nationalbankcard.count, gateway_transactions_netbilling.count, gateway_transactions_networkmerchantinc.count, gateway_transactions_ogone.count, gateway_transactions_omnipayment.count, gateway_transactions_optimal.count, gateway_transactions_orbital.count, gateway_transactions_orbitalpay.count, gateway_transactions_pacnet.count, gateway_transactions_pagamentsegur.count, gateway_transactions_pago.count, gateway_transactions_paybox.count, gateway_transactions_payhub.count, gateway_transactions_paykings.count, gateway_transactions_paymentserv.count, gateway_transactions_paymentworld.count, gateway_transactions_paymentz.count, gateway_transactions_payment_flow.count, gateway_transactions_paynet.count, gateway_transactions_payon.count, gateway_transactions_paypal.count, gateway_transactions_paypalexpress.count, gateway_transactions_payscout.count, gateway_transactions_payspace.count, gateway_transactions_paytheon.count, gateway_transactions_paytoo.count, gateway_transactions_pbs.count, gateway_transactions_ppw_partners.count, gateway_transactions_prismpay.count, gateway_transactions_processingcom.count, gateway_transactions_profitorius.count, gateway_transactions_protectpay.count, gateway_transactions_protex.count, gateway_transactions_quickpay.count, gateway_transactions_qwipi.count, gateway_transactions_rancho.count, gateway_transactions_rocketgate.count, gateway_transactions_romit.count, gateway_transactions_salt_payments_2.count, gateway_transactions_securenet.count, gateway_transactions_securepay.count, gateway_transactions_sirix.count, gateway_transactions_stripe.count, gateway_transactions_suite_pay.count, gateway_transactions_systempay.count, gateway_transactions_todur.count, gateway_transactions_transactpro.count, gateway_transactions_transready.count, gateway_transactions_tripayments.count, gateway_transactions_twokcharge.count, gateway_transactions_txassist.count, gateway_transactions_usaepay.count, gateway_transactions_vantiv.count, gateway_transactions_verifi.count, gateway_transactions_versatilepay.count, gateway_transactions_vitalpay.count, gateway_transactions_webpay.count, gateway_transactions_webstreetmedia.count, gateway_transactions_wiretrust.count, gateway_transactions_worldpay.count, gateway_transactions_ziripay.count, gpndata_notification_queue.count, load_balance_configuration_gateway_order_preserved.count, load_balance_configuration_log.count, membership_fields.count, module_decline_audit.count, orders.count, orders_features_overrides.count, orders_history.count, orders_processing_queue.count, orders_products.count, orders_status_history.count, orders_total.count, orders_to_delete.count, order_actions_history.count, order_attribute.count, order_documents.count, order_emails_to_send.count, order_import_temp.count, order_notification_history.count, order_parents.count, order_report.count, order_report_log.count, order_report_sync_queue.count, order_temp_orders_created.count, order_tracking_import.count, prospects.count, provider_batch_entry.count, retention_ancestors.count, return_import_queue.count, three_d_secure.count, v_approved_orders_decline_salvage_v2.count, v_approved_orders_initials_v2.count, v_main_order_total.count, v_orders.count, v_orders_decline_salvage.count, v_orders_first_try.count, v_orders_history.count, v_order_attribute_all.count, v_order_non_taxable.count, v_order_report.count, v_order_sales_tax.count, v_order_shipping.count, v_order_taxable.count, v_order_tax_factor.count, v_order_total.count, v_prospects.count, v_upsell_orders_count.count, v_upsell_unique_order_id_active_recurring.count]
   }
 }
