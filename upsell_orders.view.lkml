@@ -1,8 +1,5 @@
 view: upsell_orders {
-  derived_table: {
-    sql: {{ _access_filters["client.schema_name"] }}.upsell_orders
-      ;;
-  }
+  sql_table_name: {{ _access_filters["client.schema_name"] }}.upsell_orders      ;;
 
 
   dimension: upsell_orders_id {

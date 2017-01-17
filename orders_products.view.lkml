@@ -5,12 +5,6 @@ view: orders_products {
     type: count
     drill_fields: [detail*]
   }
-
-  dimension: prod_name {
-    type: number
-    sql: CONCAT(${products_name},' ','(',' ',${products_id},' ',')') ;;
-  }
-
   dimension: orders_products_id {
     type: number
     sql: ${TABLE}.orders_products_id ;;
