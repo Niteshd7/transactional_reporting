@@ -48,11 +48,30 @@ explore: orders {
     sql_on: ${orders_history.orders_id} = ${orders.orders_id};;
   }
 
+  join: admin {
+    type: left_outer
+    relationship: many_to_one
+    sql_on: ${admin.admin_id} = ${orders.user_id};;
+  }
+
   join: order_report {
     type: left_outer
     relationship: many_to_one
     sql_on: ${order_report.order_id} = ${orders.orders_id};;
-     }
+  }
+
+  join: tlkp_orders_history_type {
+    type: left_outer
+    relationship: many_to_one
+    sql_on: ${tlkp_orders_history_type.type_id} = ${orders.oht_type_id};;
+  }
+
+  join: tlkp_orders_history_group {
+    type: left_outer
+    relationship: many_to_one
+    sql_on: ${tlkp_orders_history_group.id} = ${orders.oht_group_id};;
+  }
+
 
   join: products_description {
     type: left_outer
@@ -61,6 +80,11 @@ explore: orders {
   }
 
   join: campaigns {
+    type: left_outer
+    relationship: many_to_one
+    sql_on: ${orders.campaign_order_id} = ${campaigns.c_id};;
+  }
+  join: v_campaign_currencies {
     type: left_outer
     relationship: many_to_one
     sql_on: ${orders.campaign_order_id} = ${campaigns.c_id};;
@@ -99,6 +123,13 @@ explore: orders {
     relationship: many_to_one
     sql_on: ${gateway_accounts.ga_id} = ${orders.gateway_id};;
   }
+
+  join: prospects {
+    type: left_outer
+    relationship: many_to_one
+    sql_on: ${prospects.campaign_id} = ${orders.campaign_order_id};;
+  }
+
   join: check_provider_accounts {
     type: left_outer
     relationship: many_to_one
@@ -111,6 +142,14 @@ explore: orders {
   }
 }
 
+explore:  tlkp_orders_history_type {
+  join:tlkp_orders_history_group {
+    type: left_outer
+    relationship: one_to_one
+    sql_on: ${tlkp_orders_history_group.id} = ${tlkp_orders_history_type.group_id};;
+  }
+
+}
 explore: sessions{}
 
 explore: upsell_orders{}

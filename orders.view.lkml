@@ -12,6 +12,12 @@ view: orders {
     sql: ${TABLE}.3DAuthToken ;;
   }
 
+
+  dimension: activity {
+    type: string
+    sql: IF(IFNULL(${tlkp_orders_history_group.name}, '') = '', ${tlkp_orders_history_type.name}, CONCAT(${tlkp_orders_history_group.name}, ' (', ${tlkp_orders_history_type.name}, ')')) ;;
+  }
+
   dimension: affid {
     type: string
     sql: ${TABLE}.AFFID ;;
@@ -250,32 +256,37 @@ view: orders {
     hidden: no
     full_suggestions: yes
     type: string
-    sql: CASE WHEN ${order_report.currency_id} = 1 THEN 'USD'
-              WHEN ${order_report.currency_id} = 2 THEN 'EUR'
-              WHEN ${order_report.currency_id} = 3 THEN 'GPB'
-              WHEN ${order_report.currency_id} = 4 THEN 'CAD'
-              WHEN ${order_report.currency_id} = 5 THEN 'AUD'
-              WHEN ${order_report.currency_id} = 6 THEN 'ZAR'
-              WHEN ${order_report.currency_id} = 7 THEN 'JPY'
-              WHEN ${order_report.currency_id} = 8 THEN 'DKK'
-              WHEN ${order_report.currency_id} = 9 THEN 'NOK'
-              WHEN ${order_report.currency_id} = 10 THEN 'SEK'
-              WHEN ${order_report.currency_id} = 11 THEN 'BRL'
-              WHEN ${order_report.currency_id} = 12 THEN 'CLP'
-              WHEN ${order_report.currency_id} = 13 THEN 'MXN'
-              WHEN ${order_report.currency_id} = 14 THEN 'KRW'
-              WHEN ${order_report.currency_id} = 15 THEN 'NZD'
-              WHEN ${order_report.currency_id} = 16 THEN 'PLN'
-              WHEN ${order_report.currency_id} = 17 THEN 'SGD'
-              WHEN ${order_report.currency_id} = 18 THEN 'HKD'
-              WHEN ${order_report.currency_id} = 19 THEN 'ARS'
-              ELSE 'CUR ' || ${order_report.currency_id}
+    sql: CASE WHEN ${currency_id} = 1 THEN 'USD'
+              WHEN ${currency_id} = 2 THEN 'EUR'
+              WHEN ${currency_id} = 3 THEN 'GPB'
+              WHEN ${currency_id} = 4 THEN 'CAD'
+              WHEN ${currency_id} = 5 THEN 'AUD'
+              WHEN ${currency_id} = 6 THEN 'ZAR'
+              WHEN ${currency_id} = 7 THEN 'JPY'
+              WHEN ${currency_id} = 8 THEN 'DKK'
+              WHEN ${currency_id} = 9 THEN 'NOK'
+              WHEN ${currency_id} = 10 THEN 'SEK'
+              WHEN ${currency_id} = 11 THEN 'BRL'
+              WHEN ${currency_id} = 12 THEN 'CLP'
+              WHEN ${currency_id} = 13 THEN 'MXN'
+              WHEN ${currency_id} = 14 THEN 'KRW'
+              WHEN ${currency_id} = 15 THEN 'NZD'
+              WHEN ${currency_id} = 16 THEN 'PLN'
+              WHEN ${currency_id} = 17 THEN 'SGD'
+              WHEN ${currency_id} = 18 THEN 'HKD'
+              WHEN ${currency_id} = 19 THEN 'ARS'
+              ELSE 'CUR ' || ${currency_id}
          END ;;
   }
 
   dimension: currency {
     type: string
     sql: ${TABLE}.currency ;;
+  }
+
+  dimension: currency_id {
+    type: string
+    sql: ${order_report.currency_id} ;;
   }
 
   dimension: currency_value {
@@ -634,6 +645,16 @@ view: orders {
     sql: ${TABLE}.orders_status ;;
   }
 
+  dimension: oht_type_id {
+    type: string
+    sql: ${orders_history.oht_type_id} ;;
+  }
+
+  dimension: oht_group_id {
+    type: string
+    sql: ${tlkp_orders_history_type.group_id} ;;
+  }
+
   dimension: parent_order_id {
     type: number
     sql: ${TABLE}.parent_order_id ;;
@@ -785,6 +806,11 @@ view: orders {
     sql: ${TABLE}.transaction_id ;;
   }
 
+  dimension: user_id {
+    type: string
+    sql: ${orders_history.user} ;;
+  }
+
   dimension: was_reprocessed {
     type: number
     sql: ${TABLE}.wasReprocessed ;;
@@ -812,6 +838,19 @@ view: orders {
       value: "Approved, Pending"
     }
     label: "Total"
+    drill_fields: [detail*]
+  }
+
+  measure: order_count_employee_activity {
+    type: count
+    filters: {
+      field: order_status_name
+      value: "Approved, Declined"
+    }
+    label: "Activity Count"
+    link: {
+      url: "https://analytics.limelightcrm.com/looks/579"
+    }
     drill_fields: [detail*]
   }
 
@@ -1090,7 +1129,6 @@ view: orders {
     type: yesno
     sql: ${hold_date} IS NOT NULL;;
   }
-
 
   # ----- Sets of fields for drilling ------
   set: detail {

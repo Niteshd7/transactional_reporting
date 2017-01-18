@@ -48,6 +48,11 @@ view: orders_history {
     drill_fields: [detail*]
   }
 
+  dimension: oht_type_id {
+    type: string
+    sql: ${type} || '-' || ${status} ;;
+  }
+
   set: detail {
     fields: [h_id, orders_id, user, type, status, t_stamp_time, deleted, campaign_id]
   }
