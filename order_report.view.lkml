@@ -411,6 +411,22 @@ view: order_report {
     drill_fields: [detail*]
   }
 
+  measure: shippable_count {
+    type: count
+    filters: {
+      field: shippable_flag
+      value: "1"
+    }
+    label: "Shippable Count"
+    drill_fields: [detail*]
+  }
+
+  measure: shippable_prod_count {
+    type: sum
+    label: "Shippable Product Count"
+    sql: ${shippable_prod_cnt} ;;
+    drill_fields: [detail*]
+  }
 
   dimension: order_status_name {
     type: string

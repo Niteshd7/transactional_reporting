@@ -1102,6 +1102,56 @@ view: orders {
     drill_fields: [detail*]
   }
 
+  measure: pending_post_count {
+    type: count
+    filters: {
+      field: shipping_module_code
+      value: "0"
+    }
+    filters: {
+      field: has_been_posted
+      value: "0"
+    }
+    filters: {
+      field: orders_status
+      value: "2"
+    }
+    filters: {
+      field: is_fraud
+      value: "0"
+    }
+    filters: {
+      field: is_rma
+      value: "0"
+    }
+    filters: {
+      field: is_chargeback
+      value: "0"
+    }
+    label: "Pending Post Count"
+    drill_fields: [detail*]
+  }
+
+
+  measure: return_count {
+    type: count
+    filters: {
+      field: is_rma
+      value: "2"
+    }
+    label: "Return Count"
+    drill_fields: [detail*]
+  }
+
+  measure: pending_return_count {
+    type: count
+    filters: {
+      field: is_rma
+      value: "1"
+    }
+    label: "Pending Return Count"
+    drill_fields: [detail*]
+  }
 
   measure: percent_approved {
     type: number

@@ -20,7 +20,7 @@ explore: orders_decline_salvage{
   }
 }
 
-explore: orders_first_try{}
+explore: order_report {}
 
 explore: orders_history{}
 
@@ -56,7 +56,7 @@ explore: orders {
 
   join: order_report {
     type: left_outer
-    relationship: many_to_one
+    relationship: one_to_one
     sql_on: ${order_report.order_id} = ${orders.orders_id};;
   }
 
