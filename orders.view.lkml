@@ -162,6 +162,13 @@ view: orders {
     sql: ${TABLE}.campaign_order_id ;;
   }
 
+  dimension: campaign {
+    full_suggestions: yes
+    label: "Campaign"
+    type: string
+    sql: CONCAT('(', ${campaign_order_id}, ') ', ${campaigns.c_name}) ;;
+  }
+
   dimension: cc_cvv {
     type: string
     sql: ${TABLE}.cc_cvv ;;
@@ -831,6 +838,28 @@ view: orders {
     drill_fields: [detail*]
   }
 
+  measure:  count_customers {
+    type: count_distinct
+    filters: {
+      field: order_status_name
+      value: "Approved,Shiped,Void/Refunded"
+    }
+    filters: {
+      field: deleted
+      value: "0"
+    }
+    filters: {
+      field: customers_id
+      value: ">0"
+    }
+    filters: {
+      field: parent_order_id
+      value: "0"
+    }
+    label: "Initial Customers"
+    sql: ${customers_email_address} ;;
+  }
+
   measure: order_count {
     type: count
     filters: {
@@ -879,7 +908,7 @@ view: orders {
     sql: ${order_total} ;;
   }
 
-  measure:  declined_orders {
+  measure:  declines {
     type: count
     label: "Declines"
     filters: {
@@ -887,6 +916,13 @@ view: orders {
       value: "Declined"
     }
     drill_fields: [detail*]
+  }
+
+  measure: decline_percent {
+    type: number
+    label: "Decline Percentage"
+    value_format_name: percent_2
+    sql: ${declines} / NULLIF(${count},0) ;;
   }
 
   measure:  hold_cancel_orders {
@@ -945,8 +981,8 @@ view: orders {
     type: count
     label: "Void/Refund Orders"
     filters: {
-      field: order_status_name
-      value: "Void/Refunded"
+      field: refund_type
+      value: ">0"
     }
     drill_fields: [orders_id, orders_status,order_status_name, order_total]
   }
@@ -1026,10 +1062,6 @@ view: orders {
       value: "<2"
     }
     filters: {
-      field: refund_type
-      value: "<2"
-    }
-    filters: {
       field: payment_module_code
       value: "1"
     }
@@ -1058,8 +1090,8 @@ view: orders {
     type: sum
     label: "Void/Refunded Revenue"
     filters: {
-      field: order_status_name
-      value: "Void/Refunded"
+      field: refund_type
+      value: ">0"
     }
     html: {{ currency_symbol._value }}{{ rendered_value }};;
     value_format_name: decimal_2
@@ -1092,12 +1124,12 @@ view: orders {
     type: count
     label: "Shipping"
     filters: {
-      field: order_status_name
-      value: "-Decline"
+      field: orders_status
+      value: "2,6,8"
     }
     filters: {
-      field: order_status_name
-      value: "-Pending"
+      field: payment_module_code
+      value: "1"
     }
     drill_fields: [detail*]
   }
@@ -1153,6 +1185,18 @@ view: orders {
     drill_fields: [detail*]
   }
 
+  measure: approved_revenue {
+    type: sum
+    label: "Approved Revenue"
+    filters: {
+      field: orders_status
+      value: "2,6,8"
+    }
+    html: {{ currency_symbol._value }}{{ rendered_value }};;
+    value_format_name: decimal_2
+    sql: ${order_report.subtotal_amt} ;;
+  }
+
   measure: percent_approved {
     type: number
     value_format_name: percent_2
@@ -1178,6 +1222,109 @@ view: orders {
   dimension: prior_hold_filter {
     type: yesno
     sql: ${hold_date} IS NOT NULL;;
+  }
+
+
+  # ------- Sales By Subscription ------
+
+  dimension: attempt {
+    label: "Attempt"
+    type: string
+    sql: CASE WHEN ${int_2} > 0 THEN CONCAT('Attempt', ${int_2}) ELSE 'Initial' END ;;
+  }
+
+  measure: gross_order_count {
+    label: "Gross Orders"
+    type: count
+    drill_fields: [detail*]
+  }
+
+  measure: approved_order_count {
+    label: "Approved Orders"
+    filters: {
+      field: is_approved
+      value: "1"
+    }
+    type: count
+    drill_fields: [detail*]
+  }
+
+  measure:  declined_orders {
+    type: count
+    label: "Declined Orders"
+    filters: {
+      field: orders_status
+      value: "7"
+    }
+    drill_fields: [detail*]
+  }
+
+  measure: approved_order_percent {
+    type: number
+    label: "Approved %"
+    value_format_name: percent_2
+    sql: ${approved_order_count} / NULLIF(${count},0) ;;
+  }
+
+  measure: average_discount_percent {
+    type: average
+    label: "Average Discount %"
+    value_format_name: percent_2
+    sql: CASE WHEN ${int_1} = NULL THEN "0" ELSE ${int_1} END ;;
+  }
+
+  measure: discount_percent {
+    type: number
+    label: "Discount %"
+    value_format_name: percent_1
+    sql: CASE WHEN ${v_orders.retry_discount_pct} IS NULL THEN "0" ELSE ${v_orders.retry_discount_pct} END ;;
+  }
+
+  measure: discount_amount {
+    type: number
+    label: "Discount Amount"
+    value_format_name: decimal_2
+    html: {{ currency_symbol._value }}{{ rendered_value }};;
+    sql: ${v_orders.retry_discount_amt};;
+  }
+
+  # ------- Sales By Subscription End------
+
+ # ------- Sales By Gateway ------
+
+  measure: chargeback_count {
+    label: "Chargebacks"
+    filters: {
+      field: is_chargeback
+      value: "1"
+    }
+    type: count
+    drill_fields: [detail*]
+  }
+
+  measure: chargeback_percentage {
+    type: number
+    label: "Chargeback Percentage"
+    value_format_name: percent_2
+    sql: ${chargeback_count} / NULLIF(${count},0) ;;
+  }
+
+  measure: refund_count {
+    label: "Refunds"
+    filters: {
+      field: refund_type
+      value: ">0"
+    }
+    type: count
+    drill_fields: [detail*]
+  }
+
+  measure:  net_revenue {
+    type: number
+    label: "Net Revenue"
+    html: {{ currency_symbol._value }}{{ rendered_value }};;
+    value_format_name: decimal_2
+    sql: ${net_order_total} - ${void_refund_revenue} ;;
   }
 
   # ----- Sets of fields for drilling ------

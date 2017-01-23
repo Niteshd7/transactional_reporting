@@ -60,6 +60,12 @@ explore: orders {
     sql_on: ${order_report.order_id} = ${orders.orders_id};;
   }
 
+  join: v_orders {
+    type: left_outer
+    relationship: one_to_one
+    sql_on: ${v_orders.orders_id} = ${orders.orders_id};;
+  }
+
   join: tlkp_orders_history_type {
     type: left_outer
     relationship: many_to_one

@@ -36,6 +36,12 @@ view: gateway {
     sql: ${TABLE}.global_monthly_cap ;;
   }
 
+  dimension: global_monthly_cap_fmt {
+    type: string
+    value_format_name: usd
+    sql: CASE WHEN ${global_monthly_cap} IS NULL THEN 'N/A' ELSE ${global_monthly_cap} END ;;
+  }
+
   dimension: current_monthly_amount {
     type: number
     sql: ${TABLE}.current_monthly_amount ;;
