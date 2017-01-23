@@ -543,6 +543,11 @@ view: orders {
     sql: ${TABLE}.isChargeback ;;
   }
 
+  dimension: is_declined {
+    type: yesno
+    sql: ${TABLE}.orders_status = 7 ;;
+  }
+
   dimension: is_chargeback_reversal {
     type: yesno
     sql: ${TABLE}.isChargebackReversal ;;
@@ -907,6 +912,7 @@ view: orders {
     value_format_name: decimal_2
     sql: ${order_total} ;;
   }
+
 
   measure:  declines {
     type: count
@@ -1319,12 +1325,25 @@ view: orders {
     drill_fields: [detail*]
   }
 
+  measure: net_approved_total {
+    label: "Gross Approved Revenue"
+    description: "This is the total amount of all orders"
+    type: sum
+    filters: {
+      field: order_status_name
+      value: "-Declined"
+    }
+    html: {{ currency_symbol._value }}{{ rendered_value }};;
+    value_format_name: decimal_2
+    sql: ${order_total};;
+  }
+
   measure:  net_revenue {
     type: number
     label: "Net Revenue"
     html: {{ currency_symbol._value }}{{ rendered_value }};;
     value_format_name: decimal_2
-    sql: ${net_order_total} - ${void_refund_revenue} ;;
+    sql: ${net_approved_total} - ${void_refund_revenue} ;;
   }
 
   # ----- Sets of fields for drilling ------
