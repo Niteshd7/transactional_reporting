@@ -311,14 +311,31 @@ view: order_report {
     sql: ${TABLE}.fulfillment_id ;;
   }
 
+  dimension: provider_id {
+    type: string
+    sql: CASE WHEN ${fulfillment_id} IS NULL THEN 0
+              WHEN ${fulfillment_id} = 0 THEN '-'
+              ELSE ${fulfillment_id} END ;;
+  }
+
   dimension: fulfillment_name {
     type: string
     sql: ${TABLE}.fulfillment_name ;;
   }
 
+  dimension: provider {
+    type: string
+    sql: CASE WHEN ${provider_id} = '-' THEN "In House" ELSE ${fulfillment_name} END ;;
+  }
+
   dimension: fulfillment_alias {
     type: string
     sql: ${TABLE}.fulfillment_alias ;;
+  }
+
+  dimension: alias {
+    type: string
+    sql: CASE WHEN ${provider_id} = '-' THEN "N/A" ELSE ${fulfillment_alias} END ;;
   }
 
   dimension: shippable_flag {
@@ -421,6 +438,17 @@ view: order_report {
     drill_fields: [detail*]
   }
 
+  measure: shipped_count {
+    type: count
+    filters: {
+      field: shipped_flag
+      value: "1"
+    }
+    label: "Shipped Count"
+    drill_fields: [detail*]
+  }
+
+
   measure: shippable_prod_count {
     type: sum
     label: "Shippable Product Count"
@@ -437,6 +465,7 @@ view: order_report {
     type: yesno
     sql: ${status} in (2, 6, 8) ;;
   }
+
 
 
   set: detail {
@@ -522,4 +551,6 @@ view: order_report {
       aff_val_4
     ]
   }
+
+  #----Sales by Retention------------------
 }

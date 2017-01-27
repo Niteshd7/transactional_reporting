@@ -132,8 +132,10 @@ explore: orders {
 
   join: prospects {
     type: left_outer
-    relationship: many_to_one
-    sql_on: ${prospects.campaign_id} = ${orders.campaign_order_id};;
+    relationship: one_to_one
+    #sql_on: ${prospects.campaign_id} = ${orders.campaign_order_id};;
+    sql_on: ${prospects.campaign_id} = ${orders.campaign_order_id}
+        AND ${prospects.p_date_date} = ${orders.t_stamp_date};;
   }
 
   join: check_provider_accounts {

@@ -194,10 +194,6 @@ view: orders {
     sql: ${TABLE}.cc_type ;;
   }
 
-  dimension: cc_type_fmt {
-    type: string
-    sql: CASE WHEN ${cc_type} != 'checking' THEN 'Credit Card / Other' ELSE ${cc_type} END  ;;
-  }
 
   dimension: charge_c {
     type: string
@@ -747,6 +743,11 @@ view: orders {
     sql: ${TABLE}.RMAReasonCodeId ;;
   }
 
+  dimension: return_flag {
+    type: yesno
+    sql: ${order_report.return_flag} ;;
+  }
+
   dimension: shipping_method {
     type: string
     sql: ${TABLE}.shipping_method ;;
@@ -846,14 +847,6 @@ view: orders {
   measure:  count_customers {
     type: count_distinct
     filters: {
-      field: order_status_name
-      value: "Approved,Shiped,Void/Refunded"
-    }
-    filters: {
-      field: deleted
-      value: "0"
-    }
-    filters: {
       field: customers_id
       value: ">0"
     }
@@ -910,7 +903,7 @@ view: orders {
     type: sum
     html: {{ currency_symbol._value }}{{ rendered_value }};;
     value_format_name: decimal_2
-    sql: ${order_total} ;;
+    sql: ${order_report.subtotal_amt} + ${order_report.tax_amt} + ${order_report.shipping_amt} ;;
   }
 
 
@@ -951,6 +944,10 @@ view: orders {
     filters: {
       field: rebill_depth
       value: "0"
+    }
+    filters: {
+      field: order_status_name
+      value: "-Declined"
     }
     drill_fields: [detail*]
   }
@@ -1140,57 +1137,6 @@ view: orders {
     drill_fields: [detail*]
   }
 
-  measure: pending_post_count {
-    type: count
-    filters: {
-      field: shipping_module_code
-      value: "0"
-    }
-    filters: {
-      field: has_been_posted
-      value: "0"
-    }
-    filters: {
-      field: orders_status
-      value: "2"
-    }
-    filters: {
-      field: is_fraud
-      value: "0"
-    }
-    filters: {
-      field: is_rma
-      value: "0"
-    }
-    filters: {
-      field: is_chargeback
-      value: "0"
-    }
-    label: "Pending Post Count"
-    drill_fields: [detail*]
-  }
-
-
-  measure: return_count {
-    type: count
-    filters: {
-      field: is_rma
-      value: "2"
-    }
-    label: "Return Count"
-    drill_fields: [detail*]
-  }
-
-  measure: pending_return_count {
-    type: count
-    filters: {
-      field: is_rma
-      value: "1"
-    }
-    label: "Pending Return Count"
-    drill_fields: [detail*]
-  }
-
   measure: approved_revenue {
     type: sum
     label: "Approved Revenue"
@@ -1344,6 +1290,199 @@ view: orders {
     html: {{ currency_symbol._value }}{{ rendered_value }};;
     value_format_name: decimal_2
     sql: ${net_approved_total} - ${void_refund_revenue} ;;
+  }
+
+ # ------- Sales By Gateway End------
+
+
+ # ------- Fulfillment Reconciliation-----
+
+  measure: tracking_count {
+    label: "Tracking Orders"
+    filters: {
+      field: has_been_posted
+      value: "1"
+    }
+    filters: {
+      field: shipping_module_code
+      value: "0"
+    }
+    filters: {
+      field: has_tracking_been_posted
+      value: "0"
+    }
+    type: count
+    drill_fields: [detail*]
+  }
+
+  measure: pending_post_count {
+    type: count
+    filters: {
+      field: shipping_module_code
+      value: "0"
+    }
+    filters: {
+      field: has_been_posted
+      value: "0"
+    }
+    filters: {
+      field: orders_status
+      value: "2"
+    }
+    filters: {
+      field: is_fraud
+      value: "0"
+    }
+    filters: {
+      field: is_rma
+      value: "0"
+    }
+    filters: {
+      field: is_chargeback
+      value: "0"
+    }
+    label: "Orders Pending Post"
+    drill_fields: [detail*]
+  }
+
+
+    measure: sent_count {
+    type: count
+    filters: {
+      field: has_been_posted
+      value: "1"
+    }
+    label: "Orders Sent to Fulfillment"
+    drill_fields: [detail*]
+  }
+
+
+  measure: pending_tracking_count {
+    type: number
+    label: "Pending Tracking Count"
+    sql: ${tracking_count} + ${products_tracking_count};;
+    drill_fields: [detail*]
+  }
+
+  measure: products_tracking_count {
+    type: sum
+    filters: {
+      field: tracking_num
+      value: "NULL"
+    }
+    label: "Product Tracking"
+    sql: ${products_quantity} ;;
+  }
+
+  measure: pending_return_count {
+    type: count
+    filters: {
+      field: is_rma
+      value: "1"
+    }
+    filters: {
+      field: return_flag
+      value: ">0"
+    }
+    label: "Pending Return"
+    drill_fields: [detail*]
+  }
+
+  measure: return_count {
+    type: count
+    filters: {
+      field: is_rma
+      value: "2"
+    }
+    label: "Returned"
+    drill_fields: [detail*]
+  }
+
+#-----Fulfillment Renciliation End ----------------------------
+
+#-----Sales by Prospect ----------------------------
+
+  measure:  average_revenue_prospect {
+    type: number
+    label: "Average Revenue"
+    description: "Average Revenue Calculation for Sales by Prospect"
+    html: {{ currency_symbol._value }}{{ rendered_value }};;
+    value_format_name: decimal_2
+    sql: ${net_order_total}/NULLIF(${count_customers},0) ;;
+  }
+#-----Sales by Prospect Ends ----------------------------
+
+#-----Decline Reasons ----------------------------
+
+
+  dimension: cc_type_fmt {
+    label: "Provider Type"
+    type: string
+    sql: CASE WHEN ${cc_type} != 'checking' THEN 'Credit Card / Other' ELSE ${cc_type} END  ;;
+  }
+
+  dimension: decline_reason {
+    type: string
+    sql: ${orders_history.status} ;;
+  }
+
+  measure: subscription_decline_reason {
+    label: "Subscription"
+    description: "Separate measure for Decline Reasons Report"
+    sql: ${count} - ${initial_orders} ;;
+  }
+
+#-----Decline Reasons End----------------------------
+
+
+#-----Sales by Product ----------------------------
+
+  measure:  initial_orders_product {
+    type: sum
+    label: "Initial"
+    description: "Initial Product Count"
+    filters: {
+      field: rebill_depth
+      value: "0"
+    }
+    sql: ${orders_products.products_quantity} ;;
+    drill_fields: [detail*]
+  }
+
+  measure:  subscription_orders_product {
+    type: sum
+    label: "Subscription- Sales By Product"
+    description: "Subscription Product Count"
+    filters: {
+      field: rebill_depth
+      value: ">0"
+    }
+    sql: ${orders_products.products_quantity} ;;
+    drill_fields: [detail*]
+  }
+
+  measure:  total_orders_product {
+    type: sum
+    label: "Total- Sales By Product"
+    description: "Total Product Count"
+    filters: {
+      field: order_status_name
+      value: "-Declined"
+    }
+    sql: ${orders_products.products_quantity} ;;
+    drill_fields: [detail*]
+  }
+
+  measure:  pending_orders_product {
+    type: sum
+    label: "Pending - Sales By Product"
+    description: "Pending Product Count"
+    filters: {
+      field: order_status_name
+      value: "Pending"
+    }
+    sql: ${orders_products.products_quantity} ;;
+    drill_fields: [detail*]
   }
 
   # ----- Sets of fields for drilling ------

@@ -194,8 +194,8 @@ view: prospects {
   measure: count_prospects {
     type: count
     filters: {
-      field: active
-      value: "1"
+      field: prospects_id
+      value: ">0"
     }
     drill_fields: [detail*]
   }
