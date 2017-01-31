@@ -711,6 +711,13 @@ view: orders {
     sql: ${TABLE}.rebillDepth ;;
   }
 
+
+  dimension: subscription_cycle {
+    # We put the SPACE in front of Initial on purpose so it sorts properly in tables
+    type: string
+    sql: CASE WHEN ${rebill_depth} = 0 THEN ' Initial' WHEN ${rebill_depth} >= 5 THEN 'Cycle 5+' ELSE 'Cycle ' || ${rebill_depth} END ;;
+  }
+
   dimension: rebill_discount {
     type: string
     sql: ${TABLE}.rebillDiscount ;;
