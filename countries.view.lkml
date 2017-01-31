@@ -1,5 +1,5 @@
 view: countries {
-  sql_table_name:{{ _access_filters["client.schema_name"] }}.countries    ;;
+  sql_table_name:countries    ;;
 
   measure: count {
     type: count

@@ -1,5 +1,5 @@
 view: products_description {
- sql_table_name: {{ _access_filters["client.schema_name"] }}.products_description      ;;
+ sql_table_name: products_description      ;;
 
   measure: count {
     type: count

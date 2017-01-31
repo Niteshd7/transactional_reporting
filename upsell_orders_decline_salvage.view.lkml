@@ -1,8 +1,6 @@
 view: upsell_orders_decline_salvage {
-  derived_table: {
-    sql: {{ _access_filters["client.schema_name"] }}.v_upsell_orders_decline_salvage
-      ;;
-  }
+  sql_table_name: v_upsell_orders_decline_salvage      ;;
+
 
   dimension: recurring_date {
     type: date

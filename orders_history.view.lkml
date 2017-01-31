@@ -1,5 +1,5 @@
 view: orders_history {
-  sql_table_name:{{ _access_filters["client.schema_name"] }}.orders_history
+  sql_table_name:orders_history
       ;;
 
   dimension: h_id {

@@ -1,5 +1,5 @@
 view: orders_decline_salvage {
-  sql_table_name: {{ _access_filters["client.schema_name"] }}.v_orders_decline_salvage
+  sql_table_name: v_orders_decline_salvage
       ;;
 
   measure: count {

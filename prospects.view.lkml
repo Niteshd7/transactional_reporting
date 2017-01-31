@@ -1,6 +1,13 @@
 view: prospects {
   sql_table_name: {{ _access_filters["client.schema_name"] }}.prospects      ;;
 
+  dimension: primary_key {
+    primary_key: yes
+    hidden: yes
+    sql: ${campaign_id} || '_' || ${prospects_id}
+      ;;
+  }
+
   measure: count {
     type: count
     drill_fields: [detail*]
@@ -192,11 +199,8 @@ view: prospects {
   }
 
   measure: count_prospects {
-    type: count
-    filters: {
-      field: prospects_id
-      value: ">0"
-    }
+    type: count_distinct
+    sql: ${prospects_id} ;;
     drill_fields: [detail*]
   }
 

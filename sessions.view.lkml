@@ -1,8 +1,5 @@
 view: sessions {
-  derived_table: {
-    sql: {{ _access_filters["client.schema_name"] }}.sessions
-      ;;
-  }
+  sql_table_name:sessions    ;;
 
   dimension: sesskey {
     type: string

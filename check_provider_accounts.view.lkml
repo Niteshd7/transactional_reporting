@@ -1,5 +1,5 @@
 view: check_provider_accounts {
-  sql_table_name:{{ _access_filters["client.schema_name"] }}.check_provider_accounts
+  sql_table_name:check_provider_accounts
       ;;
 
   measure: count {

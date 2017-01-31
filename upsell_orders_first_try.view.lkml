@@ -1,8 +1,6 @@
 view: upsell_orders_first_try {
-  derived_table: {
-    sql: {{ _access_filters["client.schema_name"] }}.v_upsell_orders_first_try
-      ;;
-  }
+  sql_table_name:v_upsell_orders_first_try      ;;
+
 
 
   dimension: recurring_date {

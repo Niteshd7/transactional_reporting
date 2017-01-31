@@ -1,5 +1,5 @@
 view: orders {
-  sql_table_name: {{ _access_filters["client.schema_name"] }}.orders ;;
+  sql_table_name: orders ;;
 
   dimension: common_ancestor_order_id {
     primary_key: yes
@@ -479,7 +479,7 @@ view: orders {
   dimension: gateway {
     full_suggestions: yes
     type: string
-    sql: CONCAT(${gateway.gateway_alias},' ','(',' ',${gateway_id},' ',')') ;;
+    sql:  CONCAT('(',${gateway_id}, ') ', ${gateway.gateway_alias}) ;;
   }
 
   dimension: gateway_preserve {
@@ -695,6 +695,11 @@ view: orders {
     sql: ${orders_products.products_id} ;;
   }
 
+  measure: product_id_list {
+    type: string
+    sql: GROUP_CONCAT(DISTINCT(${orders_products.products_id})) ;;
+  }
+
   dimension: products_quantity {
     type: number
     # hidden: true
@@ -839,6 +844,12 @@ view: orders {
     sql: ${subscription_id} IS NOT NULL ;;
   }
 
+  dimension: cancellation_flag {
+    type: yesno
+    sql: ${order_report.cancellation_flag} ;;
+  }
+
+
   measure: count {
     type: count
     drill_fields: [detail*]
@@ -871,19 +882,25 @@ view: orders {
   measure: order_count_employee_activity {
     type: count
     filters: {
-      field: order_status_name
-      value: "Approved, Declined"
+      field: orders_history.type
+      value: "-%gateway%"
     }
     label: "Activity Count"
     link: {
       url: "https://analytics.limelightcrm.com/looks/579"
     }
-    drill_fields: [detail*]
+    drill_fields: [orders_id, admin.admin_id, admin.admin_fullname, activity, t_stamp_date]
   }
 
   measure:  average_order_total {
     type: average
     label: "Average Order Value"
+    filters: {
+      field: is_approved
+      value: "yes"
+    }
+    html: {{ currency_symbol._value }}{{ rendered_value }};;
+    value_format_name: decimal_2
     sql: ${order_total} ;;
   }
 
@@ -932,8 +949,8 @@ view: orders {
       value: "0"
     }
     filters: {
-      field: is_hold
-      value: "1"
+      field: cancellation_flag
+      value: "yes"
     }
     drill_fields: [detail*]
   }
@@ -1010,8 +1027,8 @@ view: orders {
       value: "0"
     }
     filters: {
-      field: is_hold
-      value: "1"
+      field: cancellation_flag
+      value: "yes"
     }
     html: {{ currency_symbol._value }}{{ rendered_value }};;
     value_format_name: decimal_2
@@ -1195,7 +1212,7 @@ view: orders {
     label: "Approved Orders"
     filters: {
       field: is_approved
-      value: "1"
+      value: "yes"
     }
     type: count
     drill_fields: [detail*]
@@ -1290,6 +1307,14 @@ view: orders {
     html: {{ currency_symbol._value }}{{ rendered_value }};;
     value_format_name: decimal_2
     sql: ${net_approved_total} - ${void_refund_revenue} ;;
+  }
+
+  measure:  net_revenue_gateway {
+    type: number
+    label: "Net Revenue_Gateway"
+    html: {{ currency_symbol._value }}{{ rendered_value }};;
+    value_format_name: decimal_2
+    sql: ${order_report.net_order_total_gateway} - ${orders.void_refund_revenue} ;;
   }
 
  # ------- Sales By Gateway End------
@@ -1402,14 +1427,26 @@ view: orders {
 
 #-----Sales by Prospect ----------------------------
 
+
+  measure: net_order_total_prospect {
+    label: "Gross Revenue_Prospects"
+    description: "This is the total amount for Sales by Prospects"
+    type: sum
+    html: {{ currency_symbol._value }}{{ rendered_value }};;
+    value_format_name: decimal_2
+    sql:  ${order_report.shipping_amt} +  ${order_report.subtotal_amt} + ${order_report.tax_amt} ;;
+  }
+
   measure:  average_revenue_prospect {
     type: number
     label: "Average Revenue"
     description: "Average Revenue Calculation for Sales by Prospect"
     html: {{ currency_symbol._value }}{{ rendered_value }};;
     value_format_name: decimal_2
-    sql: ${net_order_total}/NULLIF(${count_customers},0) ;;
+    sql: ${net_order_total_prospect}/NULLIF(${count_customers},0) ;;
   }
+
+
 #-----Sales by Prospect Ends ----------------------------
 
 #-----Decline Reasons ----------------------------

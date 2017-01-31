@@ -1,5 +1,5 @@
 view: admin {
-  sql_table_name: {{ _access_filters["client.schema_name"] }}.admin      ;;
+  sql_table_name: admin      ;;
 
   measure: count {
     type: count

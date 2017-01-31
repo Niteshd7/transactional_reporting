@@ -1,5 +1,5 @@
 view: declined_ccs {
-  sql_table_name: {{ _access_filters["client.schema_name"] }}.declined_ccs
+  sql_table_name: declined_ccs
       ;;
 
   measure: count {

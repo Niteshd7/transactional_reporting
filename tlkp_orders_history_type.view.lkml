@@ -1,5 +1,5 @@
 view: tlkp_orders_history_type {
-  sql_table_name: {{ _access_filters["client.schema_name"] }}.tlkp_orders_history_type      ;;
+  sql_table_name: tlkp_orders_history_type      ;;
 
 
   measure: count {
