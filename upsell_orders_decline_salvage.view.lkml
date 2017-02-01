@@ -5,6 +5,7 @@ view: upsell_orders_decline_salvage {
   dimension: recurring_date {
     type: date
     sql: ${TABLE}.recurring_date ;;
+    convert_tz: no
   }
 
   dimension: main_orders_id {

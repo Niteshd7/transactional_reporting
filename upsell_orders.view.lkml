@@ -245,11 +245,13 @@ view: upsell_orders {
   dimension_group: last_modified {
     type: time
     sql: ${TABLE}.last_modified ;;
+    convert_tz: no
   }
 
   dimension: date_purchased {
     type: date
     sql: ${TABLE}.date_purchased ;;
+    convert_tz: no
   }
 
   dimension: orders_status {
@@ -260,6 +262,7 @@ view: upsell_orders {
   dimension_group: orders_date_finished {
     type: time
     sql: ${TABLE}.orders_date_finished ;;
+    convert_tz: no
   }
 
   dimension: currency {
@@ -300,6 +303,7 @@ view: upsell_orders {
   dimension: recurring_date {
     type: date
     sql: ${TABLE}.recurring_date ;;
+    convert_tz: no
   }
 
   dimension: subscription_id {
@@ -325,6 +329,7 @@ view: upsell_orders {
   dimension_group: t_stamp {
     type: time
     sql: ${TABLE}.t_stamp ;;
+    convert_tz: no
   }
 
   dimension: is_hold {
@@ -360,6 +365,7 @@ view: upsell_orders {
   dimension: hold_date {
     type: date
     sql: ${TABLE}.hold_date ;;
+    convert_tz: no
   }
 
   dimension: order_total_reporting {

@@ -24,6 +24,7 @@ view: gateway {
   dimension_group: created_on {
     type: time
     sql: ${TABLE}.createdOn ;;
+    convert_tz: no
   }
 
   dimension: active {
@@ -90,6 +91,7 @@ view: gateway {
   dimension_group: archive_date {
     type: time
     sql: ${TABLE}.archive_date ;;
+    convert_tz: no
   }
 
   set: detail {

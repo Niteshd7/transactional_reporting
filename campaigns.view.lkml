@@ -289,11 +289,13 @@ view: campaigns {
   dimension_group: date_in {
     type: time
     sql: ${TABLE}.date_in ;;
+    convert_tz: no
   }
 
   dimension_group: update_in {
     type: time
     sql: ${TABLE}.update_in ;;
+    convert_tz: no
   }
 
   dimension: collections_flag {
@@ -314,6 +316,7 @@ view: campaigns {
   dimension_group: archive_date {
     type: time
     sql: ${TABLE}.archive_date ;;
+    convert_tz: no
   }
 
   set: detail {

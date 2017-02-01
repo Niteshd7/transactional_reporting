@@ -14,6 +14,7 @@ view: v_orders {
   dimension_group: t_stamp {
     type: time
     sql: ${TABLE}.t_stamp ;;
+    convert_tz: no
   }
 
   dimension: orders_status {
@@ -64,21 +65,25 @@ view: v_orders {
   dimension: hold_date {
     type: date
     sql: ${TABLE}.hold_date ;;
+    convert_tz: no
   }
 
   dimension: recurring_date {
     type: date
     sql: ${TABLE}.recurring_date ;;
+    convert_tz: no
   }
 
   dimension: recurring_date_offset {
     type: date
     sql: ${TABLE}.recurring_date_offset ;;
+    convert_tz: no
   }
 
   dimension: true_recurring_date {
     type: date
     sql: ${TABLE}.true_recurring_date ;;
+    convert_tz: no
   }
 
   dimension: is_archived {
@@ -324,6 +329,7 @@ view: v_orders {
   dimension_group: rma_return_date {
     type: time
     sql: ${TABLE}.rma_return_date ;;
+    convert_tz: no
   }
 
   dimension: return_reason_id {
@@ -354,6 +360,7 @@ view: v_orders {
   dimension_group: shipped_date {
     type: time
     sql: ${TABLE}.shipped_date ;;
+    convert_tz: no
   }
 
   dimension: fulfillment_tracking_been_posted {
@@ -399,6 +406,7 @@ view: v_orders {
   dimension_group: order_confirmation_t_stamp {
     type: time
     sql: ${TABLE}.order_confirmation_t_stamp ;;
+    convert_tz: no
   }
 
   dimension: order_confirmation_id {
@@ -434,6 +442,7 @@ view: v_orders {
   dimension: date_purchased {
     type: date
     sql: ${TABLE}.date_purchased ;;
+    convert_tz: no
   }
 
   dimension: ip_address {
@@ -529,6 +538,7 @@ view: v_orders {
   dimension_group: update_in {
     type: time
     sql: ${TABLE}.update_in ;;
+    convert_tz: no
   }
 
   dimension: text_4 {
@@ -549,21 +559,25 @@ view: v_orders {
   dimension_group: date_1 {
     type: time
     sql: ${TABLE}.date_1 ;;
+    convert_tz: no
   }
 
   dimension_group: date_2 {
     type: time
     sql: ${TABLE}.date_2 ;;
+    convert_tz: no
   }
 
   dimension_group: date_3 {
     type: time
     sql: ${TABLE}.date_3 ;;
+    convert_tz: no
   }
 
   dimension_group: date_4 {
     type: time
     sql: ${TABLE}.date_4 ;;
+    convert_tz: no
   }
 
   dimension: amount_1 {

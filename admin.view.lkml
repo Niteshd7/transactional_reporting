@@ -84,11 +84,13 @@ view: admin {
   dimension_group: date_in {
     type: time
     sql: ${TABLE}.date_in ;;
+    convert_tz: no
   }
 
   dimension_group: update_in {
     type: time
     sql: ${TABLE}.update_in ;;
+    convert_tz: no
   }
 
   dimension: total_login_counter {
@@ -104,11 +106,13 @@ view: admin {
   dimension_group: date_last_login {
     type: time
     sql: ${TABLE}.date_last_login ;;
+    convert_tz: no
   }
 
   dimension_group: date_login_disabled {
     type: time
     sql: ${TABLE}.date_login_disabled ;;
+    convert_tz: no
   }
 
   dimension: temp_password {
@@ -124,11 +128,13 @@ view: admin {
   dimension_group: temp_password_date_in {
     type: time
     sql: ${TABLE}.temp_password_date_in ;;
+    convert_tz: no
   }
 
   dimension_group: reset_password_date_in {
     type: time
     sql: ${TABLE}.reset_password_date_in ;;
+    convert_tz: no
   }
 
   dimension: reset_password_force {
@@ -144,6 +150,7 @@ view: admin {
   dimension_group: message_check_date {
     type: time
     sql: ${TABLE}.message_check_date ;;
+    convert_tz: no
   }
 
   set: detail {

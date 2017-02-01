@@ -30,6 +30,7 @@ view: orders_history {
   dimension_group: t_stamp {
     type: time
     sql: ${TABLE}.t_stamp ;;
+    convert_tz: no
   }
 
   dimension: deleted {

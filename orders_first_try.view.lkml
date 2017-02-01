@@ -4,6 +4,7 @@ view: orders_first_try {
   dimension: recurring_date {
     type: date
     sql: ${TABLE}.recurring_date ;;
+    convert_tz: no
   }
 
   dimension: orders_id {

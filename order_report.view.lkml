@@ -44,6 +44,7 @@ view: order_report {
   dimension_group: t_stamp {
     type: time
     sql: ${TABLE}.t_stamp ;;
+    convert_tz: no
   }
 
   dimension: deleted_flag {
@@ -144,6 +145,7 @@ view: order_report {
   dimension_group: hold_date {
     type: time
     sql: ${TABLE}.hold_date ;;
+    convert_tz: no
   }
 
   dimension: subtotal_amt {
@@ -224,11 +226,13 @@ view: order_report {
   dimension_group: recurring_date {
     type: time
     sql: ${TABLE}.recurring_date ;;
+    convert_tz: no
   }
 
   dimension_group: retry_date {
     type: time
     sql: ${TABLE}.retry_date ;;
+    convert_tz: no
   }
 
   dimension: campaign_id {
@@ -361,6 +365,7 @@ view: order_report {
   dimension_group: shipped_date {
     type: time
     sql: ${TABLE}.shipped_date ;;
+    convert_tz: no
   }
 
   dimension: shippable_prod_cnt {

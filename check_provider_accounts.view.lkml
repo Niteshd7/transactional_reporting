@@ -40,6 +40,7 @@ view: check_provider_accounts {
   dimension_group: created_on {
     type: time
     sql: ${TABLE}.createdOn ;;
+    convert_tz: no
   }
 
   dimension: table_name {

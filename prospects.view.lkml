@@ -126,11 +126,13 @@ view: prospects {
   dimension_group: p_date {
     type: time
     sql: ${TABLE}.pDate ;;
+    convert_tz: no
   }
 
   dimension_group: update_in {
     type: time
     sql: ${TABLE}.update_in ;;
+    convert_tz: no
   }
 
   dimension: p_afid {
