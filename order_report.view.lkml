@@ -434,9 +434,13 @@ view: order_report {
   }
 
   measure: net_order_total_gateway {
-    label: "Gross Revenue_Gateway"
+    label: "Gross Approved Revenue_Gateway"
     description: "This is the total amount of all orders"
     type: sum
+    filters: {
+      field: order_status_name
+      value: "-Declined"
+    }
     html: {{ currency_symbol._value }}{{ rendered_value }};;
     value_format_name: decimal_2
     sql: ${subtotal_amt} + ${tax_amt} + ${shipping_amt} ;;
