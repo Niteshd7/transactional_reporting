@@ -1040,6 +1040,17 @@ view: orders {
     drill_fields: [detail*]
   }
 
+  measure:  initial_orders_decline_reasons {
+    type: count
+    label: "Initial"
+    description: "This is Initial count for Decline Reasons Report"
+    filters: {
+      field: rebill_depth
+      value: "0"
+    }
+    drill_fields: [detail*]
+  }
+
   measure:  pending_orders {
     type: count
     label: "Pending Orders"
@@ -1284,11 +1295,11 @@ view: orders {
     value_format_name: percent_2
     sql: ${count_approved} / NULLIF(${count},0) ;;
     html: {% if value < 0.3 %}
-      <div style="color:Black; background-color:red; font-size:100%; text-align:center">{{ rendered_value }}</div>
+      <div style="color:red; font-size:100%; text-align:center">{{ rendered_value }}</div>
       {% elsif value >= 0.3 and value < 0.7 %}
-      <div style="color:Black; background-color:yellow; font-size:100%; text-align:center">{{ rendered_value }}</div>
+      <div style="color:#eab409; font-size:100%; text-align:center">{{ rendered_value }}</div>
       {% elsif value >= 0.7 %}
-      <div style="color:Black; background-color:green; font-size:100%; text-align:center">{{ rendered_value }}</div>
+      <div style="color:green; font-size:100%; text-align:center">{{ rendered_value }}</div>
       {% endif %}
       ;;
   }
@@ -1352,7 +1363,7 @@ view: orders {
     type: average
     label: "Average Discount %"
     value_format_name: percent_2
-    sql: CASE WHEN ${int_1} = NULL THEN "0" ELSE ${int_1} END ;;
+    sql: CASE WHEN ${int_1} IS NULL THEN "0" ELSE ${int_1} END ;;
   }
 
   measure: discount_percent {
@@ -1589,7 +1600,7 @@ view: orders {
 
   measure:  initial_orders_product {
     type: sum
-    label: "Initial"
+    label: "Initial Products"
     description: "Initial Product Count"
     filters: {
       field: rebill_depth
