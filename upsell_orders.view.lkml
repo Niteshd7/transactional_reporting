@@ -1,6 +1,12 @@
 view: upsell_orders {
   sql_table_name: upsell_orders      ;;
 
+  dimension: primary_key {
+    primary_key: yes
+    hidden: yes
+    sql: ${main_orders_id} || '_' || ${upsell_orders_id}      ;;
+  }
+
 
   dimension: upsell_orders_id {
     type: number

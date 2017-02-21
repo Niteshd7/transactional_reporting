@@ -266,7 +266,7 @@ view: orders {
     type: string
     sql: CASE WHEN ${currency_id} = 1 THEN 'USD'
               WHEN ${currency_id} = 2 THEN 'EUR'
-              WHEN ${currency_id} = 3 THEN 'GPB'
+              WHEN ${currency_id} = 3 THEN 'GBP'
               WHEN ${currency_id} = 4 THEN 'CAD'
               WHEN ${currency_id} = 5 THEN 'AUD'
               WHEN ${currency_id} = 6 THEN 'ZAR'
@@ -1052,8 +1052,8 @@ view: orders {
       value: "0"
     }
     filters: {
-      field: order_status_name
-      value: "-Declined"
+      field: orders_status
+      value: "2,8"
     }
     filters: {
       field: upsell_id
@@ -1077,8 +1077,8 @@ view: orders {
     type: count
     label: "Pending Orders"
     filters: {
-      field: order_status_name
-      value: "Pending"
+      field: orders_status
+      value: "10,11"
     }
     drill_fields: [detail*]
   }
@@ -1095,8 +1095,8 @@ view: orders {
       value: ">0"
     }
     filters: {
-      field: order_status_name
-      value: "Approved, Pending"
+      field: orders_status
+      value: "2,8"
     }
     drill_fields: [detail*]
   }
@@ -1124,7 +1124,7 @@ view: orders {
     label: "Void/Refund Orders"
     filters: {
       field: refund_type
-      value: ">0"
+      value: ">1"
     }
     drill_fields: [orders_id, orders_status,order_status_name, order_total]
   }
@@ -1201,8 +1201,8 @@ view: orders {
     type: sum
     label: "Pending Revenue"
     filters: {
-      field: order_status_name
-      value: "Pending"
+      field: orders_status
+      value: "10,11"
     }
     value_format_name: decimal_2
     sql: ${order_report.subtotal_amt} ;;
@@ -1216,8 +1216,12 @@ view: orders {
       value: ">0"
     }
     filters: {
+      field: parent_order_id
+      value: ">0"
+    }
+    filters: {
       field: order_status_name
-      value: "Approved, Pending"
+      value: "-Declined"
     }
     html: {{ currency_symbol._value }}{{ rendered_value }};;
     value_format_name: decimal_2
@@ -1261,11 +1265,11 @@ view: orders {
     label: "Void/Refunded Revenue"
     filters: {
       field: refund_type
-      value: ">0"
+      value: ">1"
     }
     html: {{ currency_symbol._value }}{{ rendered_value }};;
     value_format_name: decimal_2
-    sql: ${order_total} ;;
+    sql: ${amount_refunded_so_far} ;;
   }
 
   measure: count_approved {
@@ -1295,7 +1299,7 @@ view: orders {
     label: "Shipping"
     filters: {
       field: orders_status
-      value: "2,6,8"
+      value: "NOT 7,10,11"
     }
     filters: {
       field: payment_module_code
@@ -1627,8 +1631,8 @@ view: orders {
       value: "0"
     }
     filters: {
-      field: order_status_name
-      value: "-Declined"
+      field: orders_status
+      value: "NOT 7"
     }
     sql: ${orders_products.products_quantity} ;;
     drill_fields: [detail*]
@@ -1643,8 +1647,12 @@ view: orders {
       value: ">0"
     }
     filters: {
-      field: order_status_name
-      value: "-Declined"
+      field: parent_order_id
+      value: ">0"
+    }
+    filters: {
+      field: orders_status
+      value: "NOT 7"
     }
     sql: ${orders_products.products_quantity} ;;
     drill_fields: [detail*]
@@ -1655,8 +1663,8 @@ view: orders {
     label: "Total- Sales By Product"
     description: "Total Product Count"
     filters: {
-      field: order_status_name
-      value: "-Declined"
+      field: orders_status
+      value: "NOT 7"
     }
     sql: ${orders_products.products_quantity} ;;
     drill_fields: [detail*]
@@ -1667,11 +1675,112 @@ view: orders {
     label: "Pending - Sales By Product"
     description: "Pending Product Count"
     filters: {
-      field: order_status_name
-      value: "Pending"
+      field: orders_status
+      value: "10,11"
     }
     sql: ${orders_products.products_quantity} ;;
     drill_fields: [detail*]
+  }
+
+  measure:  hold_orders_product {
+    type: sum
+    label: "Hold/Cancel - Sales By Product"
+    description: "Hold/Cancel Product Count"
+    filters: {
+      field: is_hold
+      value: "1"
+    }
+    filters: {
+      field: cancellation_flag
+      value: "yes"
+    }
+    filters: {
+      field: is_archived
+      value: "0"
+    }
+    sql: ${orders_products.products_quantity} ;;
+    drill_fields: [detail*]
+  }
+
+  measure:  initial_revenue_products {
+    type: sum
+    label: "Initial Revenue - Products"
+    filters: {
+      field: rebill_depth
+      value: "0"
+    }
+    filters: {
+      field: orders_status
+      value: "NOT 7"
+    }
+    html: {{ currency_symbol._value }}{{ rendered_value }};;
+    value_format_name: decimal_2
+    sql: ${order_report.subtotal_amt} ;;
+  }
+
+  measure: pending_revenue_products {
+    type: sum
+    label: "Pending Revenue - Products"
+    filters: {
+      field: orders_status
+      value: "10,11"
+    }
+    value_format_name: decimal_2
+    html: {{ currency_symbol._value }}{{ rendered_value }};;
+    sql: ${order_report.subtotal_amt} ;;
+  }
+
+  measure:  subscription_revenue_products {
+    type: sum
+    label: "Subscription Revenue - Products"
+    filters: {
+      field: rebill_depth
+      value: ">0"
+    }
+    filters: {
+      field: parent_order_id
+      value: ">0"
+    }
+    filters: {
+      field: orders_status
+      value: "NOT 7"
+    }
+    html: {{ currency_symbol._value }}{{ rendered_value }};;
+    value_format_name: decimal_2
+    sql: ${order_report.subtotal_amt} ;;
+  }
+
+
+  measure:  total_revenue_products {
+    type: sum
+    label: "Total Revenue - Products"
+    filters: {
+      field: orders_status
+      value: "NOT 7"
+    }
+    html: {{ currency_symbol._value }}{{ rendered_value }};;
+    value_format_name: decimal_2
+    sql: ${order_report.subtotal_amt} ;;
+  }
+
+  measure:  hold_cancel_revenue_products {
+    type: sum
+    label: "Holds/Cancels Revenue - Products"
+    filters: {
+      field: is_archived
+      value: "0"
+    }
+    filters: {
+      field: cancellation_flag
+      value: "yes"
+    }
+    filters: {
+      field: is_hold
+      value: "1"
+    }
+    html: {{ currency_symbol._value }}{{ rendered_value }};;
+    value_format_name: decimal_2
+    sql: ${order_report.subtotal_amt} ;;
   }
 
   # ----- Sets of fields for drilling ------

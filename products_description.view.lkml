@@ -23,7 +23,7 @@ view: products_description {
 
   dimension: products_name_display {
     type: string
-    sql: CONCAT(${products_name},' ','(',${products_id},')') ;;
+    sql: CONCAT('(',${products_id},')',' ',${products_name}) ;;
   }
 
   dimension: products_description {
