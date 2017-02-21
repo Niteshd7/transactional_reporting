@@ -1,4 +1,4 @@
-connection: "pair2-aws"
+connection: "transactional-pair-aws"
 
 # include all the views
 include: "*.view"
@@ -26,8 +26,16 @@ explore: orders_history{}
 
 explore: orders {
   join: upsell_orders {
+    type: left_outer
     relationship: many_to_one
     sql_on: ${upsell_orders.main_orders_id} = ${orders.common_ancestor_order_id};;
+  }
+
+  join: upsell_orders_products {
+    type: left_outer
+    relationship: many_to_one
+    sql_on: ${upsell_orders.main_orders_id} = ${orders.common_ancestor_order_id}
+      AND ${upsell_orders_products.upsell_orders_products_id} = ${upsell_orders.upsell_orders_id};;
   }
 
   join: upsell_orders_first_try {

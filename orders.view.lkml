@@ -82,6 +82,11 @@ view: orders {
     sql: ${TABLE}.BID ;;
   }
 
+  dimension: client_domain {
+    type: string
+    sql: select concat(`value`,'.limelightcrm.com') as client_domain from config_settings where `key` = 'APPLICATION_KEY' ;;
+  }
+
   dimension: billing_address_format_id {
     type: number
     sql: ${TABLE}.billing_address_format_id ;;
@@ -873,6 +878,13 @@ view: orders {
     sql: ${order_report.hold_flag} ;;
   }
 
+  dimension: upsell_id {
+    type: number
+    sql: ${order_report.upsell_id} ;;
+  }
+
+
+
 
   filter: cycle_select {
     type: number
@@ -891,6 +903,12 @@ view: orders {
 
   measure: count {
     type: count
+    drill_fields: [detail*]
+  }
+
+  measure: count_upsell_products {
+    type: number
+    sql:  ${upsell_orders_products.count};;
     drill_fields: [detail*]
   }
 
@@ -1037,6 +1055,10 @@ view: orders {
       field: order_status_name
       value: "-Declined"
     }
+    filters: {
+      field: upsell_id
+      value: "0"
+    }
     drill_fields: [detail*]
   }
 
@@ -1165,6 +1187,10 @@ view: orders {
     filters: {
       field: rebill_depth
       value: "0"
+    }
+    filters: {
+      field: order_status_name
+      value: "-Declined"
     }
     html: {{ currency_symbol._value }}{{ rendered_value }};;
     value_format_name: decimal_2
@@ -1311,12 +1337,6 @@ view: orders {
     value_format_name: decimal_2
     sql: ${order_tax} ;;
   }
-
-  dimension: prior_hold_filter {
-    type: yesno
-    sql: ${hold_date} IS NOT NULL;;
-  }
-
 
   # ------- Sales By Subscription ------
 
@@ -1606,6 +1626,10 @@ view: orders {
       field: rebill_depth
       value: "0"
     }
+    filters: {
+      field: order_status_name
+      value: "-Declined"
+    }
     sql: ${orders_products.products_quantity} ;;
     drill_fields: [detail*]
   }
@@ -1617,6 +1641,10 @@ view: orders {
     filters: {
       field: rebill_depth
       value: ">0"
+    }
+    filters: {
+      field: order_status_name
+      value: "-Declined"
     }
     sql: ${orders_products.products_quantity} ;;
     drill_fields: [detail*]
