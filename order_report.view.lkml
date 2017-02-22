@@ -433,28 +433,6 @@ view: order_report {
     drill_fields: [detail*]
   }
 
-  measure: net_order_total_gateway {
-    label: "Gross Approved Revenue_Gateway"
-    description: "This is the total amount of all orders"
-    type: sum
-    filters: {
-      field: order_status_name
-      value: "-Declined"
-    }
-    html: {{ currency_symbol._value }}{{ rendered_value }};;
-    value_format_name: decimal_2
-    sql: ${subtotal_amt} + ${tax_amt} + ${shipping_amt} ;;
-  }
-
-  measure: gross_order_gateway {
-    label: "Gross Orders_Gateway"
-    type: count
-    filters: {
-      field: upsell_flag
-      value: "0"
-    }
-    drill_fields: [detail*]
-  }
 
   measure: shippable_count {
     type: count

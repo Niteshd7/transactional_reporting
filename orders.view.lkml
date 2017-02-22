@@ -853,6 +853,12 @@ view: orders {
     sql: ${orders_history.user} ;;
   }
 
+
+  dimension: history_type {
+    type: string
+    sql: ${orders_history.type} ;;
+  }
+
   dimension: was_reprocessed {
     type: number
     sql: ${TABLE}.wasReprocessed ;;
@@ -1410,6 +1416,29 @@ view: orders {
 
  # ------- Sales By Gateway ------
 
+  measure: net_order_total_gateway {
+    label: "Gross Approved Revenue_Gateway"
+    description: "This is the total amount of all orders"
+    type: sum
+    filters: {
+      field: orders_status
+      value: "NOT 7"
+    }
+    html: {{ currency_symbol._value }}{{ rendered_value }};;
+    value_format_name: decimal_2
+    sql: ${order_total} ;;
+  }
+
+  measure: gross_order_gateway {
+    label: "Gross Orders_Gateway"
+    type: count
+    filters: {
+      field: orders_status
+      value: "NOT 7"
+    }
+    drill_fields: [detail*]
+  }
+
   measure: chargeback_count {
     label: "Chargebacks"
     filters: {
@@ -1418,6 +1447,29 @@ view: orders {
     }
     type: count
     drill_fields: [detail*]
+  }
+
+  measure:  void_refund_orders_gateway {
+    type: count
+    label: "Void/Refund Orders - Gateway"
+    filters: {
+      field: orders_history.type
+      value: "refund,void"
+    }
+    drill_fields: [orders_id, orders_status,order_status_name, order_total]
+  }
+
+
+  measure:  void_refund_revenue_gateway {
+    type: sum
+    label: "Void/Refunded Revenue - Gateway"
+    filters: {
+      field: orders_history.type
+      value: "refund,void"
+    }
+    html: {{ currency_symbol._value }}{{ rendered_value }};;
+    value_format_name: decimal_2
+    sql: ${amount_refunded_so_far} ;;
   }
 
   measure: chargeback_percentage {
@@ -1463,7 +1515,7 @@ view: orders {
     label: "Net Revenue_Gateway"
     html: {{ currency_symbol._value }}{{ rendered_value }};;
     value_format_name: decimal_2
-    sql: ${order_report.net_order_total_gateway} - ${orders.void_refund_revenue} ;;
+    sql: ${net_order_total_gateway} - ${orders.void_refund_revenue_gateway} ;;
   }
 
  # ------- Sales By Gateway End------
@@ -1692,10 +1744,6 @@ view: orders {
       value: "1"
     }
     filters: {
-      field: cancellation_flag
-      value: "yes"
-    }
-    filters: {
       field: is_archived
       value: "0"
     }
@@ -1770,10 +1818,6 @@ view: orders {
     filters: {
       field: is_archived
       value: "0"
-    }
-    filters: {
-      field: cancellation_flag
-      value: "yes"
     }
     filters: {
       field: is_hold
