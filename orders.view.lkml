@@ -926,15 +926,6 @@ view: orders {
     sql: ${customers_email_address} ;;
   }
 
-  measure: order_count {
-    type: count
-    filters: {
-      field: order_status_name
-      value: "Approved, Pending"
-    }
-    label: "Total"
-    drill_fields: [detail*]
-  }
 
   measure: order_count_employee_activity {
     type: count
@@ -985,8 +976,8 @@ view: orders {
     type: count
     label: "Declines"
     filters: {
-      field: order_status_name
-      value: "Declined"
+      field: orders_status
+      value: "7"
     }
     drill_fields: [detail*]
   }
@@ -1006,12 +997,8 @@ view: orders {
       value: "0"
     }
     filters: {
-      field: cancellation_flag
-      value: "yes"
-    }
-    filters: {
-      field: hold_flag
-      value: "yes"
+      field: is_hold
+      value: "1"
     }
     drill_fields: [detail*]
   }
@@ -1044,23 +1031,6 @@ view: orders {
     drill_fields: [detail*]
   }
 
-  measure:  initial_orders {
-    type: count
-    label: "Initial Orders"
-    filters: {
-      field: rebill_depth
-      value: "0"
-    }
-    filters: {
-      field: orders_status
-      value: "2,8"
-    }
-    filters: {
-      field: upsell_id
-      value: "0"
-    }
-    drill_fields: [detail*]
-  }
 
   measure:  initial_orders_decline_reasons {
     type: count
@@ -1073,33 +1043,6 @@ view: orders {
     drill_fields: [detail*]
   }
 
-  measure:  pending_orders {
-    type: count
-    label: "Pending Orders"
-    filters: {
-      field: orders_status
-      value: "10,11"
-    }
-    drill_fields: [detail*]
-  }
-
-  measure:  subscription_orders {
-    type: count
-    label: "Subscriptions"
-    filters: {
-      field: rebill_depth
-      value: ">0"
-    }
-    filters: {
-      field: parent_order_id
-      value: ">0"
-    }
-    filters: {
-      field: orders_status
-      value: "2,8"
-    }
-    drill_fields: [detail*]
-  }
 
   measure:  subscription_approved {
     type: count
@@ -1119,15 +1062,6 @@ view: orders {
     drill_fields: [detail*]
   }
 
-  measure:  void_refund_orders {
-    type: count
-    label: "Void/Refund Orders"
-    filters: {
-      field: refund_type
-      value: ">1"
-    }
-    drill_fields: [orders_id, orders_status,order_status_name, order_total]
-  }
 
   measure:  void_full_refund_orders {
     type: count
@@ -1147,129 +1081,6 @@ view: orders {
       value: "1"
     }
     drill_fields: [orders_id, orders_status,order_status_name, order_total]
-  }
-
-  measure: decline_revenue {
-    type: sum
-    label: "Decline Revenue"
-    filters: {
-      field: order_status_name
-      value: "Declined"
-    }
-    html: {{ currency_symbol._value }}{{ rendered_value }};;
-    value_format_name: decimal_2
-    sql: ${order_report.subtotal_amt} ;;
-  }
-
-  measure:  hold_cancel_revenue {
-    type: sum
-    label: "Holds/Cancels Revenue"
-    filters: {
-      field: is_archived
-      value: "0"
-    }
-    filters: {
-      field: cancellation_flag
-      value: "yes"
-    }
-    filters: {
-      field: hold_flag
-      value: "yes"
-    }
-    html: {{ currency_symbol._value }}{{ rendered_value }};;
-    value_format_name: decimal_2
-    sql: ${order_report.subtotal_amt} ;;
-  }
-
-  measure:  initial_revenue {
-    type: sum
-    label: "Initial Revenue"
-    filters: {
-      field: rebill_depth
-      value: "0"
-    }
-    filters: {
-      field: order_status_name
-      value: "-Declined"
-    }
-    html: {{ currency_symbol._value }}{{ rendered_value }};;
-    value_format_name: decimal_2
-    sql: ${order_report.subtotal_amt} ;;
-  }
-
-  measure: pending_revenue {
-    type: sum
-    label: "Pending Revenue"
-    filters: {
-      field: orders_status
-      value: "10,11"
-    }
-    value_format_name: decimal_2
-    sql: ${order_report.subtotal_amt} ;;
-  }
-
-  measure:  subscription_revenue {
-    type: sum
-    label: "Subscription Revenue"
-    filters: {
-      field: rebill_depth
-      value: ">0"
-    }
-    filters: {
-      field: parent_order_id
-      value: ">0"
-    }
-    filters: {
-      field: order_status_name
-      value: "-Declined"
-    }
-    html: {{ currency_symbol._value }}{{ rendered_value }};;
-    value_format_name: decimal_2
-    sql: ${order_report.subtotal_amt} ;;
-  }
-
-  measure:  shipping_revenue {
-    type: sum
-    label: "Shipping Revenue"
-    filters: {
-      field: refund_type
-      value: "<2"
-    }
-    filters: {
-      field: payment_module_code
-      value: "1"
-    }
-    filters: {
-      field: is_approved
-      value: "1"
-    }
-    html: {{ currency_symbol._value }}{{ rendered_value }};;
-    value_format_name: decimal_2
-    sql: ${order_report.shipping_amt} ;;
-  }
-
-  measure:  total_revenue {
-    type: sum
-    label: "Total Revenue"
-    filters: {
-      field: order_status_name
-      value: "Approved, Pending"
-    }
-    html: {{ currency_symbol._value }}{{ rendered_value }};;
-    value_format_name: decimal_2
-    sql: ${order_report.subtotal_amt} ;;
-  }
-
-  measure:  void_refund_revenue {
-    type: sum
-    label: "Void/Refunded Revenue"
-    filters: {
-      field: refund_type
-      value: ">1"
-    }
-    html: {{ currency_symbol._value }}{{ rendered_value }};;
-    value_format_name: decimal_2
-    sql: ${amount_refunded_so_far} ;;
   }
 
   measure: count_approved {
@@ -1313,7 +1124,7 @@ view: orders {
     label: "Approved Revenue"
     filters: {
       field: orders_status
-      value: "2,6,8"
+      value: "2,8"
     }
     html: {{ currency_symbol._value }}{{ rendered_value }};;
     value_format_name: decimal_2
@@ -1341,6 +1152,196 @@ view: orders {
     value_format_name: decimal_2
     sql: ${order_tax} ;;
   }
+
+ # ------- Sales By Date ------
+
+  measure:  initial_orders {
+    type: count
+    label: "Initial Orders"
+    filters: {
+      field: rebill_depth
+      value: "0"
+    }
+    filters: {
+      field: orders_status
+      value: "2,8"
+    }
+    drill_fields: [detail*]
+  }
+
+  measure: order_count {
+    type: count
+    filters: {
+      field: orders_status
+      value: "2,8"
+    }
+    label: "Total"
+    drill_fields: [detail*]
+  }
+
+  measure:  pending_orders {
+    type: count
+    label: "Pending Orders"
+    filters: {
+      field: orders_status
+      value: "10,11"
+    }
+    drill_fields: [detail*]
+  }
+
+  measure:  subscription_orders {
+    type: count
+    label: "Subscriptions"
+    filters: {
+      field: rebill_depth
+      value: ">0"
+    }
+    filters: {
+      field: parent_order_id
+      value: ">0"
+    }
+    filters: {
+      field: orders_status
+      value: "2,8"
+    }
+    drill_fields: [detail*]
+  }
+
+
+  measure:  void_refund_orders {
+    type: count
+    label: "Void/Refund Orders"
+    filters: {
+      field: refund_type
+      value: ">1"
+    }
+    drill_fields: [orders_id, orders_status,order_status_name, order_total]
+  }
+
+  measure: decline_revenue {
+    type: sum
+    label: "Decline Revenue"
+    filters: {
+      field: orders_status
+      value: "7"
+    }
+    html: {{ currency_symbol._value }}{{ rendered_value }};;
+    value_format_name: decimal_2
+    sql: ${order_report.subtotal_amt} ;;
+  }
+
+  measure:  hold_cancel_revenue {
+    type: sum
+    label: "Holds/Cancels Revenue"
+    filters: {
+      field: is_archived
+      value: "0"
+    }
+    filters: {
+      field: is_hold
+      value: "1"
+    }
+    html: {{ currency_symbol._value }}{{ rendered_value }};;
+    value_format_name: decimal_2
+    sql: ${order_report.subtotal_amt} ;;
+  }
+
+  measure:  initial_revenue {
+    type: sum
+    label: "Initial Revenue"
+    filters: {
+      field: rebill_depth
+      value: "0"
+    }
+    filters: {
+      field: orders_status
+      value: "2,8"
+    }
+    html: {{ currency_symbol._value }}{{ rendered_value }};;
+    value_format_name: decimal_2
+    sql: ${order_report.subtotal_amt} ;;
+  }
+
+  measure: pending_revenue {
+    type: sum
+    label: "Pending Revenue"
+    filters: {
+      field: orders_status
+      value: "10,11"
+    }
+    value_format_name: decimal_2
+    sql: ${order_report.subtotal_amt} ;;
+  }
+
+  measure:  subscription_revenue {
+    type: sum
+    label: "Subscription Revenue"
+    filters: {
+      field: rebill_depth
+      value: ">0"
+    }
+    filters: {
+      field: parent_order_id
+      value: ">0"
+    }
+    filters: {
+      field: orders_status
+      value: "2,8"
+    }
+    html: {{ currency_symbol._value }}{{ rendered_value }};;
+    value_format_name: decimal_2
+    sql: ${order_report.subtotal_amt} ;;
+  }
+
+  measure:  shipping_revenue {
+    type: sum
+    label: "Shipping Revenue"
+    filters: {
+      field: payment_module_code
+      value: "1"
+    }
+    filters: {
+      field: refund_type
+      value: "<2"
+    }
+    filters: {
+      field: orders_status
+      value: "NOT 7,10,11"
+    }
+    html: {{ currency_symbol._value }}{{ rendered_value }};;
+    value_format_name: decimal_2
+    sql: ${order_report.shipping_amt} ;;
+  }
+
+  measure:  total_revenue {
+    type: sum
+    label: "Total Revenue"
+    filters: {
+      field: orders_status
+      value: "2,8"
+    }
+    html: {{ currency_symbol._value }}{{ rendered_value }};;
+    value_format_name: decimal_2
+    sql: ${order_report.subtotal_amt} ;;
+  }
+
+  measure:  void_refund_revenue {
+    type: sum
+    label: "Void/Refunded Revenue"
+    filters: {
+      field: refund_type
+      value: ">1"
+    }
+    html: {{ currency_symbol._value }}{{ rendered_value }};;
+    value_format_name: decimal_2
+    sql: ${amount_refunded_so_far} ;;
+  }
+
+
+
+   # ------- Sales By Date End------
+
+
 
   # ------- Sales By Subscription ------
 
@@ -1441,8 +1442,8 @@ view: orders {
     description: "This is the total amount of all orders"
     type: sum
     filters: {
-      field: order_status_name
-      value: "-Declined"
+      field: orders_status
+      value: "2,8"
     }
     html: {{ currency_symbol._value }}{{ rendered_value }};;
     value_format_name: decimal_2

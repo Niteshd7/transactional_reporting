@@ -414,6 +414,20 @@ view: upsell_orders {
     drill_fields: [detail*]
   }
 
+  measure:  initial_orders {
+    type: count
+    label: "Initial Orders"
+    filters: {
+      field: is_recurring
+      value: "0"
+    }
+    filters: {
+      field: orders_status
+      value: "2,8"
+    }
+    drill_fields: [detail*]
+  }
+
   set: detail {
     fields: [upsell_orders_id, main_orders_id, customers_id, prospects_id, customers_fname, customers_lname, customers_company, customers_street_address, customers_suburb, customers_city, customers_postcode, customers_state, customers_country, customers_telephone, customers_email_address, customers_address_format_id, delivery_fname, delivery_lname, delivery_company, delivery_street_address, delivery_suburb, delivery_city, delivery_postcode, delivery_state, delivery_country, delivery_address_format_id, billing_fname, billing_lname, billing_company, billing_street_address, billing_suburb, billing_city, billing_postcode, billing_state, billing_country, billing_address_format_id, payment_method, payment_module_code, shipping_method, shipping_module_code, coupon_code, cc_type, cc_owner, cc_number, cc_expires, cc_cvv, checking_routing_number, checking_account_number, last_modified_time, date_purchased, orders_status, orders_date_finished_time, currency, currency_value, order_total, order_tax, paypal_ipn_id, ip_address, is_recurring, recurring_date, subscription_id, parent_order_id, child_order_id, campaign_order_id, t_stamp_time, is_hold, is_archived, transaction_id, tracking_num, auth_id, notes, hold_date, order_total_reporting, order_total_shipping_reporting, is_test_cc, delivery_state_id, billing_state_id, deleted]
   }
