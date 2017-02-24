@@ -28,7 +28,7 @@ explore: orders {
   join: upsell_orders {
     type: left_outer
     relationship: many_to_one
-    sql_on: ${upsell_orders.main_orders_id} = ${orders.common_ancestor_order_id};;
+    sql_on: ${upsell_orders.main_orders_id} = ${orders.orders_id};;
   }
 
   join: upsell_orders_products {

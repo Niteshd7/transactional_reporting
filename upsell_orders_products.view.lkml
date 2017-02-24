@@ -1,12 +1,6 @@
 view: upsell_orders_products {
   sql_table_name:upsell_orders_products      ;;
 
-  dimension: primary_key {
-    primary_key: yes
-    hidden: yes
-    sql: ${upsell_orders_id}      ;;
-  }
-
   measure: count {
     type: count
     drill_fields: [detail*]
