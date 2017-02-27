@@ -129,8 +129,9 @@ explore: orders {
   }
   join: gateway {
     type: left_outer
-    relationship: one_to_one
-    sql_on: ${gateway.gateway_id} = ${orders.gateway_id};;
+    relationship: many_to_one
+    sql_on: ${gateway.gateway_id} = ${orders.gateway_id} AND
+       ${orders.campaign_order_id} = ${campaigns.c_id};;
   }
   join: gateway_accounts {
     type: left_outer

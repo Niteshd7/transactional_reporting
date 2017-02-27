@@ -84,7 +84,7 @@ view: orders {
 
   dimension: client_domain {
     type: string
-    sql: select concat(`value`,'.limelightcrm.com') as client_domain from config_settings where `key` = 'APPLICATION_KEY' ;;
+    sql: (select concat(`value`,'.limelightcrm.com') as client_domain from config_settings where `key` = 'APPLICATION_KEY') ;;
   }
 
   dimension: billing_address_format_id {
@@ -659,6 +659,10 @@ view: orders {
 
   dimension: orders_id {
     type: number
+    link: {
+      label: "Navigate to Order"
+      url: "https://{{client_domain._value}}/admin/orders.php?show_details=show_details&show_folder=view_all&fromPost=1&act=&sequence=1&show_by_id={{value}}"
+    }
     # hidden: true
     sql: ${TABLE}.orders_id ;;
   }
@@ -925,11 +929,16 @@ view: orders {
       value: ">0"
     }
     filters: {
+      field: orders_status
+      value: "NOT 7, 10, 11"
+    }
+    filters: {
       field: parent_order_id
       value: "0"
     }
     label: "Initial Customers"
     sql: ${customers_email_address} ;;
+    drill_fields: [detail*]
   }
 
 
@@ -1008,6 +1017,33 @@ view: orders {
     }
     drill_fields: [detail*]
   }
+
+  measure:  prior_hold_cancel_orders {
+    type: count
+    label: "Prior Holds/Cancels"
+    filters: {
+      field: is_archived
+      value: "0"
+    }
+    filters: {
+      field: is_hold
+      value: "1"
+    }
+    filters: {
+      field: prior_hold_logic
+      value: "yes"
+    }
+    drill_fields: [detail*]
+  }
+
+
+  dimension: prior_hold_logic {
+        label: "Apply Transaction Date filter to Hold Date filter?"
+        type: yesno
+        sql: ${orders_history.t_stamp_date} <> ${t_stamp_date} ;;
+        hidden: no
+  }
+
 
   measure:  hold_orders {
     type: count
@@ -1422,7 +1458,7 @@ view: orders {
     type: sum
     filters: {
       field: orders_status
-      value: "NOT 7"
+      value: "NOT 7,10,11"
     }
     html: {{ currency_symbol._value }}{{ rendered_value }};;
     value_format_name: decimal_2
@@ -1434,7 +1470,7 @@ view: orders {
     type: count
     filters: {
       field: orders_status
-      value: "NOT 7"
+      value: "NOT 7,10,11"
     }
     drill_fields: [detail*]
   }
@@ -1633,9 +1669,22 @@ view: orders {
     label: "Gross Revenue_Prospects"
     description: "This is the total amount for Sales by Prospects"
     type: sum
+    filters: {
+      field: customers_id
+      value: ">0"
+    }
+    filters: {
+      field: orders_status
+      value: "NOT 7, 10, 11"
+    }
+    filters: {
+      field: parent_order_id
+      value: "0"
+    }
     html: {{ currency_symbol._value }}{{ rendered_value }};;
     value_format_name: decimal_2
-    sql:  ${order_report.shipping_amt} +  ${order_report.subtotal_amt} + ${order_report.tax_amt} ;;
+    sql: ${order_total} ;;
+    drill_fields: [detail*]
   }
 
   measure:  average_revenue_prospect {
