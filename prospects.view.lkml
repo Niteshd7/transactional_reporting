@@ -1,10 +1,10 @@
 view: prospects {
-  sql_table_name: {{ _access_filters["client.schema_name"] }}.prospects      ;;
+  sql_table_name: prospects      ;;
 
   dimension: primary_key {
     primary_key: yes
     hidden: yes
-    sql: ${campaign_id} || '_' || ${prospects_id}
+    sql: ${campaign_id} || '_' || ${orders_id}
       ;;
   }
 
