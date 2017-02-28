@@ -1298,7 +1298,7 @@ view: orders {
     }
     html: {{ currency_symbol._value }}{{ rendered_value }};;
     value_format_name: decimal_2
-    sql: ${v_main_order_total.main_product_amount_shipping_tax} + ${order_report.forecasted_amt} ;;
+    sql: ${order_report.forecasted_amt} ;;
   }
 
   measure:  initial_revenue {
