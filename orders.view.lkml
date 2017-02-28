@@ -994,6 +994,14 @@ view: orders {
       field: orders_status
       value: "7"
     }
+    filters: {
+      field: was_salvaged
+      value: "no"
+    }
+    filters: {
+      field: deleted
+      value: "0"
+    }
     drill_fields: [detail*]
   }
 
@@ -1030,18 +1038,23 @@ view: orders {
       value: "1"
     }
     filters: {
-      field: prior_hold_logic
+      field: prior_holds
       value: "yes"
     }
     drill_fields: [detail*]
   }
 
+  filter: prior_date_select {
+    type: date
+    suggest_dimension: t_stamp_date
+  }
 
-  dimension: prior_hold_logic {
-        label: "Apply Transaction Date filter to Hold Date filter?"
-        type: yesno
-        sql: ${orders_history.t_stamp_date} <> ${t_stamp_date} ;;
-        hidden: no
+
+  dimension: prior_holds {
+    type: yesno
+    sql: {% condition prior_date_select %} ${hold_date} {% endcondition %} AND
+        NOT({% condition prior_date_select %} ${t_stamp_date} {% endcondition %}) ;;
+    hidden: yes
   }
 
 
@@ -1170,7 +1183,7 @@ view: orders {
     }
     html: {{ currency_symbol._value }}{{ rendered_value }};;
     value_format_name: decimal_2
-    sql: ${order_report.subtotal_amt} ;;
+    sql: ${v_main_order_total.main_product_amount_shipping_tax} ;;
   }
 
   measure: percent_approved {
@@ -1285,7 +1298,7 @@ view: orders {
     }
     html: {{ currency_symbol._value }}{{ rendered_value }};;
     value_format_name: decimal_2
-    sql: ${order_report.subtotal_amt} ;;
+    sql: ${v_main_order_total.main_product_amount_shipping_tax} + ${order_report.forecasted_amt} ;;
   }
 
   measure:  initial_revenue {
@@ -1301,7 +1314,7 @@ view: orders {
     }
     html: {{ currency_symbol._value }}{{ rendered_value }};;
     value_format_name: decimal_2
-    sql: ${order_report.subtotal_amt} ;;
+    sql: ${v_main_order_total.current_total} ;;
   }
 
   measure: pending_revenue {
@@ -1312,7 +1325,7 @@ view: orders {
       value: "10,11"
     }
     value_format_name: decimal_2
-    sql: ${order_report.subtotal_amt} ;;
+    sql:${v_main_order_total.current_total} ;;
   }
 
   measure:  subscription_revenue {
@@ -1332,7 +1345,7 @@ view: orders {
     }
     html: {{ currency_symbol._value }}{{ rendered_value }};;
     value_format_name: decimal_2
-    sql: ${order_report.subtotal_amt} ;;
+    sql: ${v_main_order_total.current_total} ;;
   }
 
   measure:  shipping_revenue {
@@ -1352,7 +1365,7 @@ view: orders {
     }
     html: {{ currency_symbol._value }}{{ rendered_value }};;
     value_format_name: decimal_2
-    sql: ${order_report.shipping_amt} ;;
+    sql: ${v_main_order_total.shipping_amount} ;;
   }
 
   measure:  total_revenue {
@@ -1364,19 +1377,15 @@ view: orders {
     }
     html: {{ currency_symbol._value }}{{ rendered_value }};;
     value_format_name: decimal_2
-    sql: ${order_report.subtotal_amt} ;;
+    sql: ${v_main_order_total.current_total} ;;
   }
 
   measure:  void_refund_revenue {
     type: sum
     label: "Void/Refunded Revenue"
-    filters: {
-      field: refund_type
-      value: ">1"
-    }
     html: {{ currency_symbol._value }}{{ rendered_value }};;
     value_format_name: decimal_2
-    sql: ${amount_refunded_so_far} ;;
+    sql: ${v_main_order_total.refunded_amount} ;;
   }
 
 
