@@ -1179,7 +1179,7 @@ view: orders {
     label: "Approved Revenue"
     filters: {
       field: orders_status
-      value: "2,8"
+      value: "NOT 7"
     }
     html: {{ currency_symbol._value }}{{ rendered_value }};;
     value_format_name: decimal_2
