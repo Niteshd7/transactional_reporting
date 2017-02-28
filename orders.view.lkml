@@ -1009,7 +1009,7 @@ view: orders {
     type: number
     label: "Decline Percentage"
     value_format_name: percent_2
-    sql: ${declines} / NULLIF(${count},0) ;;
+    sql: ${declined_orders} / NULLIF(${gross_order_count},0) ;;
   }
 
   measure:  hold_cancel_orders {
@@ -1226,10 +1226,6 @@ view: orders {
 
   measure: order_count {
     type: count
-    filters: {
-      field: orders_status
-      value: "2,8"
-    }
     label: "Total"
     drill_fields: [detail*]
   }
@@ -1467,20 +1463,16 @@ view: orders {
     type: sum
     filters: {
       field: orders_status
-      value: "NOT 7,10,11"
+      value: "NOT 7"
     }
     html: {{ currency_symbol._value }}{{ rendered_value }};;
     value_format_name: decimal_2
-    sql: ${order_total} ;;
+    sql: ${v_main_order_total.main_product_amount_shipping_tax} ;;
   }
 
   measure: gross_order_gateway {
     label: "Gross Orders_Gateway"
     type: count
-    filters: {
-      field: orders_status
-      value: "NOT 7,10,11"
-    }
     drill_fields: [detail*]
   }
 
@@ -1498,8 +1490,8 @@ view: orders {
     type: count
     label: "Void/Refund Orders - Gateway"
     filters: {
-      field: orders_history.type
-      value: "refund,void"
+      field: refund_type
+      value: ">0"
     }
     drill_fields: [orders_id, orders_status,order_status_name, order_total]
   }
@@ -1509,8 +1501,8 @@ view: orders {
     type: sum
     label: "Void/Refunded Revenue - Gateway"
     filters: {
-      field: orders_history.type
-      value: "refund,void"
+      field: refund_type
+      value: ">0"
     }
     html: {{ currency_symbol._value }}{{ rendered_value }};;
     value_format_name: decimal_2
@@ -1560,7 +1552,7 @@ view: orders {
     label: "Net Revenue_Gateway"
     html: {{ currency_symbol._value }}{{ rendered_value }};;
     value_format_name: decimal_2
-    sql: ${net_order_total_gateway} - ${orders.void_refund_revenue_gateway} ;;
+    sql: ${v_main_order_total.current_total} ;;
   }
 
  # ------- Sales By Gateway End------
