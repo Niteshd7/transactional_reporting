@@ -1777,7 +1777,7 @@ view: orders {
       field: orders_status
       value: "NOT 7"
     }
-    sql: ${orders_products.products_quantity ;;
+    sql: ${orders_products.products_quantity} ;;
     drill_fields: [detail*]
   }
 
