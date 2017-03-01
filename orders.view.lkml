@@ -1461,7 +1461,7 @@ view: orders {
     type: average
     label: "Average Discount %"
     value_format_name: percent_2
-    sql: CASE WHEN ${int_1} IS NULL THEN "0" ELSE ${int_1} END ;;
+    sql: CASE WHEN ${int_1} IS NULL THEN "0" ELSE (${int_1}/100) END ;;
   }
 
   measure: discount_percent {
