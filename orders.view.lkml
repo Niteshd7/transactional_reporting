@@ -1401,6 +1401,10 @@ view: orders {
   measure: gross_order_count {
     label: "Gross Orders"
     type: count
+    filters: {
+      field: order_report.upsell_flag
+      value: "0"
+    }
     drill_fields: [detail*]
   }
 
@@ -1409,6 +1413,28 @@ view: orders {
     filters: {
       field: is_approved
       value: "yes"
+    }
+    type: count
+    drill_fields: [detail*]
+  }
+
+  measure: approved_subscriptions_count {
+    label: "Subscriptions Approved SbR"
+    filters: {
+      field: refund_type
+      value: "<2"
+    }
+    filters: {
+      field: is_approved
+      value: "yes"
+    }
+    filters: {
+      field: order_report.subscription_flag
+      value: "1"
+    }
+    filters: {
+      field: order_report.straight_sale_flag
+      value: "0"
     }
     type: count
     drill_fields: [detail*]
