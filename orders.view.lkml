@@ -1087,17 +1087,6 @@ view: orders {
   }
 
 
-  measure:  initial_orders_decline_reasons {
-    type: count
-    label: "Initial"
-    description: "This is Initial count for Decline Reasons Report"
-    filters: {
-      field: rebill_depth
-      value: "0"
-    }
-    drill_fields: [detail*]
-  }
-
 
   measure:  subscription_approved {
     type: count
@@ -1227,8 +1216,13 @@ view: orders {
   measure: order_count {
     type: count
     label: "Total"
+    filters: {
+      field: orders_status
+      value: "2,8"
+    }
     drill_fields: [detail*]
   }
+
 
   measure:  pending_orders {
     type: count
@@ -1740,10 +1734,30 @@ view: orders {
     sql: ${orders_history.status} ;;
   }
 
+  measure:  initial_orders_decline_reasons {
+    type: count
+    label: "Initial"
+    description: "This is Initial count for Decline Reasons Report"
+    filters: {
+      field: rebill_depth
+      value: "0"
+    }
+    drill_fields: [orders_id, is_subscription, t_stamp_date, decline_reason]
+  }
+
   measure: subscription_decline_reason {
     label: "Subscription"
+    type: number
     description: "Separate measure for Decline Reasons Report"
-    sql: ${count} - ${initial_orders} ;;
+    sql: ${count_decl_reas} - ${initial_orders_decline_reasons} ;;
+    drill_fields: [orders_id, is_subscription, t_stamp_date, decline_reason]
+  }
+
+  measure: count_decl_reas {
+    type: count
+    label: "All"
+    description: "Separate measure for Decline Reasons Report"
+    drill_fields: [orders_id, is_subscription, t_stamp_date, decline_reason]
   }
 
 #-----Decline Reasons End----------------------------
@@ -1763,7 +1777,7 @@ view: orders {
       field: orders_status
       value: "NOT 7"
     }
-    sql: ${orders_products.products_quantity} ;;
+    sql: ${orders_products.products_quantity ;;
     drill_fields: [detail*]
   }
 
