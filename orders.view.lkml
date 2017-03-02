@@ -953,15 +953,11 @@ view: orders {
   }
 
   measure:  average_order_total {
-    type: average
+    type: number
     label: "Average Order Value"
-    filters: {
-      field: is_approved
-      value: "yes"
-    }
     html: {{ currency_symbol._value }}{{ rendered_value }};;
     value_format_name: decimal_2
-    sql: ${order_total} ;;
+    sql: ${total_revenue}/NULLIF(${order_count},0) ;;
   }
 
   dimension: order_status_name {
@@ -1247,6 +1243,21 @@ view: orders {
     drill_fields: [detail*]
   }
 
+  measure:  declined_orders {
+    type: count_distinct
+    label: "Declined Orders"
+    filters: {
+      field: orders_status
+      value: "7"
+    }
+    filters: {
+      field: was_salvaged
+      value: "no"
+    }
+    sql: CONCAT(${campaign_order_id}, ${customers_email_address}, ${t_stamp_date}) ;;
+    drill_fields: [detail*]
+  }
+
   measure:  subscription_orders {
     type: count
     label: "Subscriptions"
@@ -1435,7 +1446,40 @@ view: orders {
 
    # ------- Sales By Date End------
 
+  # ------- Sales By Campaign ------
 
+  measure:  declined_orders_campaign {
+    type: count_distinct
+    label: "Declined Orders - Campaign"
+    filters: {
+      field: orders_status
+      value: "7"
+    }
+    filters: {
+      field: was_salvaged
+      value: "no"
+    }
+    sql: CONCAT(${campaign_order_id}, ${customers_email_address}) ;;
+    drill_fields: [detail*]
+  }
+
+  measure: decline_revenue_campaign {
+    type: sum
+    label: "Decline Revenue - Campaign"
+    filters: {
+      field: orders_status
+      value: "7"
+    }
+    filters: {
+      field: was_salvaged
+      value: "no"
+    }
+    html: {{ currency_symbol._value }}{{ rendered_value }};;
+    value_format_name: decimal_2
+    sql: SELECT ${order_total} GROUP BY CONCAT(${campaign_order_id}, ${customers_email_address}) IS NOT NULL ;;
+  }
+
+  # ------- Sales By Campaign End  ------
 
   # ------- Sales By Subscription ------
 
@@ -1484,21 +1528,6 @@ view: orders {
       value: "0"
     }
     type: count
-    drill_fields: [detail*]
-  }
-
-  measure:  declined_orders {
-    type: count_distinct
-    label: "Declined Orders"
-    filters: {
-      field: orders_status
-      value: "7"
-    }
-    filters: {
-      field: was_salvaged
-      value: "no"
-    }
-    sql: CONCAT(${campaign_order_id}, ${customers_email_address}, ${t_stamp_date}) ;;
     drill_fields: [detail*]
   }
 
@@ -1558,7 +1587,7 @@ view: orders {
     label: "Chargebacks"
     filters: {
       field: is_chargeback
-      value: "1"
+      value: "yes"
     }
     type: count
     drill_fields: [detail*]
@@ -1591,7 +1620,7 @@ view: orders {
     type: number
     label: "Chargeback Percentage"
     value_format_name: percent_2
-    sql: ${chargeback_count} / NULLIF(${count},0) ;;
+    sql: ${chargeback_count} / NULLIF(${initial_orders},0) ;;
   }
 
   measure: refund_count {
