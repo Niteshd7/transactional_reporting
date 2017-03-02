@@ -1017,8 +1017,8 @@ view: orders {
       value: "0"
     }
     filters: {
-      field: is_hold
-      value: "1"
+      field: hold_flag
+      value: "yes"
     }
     drill_fields: [detail*]
   }
@@ -1157,6 +1157,10 @@ view: orders {
       field: payment_module_code
       value: "1"
     }
+    filters: {
+      field: order_report.upsell_flag
+      value: "0"
+    }
     drill_fields: [detail*]
   }
 
@@ -1207,6 +1211,10 @@ view: orders {
       field: orders_status
       value: "2,8"
     }
+    filters: {
+      field: order_report.upsell_flag
+      value: "0"
+    }
     drill_fields: [detail*]
   }
 
@@ -1216,6 +1224,10 @@ view: orders {
     filters: {
       field: orders_status
       value: "2,8"
+    }
+    filters: {
+      field: order_report.upsell_flag
+      value: "0"
     }
     drill_fields: [detail*]
   }
@@ -1227,6 +1239,10 @@ view: orders {
     filters: {
       field: orders_status
       value: "10,11"
+    }
+    filters: {
+      field: order_report.upsell_flag
+      value: "0"
     }
     drill_fields: [detail*]
   }
@@ -1246,6 +1262,10 @@ view: orders {
       field: orders_status
       value: "2,8"
     }
+    filters: {
+      field: order_report.upsell_flag
+      value: "0"
+    }
     drill_fields: [detail*]
   }
 
@@ -1257,6 +1277,10 @@ view: orders {
       field: refund_type
       value: ">1"
     }
+    filters: {
+      field: order_report.upsell_flag
+      value: "0"
+    }
     drill_fields: [orders_id, orders_status,order_status_name, order_total]
   }
 
@@ -1267,9 +1291,13 @@ view: orders {
       field: orders_status
       value: "7"
     }
+    filters: {
+      field: was_salvaged
+      value: "no"
+    }
     html: {{ currency_symbol._value }}{{ rendered_value }};;
     value_format_name: decimal_2
-    sql: ${order_report.subtotal_amt} ;;
+    sql: CASE WHEN CONCAT(${campaign_order_id}, ${customers_email_address}, ${t_stamp_date}) IS NOT NULL  THEN (${v_main_order_total.main_product_amount_shipping_tax} + ${order_report.upsell_amt}) END ;;
   }
 
   measure:  hold_cancel_revenue {
@@ -1283,9 +1311,13 @@ view: orders {
       field: is_hold
       value: "1"
     }
+    filters: {
+      field: order_report.upsell_flag
+      value: "0"
+    }
     html: {{ currency_symbol._value }}{{ rendered_value }};;
     value_format_name: decimal_2
-    sql: ${order_report.forecasted_amt} ;;
+    sql: ${currency_value} ;;
   }
 
   measure:  initial_revenue {
@@ -1299,9 +1331,13 @@ view: orders {
       field: orders_status
       value: "2,8"
     }
+    filters: {
+      field: order_report.upsell_flag
+      value: "0"
+    }
     html: {{ currency_symbol._value }}{{ rendered_value }};;
     value_format_name: decimal_2
-    sql: ${v_main_order_total.current_total} ;;
+    sql: (${v_main_order_total.current_total} + ${order_report.upsell_amt});;
   }
 
   measure: pending_revenue {
@@ -1311,8 +1347,12 @@ view: orders {
       field: orders_status
       value: "10,11"
     }
+    filters: {
+      field: order_report.upsell_flag
+      value: "0"
+    }
     value_format_name: decimal_2
-    sql:${v_main_order_total.current_total} ;;
+    sql:(${v_main_order_total.current_total} + ${order_report.upsell_amt}) ;;
   }
 
   measure:  subscription_revenue {
@@ -1330,9 +1370,13 @@ view: orders {
       field: orders_status
       value: "2,8"
     }
+    filters: {
+      field: order_report.upsell_flag
+      value: "0"
+    }
     html: {{ currency_symbol._value }}{{ rendered_value }};;
     value_format_name: decimal_2
-    sql: ${v_main_order_total.current_total} ;;
+    sql: (${v_main_order_total.current_total} + ${order_report.upsell_amt}) ;;
   }
 
   measure:  shipping_revenue {
@@ -1350,9 +1394,13 @@ view: orders {
       field: orders_status
       value: "NOT 7,10,11"
     }
+    filters: {
+      field: order_report.upsell_flag
+      value: "0"
+    }
     html: {{ currency_symbol._value }}{{ rendered_value }};;
     value_format_name: decimal_2
-    sql: ${v_main_order_total.shipping_amount} ;;
+    sql: (${order_report.shipping_amt}) ;;
   }
 
   measure:  total_revenue {
@@ -1362,14 +1410,22 @@ view: orders {
       field: orders_status
       value: "2,8"
     }
+    filters: {
+      field: order_report.upsell_flag
+      value: "0"
+    }
     html: {{ currency_symbol._value }}{{ rendered_value }};;
     value_format_name: decimal_2
-    sql: ${v_main_order_total.current_total} ;;
+    sql: (${v_main_order_total.current_total} + ${order_report.upsell_amt}) ;;
   }
 
   measure:  void_refund_revenue {
     type: sum
     label: "Void/Refunded Revenue"
+    filters: {
+      field: order_report.upsell_flag
+      value: "0"
+    }
     html: {{ currency_symbol._value }}{{ rendered_value }};;
     value_format_name: decimal_2
     sql: ${v_main_order_total.refunded_amount} ;;
@@ -1432,12 +1488,17 @@ view: orders {
   }
 
   measure:  declined_orders {
-    type: count
+    type: count_distinct
     label: "Declined Orders"
     filters: {
       field: orders_status
       value: "7"
     }
+    filters: {
+      field: was_salvaged
+      value: "no"
+    }
+    sql: CONCAT(${campaign_order_id}, ${customers_email_address}, ${t_stamp_date}) ;;
     drill_fields: [detail*]
   }
 
