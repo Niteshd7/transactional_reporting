@@ -413,7 +413,6 @@ view: orders {
     timeframes: [date, week, month]
     convert_tz: no
     sql: ${TABLE}.date_purchased ;;
-    convert_tz: no
   }
 
   dimension: deleted {
@@ -513,7 +512,6 @@ view: orders {
     timeframes: [date, week, month]
     convert_tz: no
     sql: ${TABLE}.hold_date ;;
-    convert_tz: no
   }
 
   dimension: int_1 {
@@ -747,7 +745,6 @@ view: orders {
     timeframes: [date, week, month]
     convert_tz: no
     sql: ${TABLE}.recurring_date ;;
-    convert_tz: no
   }
 
   dimension: recurring_days_custom {
