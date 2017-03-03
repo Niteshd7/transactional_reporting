@@ -559,6 +559,11 @@ view: orders {
     sql: ${TABLE}.isChargebackReversal ;;
   }
 
+  dimension: date_decline {
+    type: number
+    sql: (CONCAT(${campaign_order_id}, ${customers_email_address}, ${t_stamp_date} , ${t_stamp_week}));;
+  }
+
   dimension: is_fraud {
     type: yesno
     sql: ${TABLE}.isFraud ;;
@@ -809,7 +814,7 @@ view: orders {
 
   dimension_group: t_stamp {
     type: time
-    timeframes: [time, date, week, month]
+    timeframes: [time, date, week, month, raw]
     sql: ${TABLE}.t_stamp ;;
     convert_tz: no
   }
@@ -1296,7 +1301,7 @@ view: orders {
   }
 
   measure: decline_revenue {
-    type: sum
+    type: sum_distinct
     label: "Decline Revenue"
     filters: {
       field: orders_status
@@ -1308,7 +1313,8 @@ view: orders {
     }
     html: {{ currency_symbol._value }}{{ rendered_value }};;
     value_format_name: decimal_2
-    sql: CASE WHEN CONCAT(${campaign_order_id}, ${customers_email_address}, ${t_stamp_date}) IS NOT NULL  THEN (${v_main_order_total.main_product_amount_shipping_tax} + ${order_report.upsell_amt}) END ;;
+    sql: (${v_main_order_total.current_total} + ${order_report.upsell_amt}) ;;
+    sql_distinct_key: CONCAT(${campaign_order_id}, ${customers_email_address}, ${t_stamp_date}) ;;
   }
 
   measure:  hold_cancel_revenue {
