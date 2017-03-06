@@ -52,7 +52,7 @@ view: orders_history {
 
   dimension: oht_type_id {
     type: string
-    sql: ${type} || '-' || ${status} ;;
+    sql: CASE WHEN ${type} = 'recurring' AND ${status} IN ('hold','stop') THEN ${type} || '-' || ${status} ELSE ${type} END ;;
   }
 
   set: detail {
