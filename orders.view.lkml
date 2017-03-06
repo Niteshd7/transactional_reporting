@@ -1021,6 +1021,10 @@ view: orders {
       field: hold_flag
       value: "yes"
     }
+    filters: {
+      field: currency_value
+      value: "NOT NULL"
+    }
     drill_fields: [detail*]
   }
 
@@ -1331,6 +1335,10 @@ view: orders {
     filters: {
       field: order_report.upsell_flag
       value: "0"
+    }
+    filters: {
+      field: currency_value
+      value: "NOT NULL"
     }
     html: {{ currency_symbol._value }}{{ rendered_value }};;
     value_format_name: decimal_2
