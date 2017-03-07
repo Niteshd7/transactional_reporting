@@ -1662,7 +1662,7 @@ view: orders {
     type: number
     label: "Chargeback Percentage"
     value_format_name: percent_2
-    sql: ${chargeback_count} / NULLIF(${initial_orders},0) ;;
+    sql: ${chargeback_count} / NULLIF(${order_count},0) ;;
   }
 
   measure: refund_count {
