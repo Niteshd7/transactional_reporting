@@ -16,7 +16,23 @@ view: orders {
   dimension: activity {
     label: "Activity"
     type: string
-    sql: IF(IFNULL(${tlkp_orders_history_group.name}, '') = '', ${tlkp_orders_history_type.name}, CONCAT(${tlkp_orders_history_group.name}, ' (', ${tlkp_orders_history_type.name}, ')')) ;;
+    sql: IFNULL(${tlkp_orders_history_group.name}, ${tlkp_orders_history_type.name}) ;;
+    #sql: IF(IFNULL(${tlkp_orders_history_group.name}, '') = '', ${tlkp_orders_history_type.name}, CONCAT(${tlkp_orders_history_group.name}, ' (', ${tlkp_orders_history_type.name}, ')')) ;;
+  }
+
+
+  dimension: activity_rep_yesno {
+    label: "Activity"
+    type: yesno
+    sql: ((
+                  IF
+                  (
+                     ${orders_history.type} = 'recurring' AND ${orders_history.status} IN ('hold', 'stop'),
+                     CONCAT(${orders_history.type}, '-', ${orders_history.status}),
+                     ${orders_history.type}
+                  )
+               ) = ${tlkp_orders_history_type.type_id});;
+    #sql: IF(IFNULL(${tlkp_orders_history_group.name}, '') = '', ${tlkp_orders_history_type.name}, CONCAT(${tlkp_orders_history_group.name}, ' (', ${tlkp_orders_history_type.name}, ')')) ;;
   }
 
   dimension: affid {
