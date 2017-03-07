@@ -14,6 +14,7 @@ view: orders {
 
 
   dimension: activity {
+    label: "Activity"
     type: string
     sql: IF(IFNULL(${tlkp_orders_history_group.name}, '') = '', ${tlkp_orders_history_type.name}, CONCAT(${tlkp_orders_history_group.name}, ' (', ${tlkp_orders_history_type.name}, ')')) ;;
   }
