@@ -40,7 +40,7 @@ view: orders {
     sql: ${TABLE}.AFFID ;;
   }
 
-  dimension: affiliate_breakdown {
+  measure: affiliate_breakdown {
     sql: "Affiliate ID" ;;
     link: {
       label: "Affiliate Breakdown"
@@ -736,7 +736,7 @@ view: orders {
 
   measure: product_id_list {
     type: string
-    sql: GROUP_CONCAT(DISTINCT(${orders_products.products_id})) ;;
+    sql: SUBSTRING(GROUP_CONCAT(DISTINCT(${orders_products.products_id})),1,20) ;;
   }
 
   dimension: products_quantity {
@@ -1508,6 +1508,12 @@ view: orders {
     html: {{ currency_symbol._value }}{{ rendered_value }};;
     value_format_name: decimal_2
     sql: SELECT ${order_total} GROUP BY CONCAT(${campaign_order_id}, ${customers_email_address}) IS NOT NULL ;;
+  }
+
+  measure: active_subscription_cnt {
+    label: "Active Subscription Count"
+    type: sum
+    sql: ${order_report.active_subscription_cnt} ;;
   }
 
   # ------- Sales By Campaign End  ------
