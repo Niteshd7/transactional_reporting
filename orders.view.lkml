@@ -734,7 +734,7 @@ view: orders {
     sql: ${orders_products.products_id} ;;
   }
 
-  measure: product_id_list {
+  dimension: product_id_list {
     type: string
     sql: SUBSTRING(GROUP_CONCAT(DISTINCT(${orders_products.products_id})),1,20) ;;
   }
