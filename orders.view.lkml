@@ -976,7 +976,7 @@ view: orders {
 
   measure:  average_order_total {
     type: number
-    label: "Average Order Value"
+    label: "Avg Order"
     html: {{ currency_symbol._value }}{{ rendered_value }};;
     value_format_name: decimal_2
     sql: ${total_revenue}/NULLIF(${order_count},0) ;;
