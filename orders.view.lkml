@@ -1322,7 +1322,7 @@ view: orders {
   }
 
   measure: decline_revenue {
-    type: sum_distinct
+    type: sum
     label: "Decline Revenue"
     filters: {
       field: orders_status
@@ -1334,8 +1334,23 @@ view: orders {
     }
     html: {{ currency_symbol._value }}{{ rendered_value }};;
     value_format_name: decimal_2
-    sql: (${v_main_order_total.current_total} + ${order_report.upsell_amt}) ;;
-    sql_distinct_key: CONCAT(${campaign_order_id}, ${customers_email_address}, ${t_stamp_date}) ;;
+    sql: (${v_main_order_total.main_product_amount_shipping_tax} + ${order_report.upsell_amt}) ;;
+    #sql_distinct_key: CONCAT(${campaign_order_id}, ${customers_email_address}, ${t_stamp_date}) ;;
+  }
+
+  measure: decline_distinct_ratio_date {
+    type: number
+    hidden: yes
+    value_format_name: decimal_4
+    sql:  ${declined_orders}/NULLIF(${declined_orders_hide},0);;
+  }
+
+  measure: decline_revenue_date {
+    type: number
+    label: "Decline Revenue - Date"
+    html: {{ currency_symbol._value }}{{ rendered_value }};;
+    value_format_name: decimal_2
+    sql:${decline_revenue}*${decline_distinct_ratio_date} ;;
   }
 
   measure:  hold_cancel_revenue {
@@ -1494,9 +1509,10 @@ view: orders {
     drill_fields: [detail*]
   }
 
-  measure: decline_revenue_campaign {
-    type: sum
-    label: "Decline Revenue - Campaign"
+  measure:  declined_orders_hide {
+    type: count
+    hidden: yes
+    label: "Declined Orders - Hide"
     filters: {
       field: orders_status
       value: "7"
@@ -1505,9 +1521,22 @@ view: orders {
       field: was_salvaged
       value: "no"
     }
+    drill_fields: [detail*]
+  }
+
+  measure: decline_distinct_ratio_campaign {
+    type: number
+    hidden: yes
+    value_format_name: decimal_4
+    sql:  ${declined_orders_campaign}/NULLIF(${declined_orders_hide},0);;
+  }
+
+  measure: decline_revenue_campaign {
+    type: number
+    label: "Decline Revenue - Campaign"
     html: {{ currency_symbol._value }}{{ rendered_value }};;
     value_format_name: decimal_2
-    sql: SELECT ${order_total} GROUP BY CONCAT(${campaign_order_id}, ${customers_email_address}) IS NOT NULL ;;
+    sql:${decline_revenue}*${decline_distinct_ratio_campaign} ;;
   }
 
   measure: active_subscription_cnt {
