@@ -1682,11 +1682,40 @@ view: orders {
   }
 
   measure:  net_revenue_gateway {
-    type: number
+    type: sum
     label: "Net Revenue_Gateway"
+    filters: {
+      field: orders_status
+      value: "NOT 7"
+    }
     html: {{ currency_symbol._value }}{{ rendered_value }};;
     value_format_name: decimal_2
-    sql: ${v_main_order_total.current_total} ;;
+    sql: (${v_main_order_total.current_total} + ${order_report.upsell_amt}) ;;
+  }
+
+  measure: chargeback_percentage_gateway {
+    type: number
+    label: "Chargeback Percentage - Gateway"
+    value_format_name: percent_2
+    sql: ${chargeback_count} / NULLIF(${gross_order_gateway},0) ;;
+  }
+
+  measure:  declined_orders_gateway {
+    type: count
+    label: "Declined Orders - Gateway"
+    filters: {
+      field: orders_status
+      value: "7"
+    }
+    #sql: CONCAT(${campaign_order_id}, ${customers_email_address}, ${t_stamp_date}) ;;
+    drill_fields: [detail*]
+  }
+
+  measure: decline_percent_gateway {
+    type: number
+    label: "Decline Percentage - Gateway"
+    value_format_name: percent_2
+    sql: ${declined_orders_gateway} / NULLIF(${gross_order_gateway},0) ;;
   }
 
  # ------- Sales By Gateway End------
@@ -2037,7 +2066,7 @@ view: orders {
 
   measure: order_count_retention {
     type: count_distinct
-    label: "Declined Orders - Campaign"
+    label: "Declined Orders - Retention"
     filters: {
       field: order_report.upsell_flag
       value: "0"
