@@ -55,6 +55,21 @@ view: orders_history {
     sql: CASE WHEN ${type} = 'recurring' AND ${status} IN ('hold','stop') THEN ${type} || '-' || ${status} ELSE ${type} END ;;
   }
 
+
+  dimension_group: chargeback_date {
+    type: time
+    timeframes: [time, date, week, month]
+    sql: CASE WHEN ${type} = 'chargeback-order-on' THEN ${t_stamp_date} ELSE NULL END ;;
+    convert_tz: no
+  }
+
+  dimension_group: refund_date {
+    type: time
+    timeframes: [time, date, week, month]
+    sql: CASE WHEN ${type} = 'refund' THEN ${t_stamp_date} ELSE NULL END ;;
+    convert_tz: no
+  }
+
   set: detail {
     fields: [h_id, orders_id, user, type, status, t_stamp_time, deleted, campaign_id]
   }
