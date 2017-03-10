@@ -1607,7 +1607,7 @@ view: orders {
   measure: gross_order_gateway {
     label: "Gross Orders_Gateway"
     type: count
-    drill_fields: [detail*]
+    drill_fields: [gateway*]
   }
 
   measure: chargeback_count {
@@ -1617,7 +1617,7 @@ view: orders {
       value: "yes"
     }
     type: count
-    drill_fields: [detail*]
+    drill_fields: [gateway*]
   }
 
   measure:  void_refund_orders_gateway {
@@ -1627,7 +1627,7 @@ view: orders {
       field: refund_type
       value: ">0"
     }
-    drill_fields: [orders_id, orders_status,order_status_name, order_total]
+    drill_fields: [gateway*]
   }
 
 
@@ -1708,7 +1708,7 @@ view: orders {
       value: "7"
     }
     #sql: CONCAT(${campaign_order_id}, ${customers_email_address}, ${t_stamp_date}) ;;
-    drill_fields: [detail*]
+    drill_fields: [gateway*]
   }
 
   measure: decline_percent_gateway {
@@ -2179,5 +2179,9 @@ view: orders {
 
   set: subscription {
     fields: [orders_id, attempt, t_stamp_date, order_status_name, discount_percent, discount_amount, approved_revenue]
-    }
+  }
+
+  set: gateway {
+    fields: [orders_id, cc_type_fmt, net_order_total, void_refund_revenue_gateway, refund_type, net_revenue_gateway, is_chargeback, is_declined, t_stamp_date]
+  }
 }
