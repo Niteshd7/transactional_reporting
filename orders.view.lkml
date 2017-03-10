@@ -1035,8 +1035,8 @@ view: orders {
       value: "0"
     }
     filters: {
-      field: hold_flag
-      value: "yes"
+      field: is_hold
+      value: "1"
     }
     filters: {
       field: currency_value
@@ -1773,12 +1773,13 @@ view: orders {
 
 
     measure: sent_count {
-    type: count
+    type: sum
     filters: {
-      field: has_been_posted
+      field: order_report.fulfillment_sent_flag
       value: "1"
     }
-    label: "Orders Sent to Fulfillment"
+    label: "Sent to Fulfillment"
+    sql: (${products_quantity} + ${count_upsell_products}) ;;
     drill_fields: [detail*]
   }
 
@@ -1801,14 +1802,12 @@ view: orders {
   }
 
   measure: shippable_order_count {
-    type: sum
+    type: count
     label: "Shippable Orders Count"
-    sql: CASE
-              WHEN ${orders_products.count} > '0' AND ${has_been_posted} = '1' THEN 1
-              WHEN ${orders_products.count} > '0' AND ${orders_status} IN ('2','8') AND (${is_fraud} + ${is_rma} + ${is_chargeback}) = '0' THEN 1
-              ELSE
-                 0
-              END ;;
+    filters: {
+      field: v_orders.shippable_flag
+      value: "1"
+    }
   }
 
   measure: shippable_product_count {
