@@ -1800,6 +1800,28 @@ view: orders {
     sql: ${products_quantity} ;;
   }
 
+  measure: shippable_order_count {
+    type: sum
+    label: "Shippable Orders Count"
+    sql: CASE
+              WHEN ${orders_products.count} > '0' AND ${has_been_posted} = '1' THEN 1
+              WHEN ${orders_products.count} > '0' AND ${orders_status} IN ('2','8') AND (${is_fraud} + ${is_rma} + ${is_chargeback}) = '0' THEN 1
+              ELSE
+                 0
+              END ;;
+  }
+
+  measure: shippable_product_count {
+    type: sum
+    label: "Shippable Product Count"
+    sql: CASE
+              WHEN ${has_been_posted} = '1' THEN 1
+              WHEN ${orders_status} IN ('2','8') AND (${is_fraud} + ${is_rma} + ${is_chargeback}) = '0' THEN 1
+              ELSE
+                 0
+              END ;;
+  }
+
   measure: pending_return_count {
     type: count
     filters: {
