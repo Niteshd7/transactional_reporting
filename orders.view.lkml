@@ -2087,7 +2087,7 @@ view: orders {
 
   measure: order_count_retention {
     type: count_distinct
-    label: "Declined Orders - Retention"
+    label: "Gross Orders - Retention"
     filters: {
       field: order_report.upsell_flag
       value: "0"
@@ -2118,6 +2118,32 @@ view: orders {
     drill_fields: [subscription*]
   }
 
+  measure: pending_count_retention {
+    label: "Pending SbR"
+    filters: {
+      field: is_approved
+      value: "yes"
+    }
+    filters: {
+      field: order_report.straight_sale_flag
+      value: "0"
+    }
+    filters: {
+      field: is_hold
+      value: "0"
+    }
+    filters: {
+      field: refund_type
+      value: "<2"
+    }
+    filters: {
+      field: is_subscription
+      value: "yes"
+    }
+    type: count
+    drill_fields: [subscription*]
+  }
+
   measure: approved_order_count_retention {
     label: "Approved Orders - Sales by Retention"
     filters: {
@@ -2125,15 +2151,18 @@ view: orders {
       value: "2,8"
     }
     filters: {
-      field: order_report.upsell_flag
-      value: "0"
-    }
-    filters: {
-      field: order_report.straight_sale_flag
-      value: "0"
+      field: refund_type
+      value: "<2"
     }
     type: count
     drill_fields: [subscription*]
+  }
+
+  measure: approval_rate_retention {
+    type: number
+    label: "Approval Rate"
+    value_format_name: percent_2
+    sql: ${approved_subscriptions_count} / NULLIF(${order_count_retention},0) ;;
   }
 
   measure:  declined_orders_retention {
@@ -2153,6 +2182,10 @@ view: orders {
     filters: {
       field: hold_flag
       value: "yes"
+    }
+    filters: {
+      field: refund_type
+      value: "<2"
     }
     filters: {
       field: cancellation_flag
@@ -2179,6 +2212,10 @@ view: orders {
     filters: {
       field: cancellation_flag
       value: "yes"
+    }
+    filters: {
+      field: refund_type
+      value: "<2"
     }
     filters: {
       field: order_report.upsell_flag
