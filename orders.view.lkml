@@ -1634,7 +1634,7 @@ view: orders {
     }
     html: {{ currency_symbol._value }}{{ rendered_value }};;
     value_format_name: decimal_2
-    sql: ${v_main_order_total.main_product_amount_shipping_tax} ;;
+    sql: ${v_main_order_total.current_total} + ${order_report.upsell_amt} ;;
   }
 
   measure: gross_order_gateway {
@@ -1972,10 +1972,7 @@ view: orders {
     description: "Separate measure for Decline Reasons Report"
     drill_fields: [orders_id, is_subscription, t_stamp_date, decline_reason]
   }
-
 #-----Decline Reasons End----------------------------
-
-
 #-----Sales by Product ----------------------------
 
   measure:  initial_orders_product {
