@@ -566,6 +566,11 @@ view: orders {
     sql: ${TABLE}.isChargeback ;;
   }
 
+  dimension: is_chargeback_num {
+    type: number
+    sql: ${TABLE}.isChargeback ;;
+  }
+
   dimension: is_declined {
     type: yesno
     sql: ${TABLE}.orders_status = 7 ;;
@@ -586,6 +591,11 @@ view: orders {
     sql: ${TABLE}.isFraud ;;
   }
 
+  dimension: is_fraud_num {
+    type: number
+    sql: ${TABLE}.isFraud ;;
+  }
+
   dimension: is_hold {
     type: number
     sql: ${TABLE}.is_hold ;;
@@ -598,6 +608,11 @@ view: orders {
 
   dimension: is_rma {
     type: yesno
+    sql: ${TABLE}.isRMA ;;
+  }
+
+  dimension: is_rma_num {
+    type: number
     sql: ${TABLE}.isRMA ;;
   }
 
@@ -1542,16 +1557,34 @@ view: orders {
       field: orders_status
       value: "NOT 7"
     }
+    filters: {
+      field: order_report.upsell_flag
+      value: "0"
+    }
     type: count
     drill_fields: [subscription*]
   }
 
-
+  measure: approved_revenue_subscription {
+    type: sum
+    label: "Approved Revenue - Subscription"
+    filters: {
+      field: orders_status
+      value: "NOT 7"
+    }
+    filters: {
+      field: order_report.upsell_flag
+      value: "0"
+    }
+    html: {{ currency_symbol._value }}{{ rendered_value }};;
+    value_format_name: decimal_2
+    sql: (${v_main_order_total.main_product_amount_shipping_tax} + ${order_report.upsell_amt}) ;;
+  }
 
   measure: approved_order_percent {
     type: number
     label: "Approved %"
-    value_format_name: percent_2
+    value_format_name: percent_1
     sql: ${approved_order_count} / NULLIF(${count},0) ;;
   }
 
@@ -1744,28 +1777,32 @@ view: orders {
   measure: pending_post_count {
     type: count
     filters: {
+      field: has_been_posted
+      value: "0"
+    }
+    filters: {
       field: shipping_module_code
       value: "0"
     }
     filters: {
-      field: has_been_posted
-      value: "0"
+      field: is_fraud
+      value: "no"
+    }
+    filters: {
+      field: is_rma
+      value: "no"
+    }
+    filters: {
+      field: is_chargeback
+      value: "no"
     }
     filters: {
       field: orders_status
       value: "2"
     }
     filters: {
-      field: is_fraud
-      value: "0"
-    }
-    filters: {
-      field: is_rma
-      value: "0"
-    }
-    filters: {
-      field: is_chargeback
-      value: "0"
+      field: orders_products.products_quantity
+      value: ">0"
     }
     label: "Orders Pending Post"
     drill_fields: [detail*]
@@ -1773,13 +1810,24 @@ view: orders {
 
 
     measure: sent_count {
-    type: sum
+    type: count
     filters: {
       field: order_report.fulfillment_sent_flag
       value: "1"
     }
     label: "Sent to Fulfillment"
-    sql: (${products_quantity} + ${count_upsell_products}) ;;
+    #sql: (${products_quantity} + ${count_upsell_products}) ;;
+    drill_fields: [detail*]
+  }
+
+  measure: shipped_count {
+    type: count
+    filters: {
+      field: shipping_module_code
+      value: "1"
+    }
+    label: "Shipped Orders"
+    #sql: (${products_quantity} + ${count_upsell_products}) ;;
     drill_fields: [detail*]
   }
 
@@ -1813,12 +1861,13 @@ view: orders {
   measure: shippable_product_count {
     type: sum
     label: "Shippable Product Count"
-    sql: CASE
-              WHEN ${has_been_posted} = '1' THEN 1
-              WHEN ${orders_status} IN ('2','8') AND (${is_fraud} + ${is_rma} + ${is_chargeback}) = '0' THEN 1
-              ELSE
-                 0
-              END ;;
+    sql: ${order_report.shippable_prod_cnt} ;;
+  }
+
+  measure: avg_days_pending {
+    type: average
+    label: "Average Days Pending Tracking"
+    sql: ${order_report.days_pending} ;;
   }
 
   measure: pending_return_count {
@@ -2166,9 +2215,14 @@ view: orders {
   }
 
   measure:  declined_orders_retention {
-    type: number
+    type: count_distinct
+    filters: {
+      field: orders_status
+      value: "7"
+    }
     label: "Declined Orders - Sales By Retention"
-    sql: ${order_count_retention} - ${approved_order_count_retention} ;;
+    #sql: ${order_count_retention} - ${approved_order_count_retention} ;;
+    sql: CONCAT(${campaign_order_id}, ${customers_email_address}) ;;
     drill_fields: [subscription*]
   }
 
