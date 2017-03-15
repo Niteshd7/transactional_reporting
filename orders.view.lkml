@@ -1054,8 +1054,26 @@ view: orders {
       value: "1"
     }
     filters: {
-      field: currency_value
-      value: "NOT NULL"
+      field: order_report.upsell_flag
+      value: "0"
+    }
+    drill_fields: [detail*]
+  }
+
+  measure:  cancel_orders {
+    type: count
+    label: "Cancels"
+    filters: {
+      field: is_archived
+      value: "0"
+    }
+    filters: {
+      field: cancellation_flag
+      value: "1"
+    }
+    filters: {
+      field: is_hold
+      value: "0"
     }
     drill_fields: [detail*]
   }
@@ -1304,6 +1322,24 @@ view: orders {
       value: "0"
     }
     drill_fields: [orders_id, orders_status,order_status_name, order_total]
+  }
+
+  measure:  hold_cancel_orders_date {
+    type: count
+    label: "Holds/Cancels - Sales by Date"
+    filters: {
+      field: is_archived
+      value: "0"
+    }
+    filters: {
+      field: is_hold
+      value: "1"
+    }
+    filters: {
+      field: order_report.upsell_flag
+      value: "0"
+    }
+    drill_fields: [detail*]
   }
 
   measure: decline_revenue {
@@ -1591,7 +1627,7 @@ view: orders {
   measure: average_discount_percent {
     type: average
     label: "Average Discount %"
-    value_format_name: percent_2
+    value_format_name: percent_1
     sql: CASE WHEN ${int_1} IS NULL THEN "0" ELSE (${int_1}/100) END ;;
   }
 
@@ -1601,6 +1637,10 @@ view: orders {
     filters: {
       field: orders_status
       value: "7"
+    }
+    filters: {
+      field: order_report.upsell_flag
+      value: "0"
     }
     drill_fields: [detail*]
   }
@@ -1649,9 +1689,14 @@ view: orders {
       field: is_chargeback
       value: "yes"
     }
+    filters: {
+      field: order_report.upsell_flag
+      value: "0"
+    }
     type: count
     drill_fields: [gateway*]
   }
+
 
   measure:  void_refund_orders_gateway {
     type: count
