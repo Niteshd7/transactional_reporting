@@ -1583,8 +1583,24 @@ view: orders {
   measure: active_subscription_cnt {
     label: "Active Subscription Count"
     type: sum
-    sql: ${order_report.active_subscription_cnt} ;;
+    filters: {
+      field: orders_status
+      value: "2,8"
+    }
+    filters: {
+      field: is_recurring
+      value: "yes"
+    }
+    filters: {
+      field: order_report.upsell_flag
+      value: "0"
+    }
+    sql: ${is_recurring} ;;
+    drill_fields: [detail*]
+    #sql: ${order_report.active_subscription_cnt} ;;
   }
+
+
 
   # ------- Sales By Campaign End  ------
 
