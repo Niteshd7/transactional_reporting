@@ -1685,12 +1685,15 @@ view: orders {
  # ------- Sales By Gateway ------
 
   measure: net_order_total_gateway {
-    label: "Gross Approved Revenue_Gateway"
-    description: "This is the total amount of all orders"
+    label: "Net Revenue_Gateway"
     type: sum
     filters: {
       field: orders_status
       value: "NOT 7"
+    }
+    filters: {
+      field: order_report.upsell_flag
+      value: "0"
     }
     html: {{ currency_symbol._value }}{{ rendered_value }};;
     value_format_name: decimal_2
@@ -1700,6 +1703,10 @@ view: orders {
   measure: gross_order_gateway {
     label: "Gross Orders_Gateway"
     type: count
+    filters: {
+      field: order_report.upsell_flag
+      value: "0"
+    }
     drill_fields: [gateway*]
   }
 
@@ -1725,6 +1732,10 @@ view: orders {
       field: refund_type
       value: ">0"
     }
+    filters: {
+      field: order_report.upsell_flag
+      value: "0"
+    }
     drill_fields: [gateway*]
   }
 
@@ -1735,6 +1746,10 @@ view: orders {
     filters: {
       field: refund_type
       value: ">0"
+    }
+    filters: {
+      field: order_report.upsell_flag
+      value: "0"
     }
     html: {{ currency_symbol._value }}{{ rendered_value }};;
     value_format_name: decimal_2
@@ -1779,16 +1794,12 @@ view: orders {
     sql: ${net_approved_total} - ${void_refund_revenue} ;;
   }
 
-  measure:  net_revenue_gateway {
-    type: sum
-    label: "Net Revenue_Gateway"
-    filters: {
-      field: orders_status
-      value: "NOT 7"
-    }
+  measure:  gross_revenue_gateway {
+    type: number
+    label: "Gross Approved Revenue_Gateway"
     html: {{ currency_symbol._value }}{{ rendered_value }};;
     value_format_name: decimal_2
-    sql: (${v_main_order_total.current_total} + ${order_report.upsell_amt}) ;;
+    sql: (${net_order_total_gateway} + ${void_refund_revenue_gateway}) ;;
   }
 
   measure: chargeback_percentage_gateway {
@@ -1804,6 +1815,10 @@ view: orders {
     filters: {
       field: orders_status
       value: "7"
+    }
+    filters: {
+      field: order_report.upsell_flag
+      value: "0"
     }
     #sql: CONCAT(${campaign_order_id}, ${customers_email_address}, ${t_stamp_date}) ;;
     drill_fields: [gateway*]
@@ -2197,11 +2212,57 @@ view: orders {
  # ------- Sales By Retention ------
 
   measure: order_count_retention {
-    type: count_distinct
+    type: count
     label: "Gross Orders - Retention"
+    filters: {
+      field: refund_type
+      value: "<2"
+    }
     filters: {
       field: order_report.upsell_flag
       value: "0"
+    }
+    filters: {
+      field: orders_status
+      value: "NOT 7"
+    }
+    #sql: CONCAT(${campaign_order_id}, ${customers_email_address}) ;;
+    drill_fields: [subscription*]
+  }
+
+  measure: unique_declines_retention {
+    type: count_distinct
+    label: "Unique Declines - Retention"
+    filters: {
+      field: refund_type
+      value: "<2"
+    }
+    filters: {
+      field: order_report.upsell_flag
+      value: "0"
+    }
+    filters: {
+      field: orders_status
+      value: "7"
+    }
+    sql: CONCAT(${campaign_order_id}, ${customers_email_address}) ;;
+    drill_fields: [subscription*]
+  }
+
+  measure: unique_declines_1_retention {
+    type: count_distinct
+    label: "Unique Declines 1 - Retention"
+    filters: {
+      field: refund_type
+      value: "<2"
+    }
+    filters: {
+      field: order_report.upsell_flag
+      value: "0"
+    }
+    filters: {
+      field: is_approved
+      value: "yes"
     }
     sql: CONCAT(${campaign_order_id}, ${customers_email_address}) ;;
     drill_fields: [subscription*]
@@ -2222,8 +2283,8 @@ view: orders {
       value: "0"
     }
     filters: {
-      field: order_report.straight_sale_flag
-      value: "0"
+      field: order_report.subscription_cnt
+      value: ">0"
     }
     type: count
     drill_fields: [subscription*]
@@ -2258,12 +2319,16 @@ view: orders {
   measure: approved_order_count_retention {
     label: "Approved Orders - Sales by Retention"
     filters: {
-      field: orders_status
-      value: "2,8"
+      field: is_approved
+      value: "yes"
     }
     filters: {
       field: refund_type
       value: "<2"
+    }
+    filters: {
+      field: order_report.upsell_flag
+      value: "0"
     }
     type: count
     drill_fields: [subscription*]
@@ -2356,6 +2421,6 @@ view: orders {
   }
 
   set: gateway {
-    fields: [orders_id, cc_type_fmt, net_order_total, void_refund_revenue_gateway, refund_type, net_revenue_gateway, is_chargeback, is_declined, t_stamp_date]
+    fields: [orders_id, cc_type_fmt, net_order_total, void_refund_revenue_gateway, refund_type, is_chargeback, is_declined, t_stamp_date]
   }
 }
