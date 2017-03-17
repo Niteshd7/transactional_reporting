@@ -2063,8 +2063,9 @@ view: orders {
   }
 
   measure: count_decl_reas {
-    type: count
+    type: count_distinct
     label: "All"
+    sql: ${orders_id} ;;
     description: "Separate measure for Decline Reasons Report"
     drill_fields: [orders_id, is_subscription, t_stamp_date, decline_reason]
   }
