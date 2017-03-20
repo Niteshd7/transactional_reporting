@@ -179,6 +179,7 @@ view: decline_hold_pdt {
                    GROUP BY
                            d.orders_id
  ;;
+    indexes: ["orders_id"]
   }
 
   measure: count {
@@ -189,6 +190,14 @@ view: decline_hold_pdt {
   measure: prior_hold_count {
     type: sum
     sql: ${hold_cnt_outside} ;;
+    drill_fields: [orders_id, orders.hold_date, orders.t_stamp_date]
+  }
+
+
+  measure: current_hold_count {
+    type: sum
+    sql: ${hold_cnt};;
+    drill_fields: [orders_id, orders.hold_date, orders.t_stamp_date]
   }
 
   dimension: orders_id {
