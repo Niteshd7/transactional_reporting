@@ -193,6 +193,12 @@ view: decline_hold_pdt {
     drill_fields: [orders_id, orders.hold_date, orders.t_stamp_date]
   }
 
+  measure: decline_revenue {
+    type: sum
+    sql: ${decline_rev} ;;
+    drill_fields: [orders_id, orders.hold_date, orders.t_stamp_date]
+  }
+
 
   measure: current_hold_count {
     type: sum
