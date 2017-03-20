@@ -75,11 +75,15 @@ explore: orders {
   }
 
 
-  #join: decline_hold_pdt {
-   # type: left_outer
-    #relationship: one_to_one
-    #sql_on: ${decline_hold_pdt.orders_id} = ${orders.orders_id};;
-  #}
+  join: decline_hold_pdt {
+    relationship: one_to_one
+    sql_on: ${decline_hold_pdt.orders_id} = ${orders.orders_id};;
+  }
+
+  join: decline_hold_data{
+    relationship: one_to_one
+    sql_on: ${decline_hold_data.orders_id} = ${orders.orders_id};;
+  }
 
   join: tlkp_orders_history_type {
     type: left_outer

@@ -1,3 +1,7 @@
+view: decline_hold_data {
+  extends: [decline_hold_pdt]
+}
+
 view: decline_hold_pdt {
   derived_table: {
     sql: SELECT
@@ -41,7 +45,7 @@ view: decline_hold_pdt {
                         AND
                            o.orders_id         = ot.orders_id
                         AND
-                           o.t_stamp BETWEEN '2017-03-14 00:00:00' AND '2017-03-14 23:59:59'
+                           {% condition orders.t_stamp_date %} o.t_stamp {% endcondition %}
                            AND o.is_test_cc IN (0, 1)
 
                    GROUP BY
@@ -76,14 +80,14 @@ view: decline_hold_pdt {
                               SELECT
                                     o.orders_id,
                                     IFNULL(currency_value, 0) AS currency_value,
-                                    IF((hold_date BETWEEN '2017-03-14 00:00:00' AND '2017-03-14 23:59:59') AND (t_stamp NOT BETWEEN '2017-03-14 00:00:00' AND '2017-03-14 23:59:59'), 1, 0) AS outside
+                                    IF(({% condition orders.t_stamp_date %} o.hold_date {% endcondition %}) AND ({% condition orders.t_stamp_date %} o.t_stamp {% endcondition %}), 1, 0) AS outside
                                 FROM
                                     orders o
                                WHERE
                                     o.is_hold = 1
                                  AND
                                     (
-                                       o.t_stamp   BETWEEN '2017-03-14 00:00:00' AND '2017-03-14 23:59:59'
+                                       {% condition orders.t_stamp_date %} o.t_stamp {% endcondition %}
 
                                     )
 
@@ -91,7 +95,7 @@ view: decline_hold_pdt {
                               SELECT
                                     o.orders_id,
                                     IFNULL(uo.currency_value, 0) AS currency_value,
-                                    IF((uo.hold_date BETWEEN '2017-03-14 00:00:00' AND '2017-03-14 23:59:59') AND (uo.t_stamp NOT BETWEEN '2017-03-14 00:00:00' AND '2017-03-14 23:59:59'), 1, 0) AS outside
+                                    IF(({% condition orders.t_stamp_date %} uo.hold_date {% endcondition %}) AND ({% condition orders.t_stamp_date %} uo.t_stamp {% endcondition %}), 1, 0) AS outside
                                 FROM
                                     orders        o,
                                     upsell_orders uo
@@ -101,7 +105,7 @@ view: decline_hold_pdt {
                                     uo.is_hold = 1
                                  AND
                                     (
-                                       uo.t_stamp   BETWEEN '2017-03-14 00:00:00' AND '2017-03-14 23:59:59'
+                                       {% condition orders.t_stamp_date %} uo.t_stamp {% endcondition %}
 
                                     )
                                     AND o.is_test_cc IN (0, 1)
@@ -161,6 +165,10 @@ view: decline_hold_pdt {
                                              o.orders_status = 7
                                           AND
                                              o.wasSalvaged   = 0
+                                          AND
+                                             {% condition orders.t_stamp_date %} o.t_stamp {% endcondition %}
+                                             AND o.is_test_cc IN (0, 1)
+
                                      GROUP BY
                                              CONCAT(o.campaign_order_id, o.customers_email_address, DATE(o.t_stamp)),
                                              ot.main_product_amount_shipping_tax + f_upsell_order_total(o.orders_id)
@@ -171,12 +179,16 @@ view: decline_hold_pdt {
                    GROUP BY
                            d.orders_id
  ;;
-    indexes: ["orders_id"]
   }
 
   measure: count {
     type: count
     drill_fields: [detail*]
+  }
+
+  measure: prior_hold_count {
+    type: sum
+    sql: ${hold_cnt_outside} ;;
   }
 
   dimension: orders_id {
@@ -289,9 +301,18 @@ view: decline_hold_pdt {
     sql: ${TABLE}.chargeback_cnt ;;
   }
 
+  dimension_group: created {
+    type: time
+    timeframes: [time, date, week, month]
+    sql: ${orders.t_stamp_date} ;;
+    convert_tz: no
+  }
+
+
   set: detail {
     fields: [
       orders_id,
+      created_date,
       new_order_cnt,
       new_order_rev,
       recurring_order_cnt,
