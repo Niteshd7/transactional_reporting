@@ -4,7 +4,7 @@ view: subscr_mgmt {
 
 
                   orders.orders_id,
-                  CASE WHEN orders.int_2 > 0 THEN CONCAT('Attempt', orders.int_2) ELSE 'Initial' END as attempt,
+                  CASE WHEN declined_ccs.attempt_no > 0 THEN CONCAT('Attempt', declined_ccs.attempt_no) ELSE 'Initial' END as attempt,
                   orders.campaign_order_id,
                         IF
                         (
