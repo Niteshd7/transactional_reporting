@@ -11,6 +11,8 @@ explore: countries{}
 
 explore: gateway{}
 
+explore: subscr_mgmt{}
+
 explore: orders_decline_salvage{
 
   join: declined_ccs {
