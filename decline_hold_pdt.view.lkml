@@ -208,6 +208,7 @@ view: decline_hold_pdt {
 
   dimension: orders_id {
     type: number
+    primary_key: yes
     sql: ${TABLE}.orders_id ;;
   }
 

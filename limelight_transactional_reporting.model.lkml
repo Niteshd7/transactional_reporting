@@ -76,12 +76,12 @@ explore: orders {
 
 
   join: decline_hold_pdt {
-    relationship: one_to_one
+    relationship: one_to_many
     sql_on: ${decline_hold_pdt.orders_id} = ${orders.orders_id};;
   }
 
   join: decline_hold_data{
-    relationship: one_to_one
+    relationship: one_to_many
     sql_on: ${decline_hold_data.orders_id} = ${orders.orders_id};;
   }
 
