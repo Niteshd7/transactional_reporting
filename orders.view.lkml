@@ -2,7 +2,7 @@ view: orders {
   sql_table_name: orders ;;
 
   dimension: common_ancestor_order_id {
-    primary_key: yes
+    #primary_key: yes
     type: number
     sql: ${TABLE}.commonAncestorOrderId ;;
   }
@@ -694,6 +694,7 @@ view: orders {
 
   dimension: orders_id {
     type: number
+    primary_key: yes
     link: {
       label: "Navigate to Order"
       url: "https://{{client_domain._value}}/admin/orders.php?show_details=show_details&show_folder=view_all&fromPost=1&act=&sequence=1&show_by_id={{value}}"
@@ -1391,7 +1392,7 @@ view: orders {
     label: "Decline Revenue - Date"
     html: {{ currency_symbol._value }}{{ rendered_value }};;
     value_format_name: decimal_2
-    sql:${decline_revenue}*${decline_distinct_ratio_date} ;;
+    sql: SUM(${decline_hold_pdt.decline_rev}) ;;
   }
 
   measure:  hold_cancel_revenue {
@@ -1577,7 +1578,7 @@ view: orders {
     label: "Decline Revenue - Campaign"
     html: {{ currency_symbol._value }}{{ rendered_value }};;
     value_format_name: decimal_2
-    sql:${decline_revenue}*${decline_distinct_ratio_campaign} ;;
+    sql: SUM(${decline_hold_pdt.decline_rev}) ;;
   }
 
   measure: active_subscription_cnt {
