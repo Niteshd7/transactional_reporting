@@ -1099,37 +1099,10 @@ view: orders {
     drill_fields: [detail*]
   }
 
-  measure:  prior_hold_cancel_orders {
-    type: count
-    label: "Prior Holds/Cancels"
-    filters: {
-      field: is_archived
-      value: "0"
-    }
-    filters: {
-      field: is_hold
-      value: "1"
-    }
-    filters: {
-      field: prior_holds
-      value: "yes"
-    }
-    drill_fields: [detail*]
-  }
-
   filter: prior_date_select {
     type: date
     suggest_dimension: t_stamp_date
   }
-
-
-  dimension: prior_holds {
-    type: yesno
-    sql: {% condition prior_date_select %} ${hold_date} {% endcondition %} AND
-        NOT({% condition prior_date_select %} ${t_stamp_date} {% endcondition %}) ;;
-    hidden: yes
-  }
-
 
   measure:  subscription_approved {
     type: count

@@ -188,8 +188,8 @@ view: decline_hold_pdt {
   }
 
   measure: prior_hold_count {
-    type: sum
-    sql: ${hold_cnt_outside} ;;
+    type: number
+    sql: SUM(${hold_cnt_outside}) ;;
     drill_fields: [orders_id, orders.hold_date, orders.t_stamp_date]
   }
 
