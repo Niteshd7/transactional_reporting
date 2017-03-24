@@ -2018,13 +2018,14 @@ view: orders {
   }
 
   measure:  initial_orders_decline_reasons {
-    type: count
+    type: count_distinct
     label: "Initial"
     description: "This is Initial count for Decline Reasons Report"
     filters: {
       field: rebill_depth
-      value: "0"
+      value: "<1"
     }
+    sql: ${orders_id} ;;
     drill_fields: [orders_id, is_subscription, t_stamp_date, decline_reason]
   }
 
