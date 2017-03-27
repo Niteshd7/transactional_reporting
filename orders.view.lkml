@@ -1871,8 +1871,12 @@ view: orders {
       value: "2"
     }
     filters: {
-      field: orders_products.products_quantity
-      value: ">0"
+      field: order_report.upsell_flag
+      value: "0"
+    }
+    filters: {
+      field: v_orders.shippable_flag
+      value: "1"
     }
     label: "Orders Pending Post"
     drill_fields: [detail*]
@@ -1885,6 +1889,14 @@ view: orders {
       field: order_report.fulfillment_sent_flag
       value: "1"
     }
+    filters: {
+      field: orders_status
+      value: "2,8"
+    }
+    filters: {
+      field: order_report.upsell_flag
+      value: "0"
+    }
     label: "Sent to Fulfillment"
     #sql: (${products_quantity} + ${count_upsell_products}) ;;
     drill_fields: [detail*]
@@ -1893,11 +1905,18 @@ view: orders {
   measure: shipped_count {
     type: count
     filters: {
+      field: orders_status
+      value: "2,6,8"
+    }
+    filters: {
       field: shipping_module_code
       value: "1"
     }
-    label: "Shipped Orders"
-    #sql: (${products_quantity} + ${count_upsell_products}) ;;
+    filters: {
+      field: parent_order_id
+      value: "0"
+    }
+    label: "Shipped Orders - Fufil"
     drill_fields: [detail*]
   }
 
@@ -1926,12 +1945,26 @@ view: orders {
       field: v_orders.shippable_flag
       value: "1"
     }
+    filters: {
+      field: orders_status
+      value: "2,8"
+    }
+    filters: {
+      field: order_report.upsell_flag
+      value: "0"
+    }
+    drill_fields: [detail*]
   }
 
   measure: shippable_product_count {
     type: sum
     label: "Shippable Product Count"
     sql: ${order_report.shippable_prod_cnt} ;;
+    filters: {
+      field: orders_status
+      value: "2,8"
+    }
+    drill_fields: [detail*]
   }
 
   measure: avg_days_pending {
