@@ -79,12 +79,14 @@ explore: orders {
 
   join: decline_hold_pdt {
     relationship: one_to_many
-    sql_on: ${decline_hold_pdt.orders_id} = ${orders.orders_id};;
+    sql_on: ${decline_hold_pdt.orders_id} = ${orders.orders_id}
+        AND ${decline_hold_pdt.orders_id} > '0';;
   }
 
   join: decline_hold_data{
     relationship: one_to_many
-    sql_on: ${decline_hold_data.orders_id} = ${orders.orders_id};;
+    sql_on: ${decline_hold_data.orders_id} = ${orders.orders_id}
+      AND ${decline_hold_data.orders_id} > '0';;
   }
 
   join: tlkp_orders_history_type {
