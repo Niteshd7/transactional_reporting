@@ -195,6 +195,10 @@ view: decline_hold_pdt {
 
   measure: decline_revenue {
     type: sum
+    filters: {
+      field: orders.upsell_flag
+      value: "0"
+    }
     sql: ${decline_rev} ;;
     drill_fields: [orders_id, orders.hold_date, orders.t_stamp_date]
   }

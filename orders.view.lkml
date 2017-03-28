@@ -928,7 +928,10 @@ view: orders {
     sql: ${order_report.upsell_id} ;;
   }
 
-
+  dimension: upsell_flag {
+    type: number
+    sql: ${order_report.upsell_flag} ;;
+  }
 
 
   filter: cycle_select {
@@ -1365,7 +1368,7 @@ view: orders {
     label: "Decline Revenue - Date"
     html: {{ currency_symbol._value }}{{ rendered_value }};;
     value_format_name: decimal_2
-    sql: SUM(${decline_hold_pdt.decline_rev}) ;;
+    sql: SUM(${decline_hold_pdt.decline_rev});;
   }
 
   measure:  hold_cancel_revenue {
