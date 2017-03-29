@@ -1099,6 +1099,10 @@ view: orders {
       field: orders_status
       value: "2,6,8"
     }
+    filters: {
+      field: order_report.upsell_flag
+      value: "0"
+    }
     drill_fields: [detail*]
   }
 
@@ -1325,16 +1329,12 @@ view: orders {
     type: count
     label: "Holds/Cancels - Sales by Date"
     filters: {
-      field: is_archived
+      field: deleted
       value: "0"
     }
     filters: {
       field: is_hold
       value: "1"
-    }
-    filters: {
-      field: order_report.upsell_flag
-      value: "0"
     }
     drill_fields: [detail*]
   }
