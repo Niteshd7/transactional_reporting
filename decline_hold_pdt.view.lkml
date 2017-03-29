@@ -133,6 +133,7 @@ view: decline_hold_pdt {
       value: "0"
     }
     sql: ${decline_rev} ;;
+    value_format_name: decimal_2
     drill_fields: [orders_id, orders.hold_date, orders.t_stamp_date]
   }
 
