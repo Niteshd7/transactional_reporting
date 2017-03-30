@@ -84,6 +84,13 @@ explore: orders {
         AND ${decline_hold_pdt.orders_id} > '0';;
   }
 
+  join: hold_pdt {
+    type: inner
+    relationship: one_to_one
+    sql_on: ${hold_pdt.orders_id} = ${orders.orders_id}
+      AND ${hold_pdt.orders_id} > '0';;
+  }
+
   join: decline_hold_pdt_campaign {
     type: inner
     relationship: one_to_one
