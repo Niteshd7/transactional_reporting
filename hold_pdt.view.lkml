@@ -94,6 +94,13 @@ view: hold_pdt {
     drill_fields: [detail*]
   }
 
+  measure: count_prior_hold {
+    type: sum_distinct
+    sql: ${hold_cnt_outside} ;;
+    sql_distinct_key: ${orders_id} ;;
+    drill_fields: [detail*]
+  }
+
   dimension: orders_id {
     type: number
     sql: ${TABLE}.orders_id ;;
