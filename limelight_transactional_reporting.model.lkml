@@ -175,7 +175,7 @@ explore: orders {
     relationship: one_to_one
     #sql_on: ${prospects.campaign_id} = ${orders.campaign_order_id};;
     sql_on: ${prospects.campaign_id} = ${campaigns.c_id}
-        AND ${prospects.p_date_date} = ${orders.t_stamp_date};;
+        AND {% condition orders.t_stamp_date %} prospects.pDate {% endcondition %};;
   }
 
   join: check_provider_accounts {

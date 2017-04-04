@@ -2240,21 +2240,10 @@ view: orders {
  # ------- Sales By Retention ------
 
   measure: order_count_retention {
-    type: count
+    type: number
     label: "Gross Orders - Retention"
-    filters: {
-      field: refund_type
-      value: "<2"
-    }
-    filters: {
-      field: order_report.upsell_flag
-      value: "0"
-    }
-    filters: {
-      field: orders_status
-      value: "NOT 7"
-    }
     #sql: CONCAT(${campaign_order_id}, ${customers_email_address}) ;;
+    sql: ${approved_order_count_retention} + ${declined_orders_retention} + ${void_full_refund_orders} ;;
     drill_fields: [subscription*]
   }
 
