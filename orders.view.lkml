@@ -2243,45 +2243,7 @@ view: orders {
     type: number
     label: "Gross Orders - Retention"
     #sql: CONCAT(${campaign_order_id}, ${customers_email_address}) ;;
-    sql: ${approved_order_count_retention} + ${declined_orders_retention} + ${void_full_refund_orders} ;;
-    drill_fields: [subscription*]
-  }
-
-  measure: unique_declines_retention {
-    type: count_distinct
-    label: "Unique Declines - Retention"
-    filters: {
-      field: refund_type
-      value: "<2"
-    }
-    filters: {
-      field: order_report.upsell_flag
-      value: "0"
-    }
-    filters: {
-      field: orders_status
-      value: "7"
-    }
-    sql: CONCAT(${campaign_order_id}, ${customers_email_address}) ;;
-    drill_fields: [subscription*]
-  }
-
-  measure: unique_declines_1_retention {
-    type: count_distinct
-    label: "Unique Declines 1 - Retention"
-    filters: {
-      field: refund_type
-      value: "<2"
-    }
-    filters: {
-      field: order_report.upsell_flag
-      value: "0"
-    }
-    filters: {
-      field: is_approved
-      value: "yes"
-    }
-    sql: CONCAT(${campaign_order_id}, ${customers_email_address}) ;;
+    sql: ${approved_order_count_retention} + ${declined_orders_campaign} + ${void_full_refund_orders} ;;
     drill_fields: [subscription*]
   }
 
@@ -2314,10 +2276,6 @@ view: orders {
       value: "yes"
     }
     filters: {
-      field: order_report.straight_sale_flag
-      value: "0"
-    }
-    filters: {
       field: is_hold
       value: "0"
     }
@@ -2326,8 +2284,12 @@ view: orders {
       value: "<2"
     }
     filters: {
-      field: is_subscription
-      value: "yes"
+      field: order_report.order_subscription_flag
+      value: "1"
+    }
+    filters: {
+      field: order_report.upsell_flag
+      value: "0"
     }
     type: count
     drill_fields: [subscription*]
@@ -2355,19 +2317,22 @@ view: orders {
     type: number
     label: "Approval Rate"
     value_format_name: percent_2
-    sql: ${approved_subscriptions_count} / NULLIF(${order_count_retention},0) ;;
+    sql: ${approved_order_count_retention} / NULLIF(${order_count_retention},0) ;;
   }
 
   measure:  declined_orders_retention {
     type: count_distinct
+    label: "Declined Orders - Retention"
     filters: {
       field: orders_status
       value: "7"
     }
-    label: "Declined Orders - Sales By Retention"
-    #sql: ${order_count_retention} - ${approved_order_count_retention} ;;
+    filters: {
+      field: was_salvaged
+      value: "no"
+    }
     sql: CONCAT(${campaign_order_id}, ${customers_email_address}) ;;
-    drill_fields: [subscription*]
+    drill_fields: [detail*]
   }
 
   measure:  hold_orders {
