@@ -70,6 +70,7 @@ view: hold_pdt {
                    GROUP BY
                            o.orders_id
  ;;
+    indexes: ["orders_id"]
   }
 
   measure: count {
@@ -102,6 +103,7 @@ view: hold_pdt {
   }
 
   dimension: orders_id {
+    primary_key: yes
     type: number
     sql: ${TABLE}.orders_id ;;
   }
