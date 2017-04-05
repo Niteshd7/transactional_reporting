@@ -68,6 +68,7 @@ view: prospect_pdt {
          GROUP BY
                  campaign_id
  ;;
+indexes: ["prospect_id,campaign_id"]
   }
 
   measure: count {
