@@ -185,6 +185,13 @@ explore: orders {
         AND {% condition orders.t_stamp_date %} prospects.pDate {% endcondition %};;
   }
 
+  join: prospect_pdt {
+    type: left_outer
+    relationship: one_to_one
+    #sql_on: ${prospects.campaign_id} = ${orders.campaign_order_id};;
+    sql_on: ${prospect_pdt.campaign} = ${orders.campaign_order_id} ;;
+  }
+
   join: check_provider_accounts {
     type: left_outer
     relationship: many_to_one

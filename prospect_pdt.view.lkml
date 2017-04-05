@@ -1,7 +1,7 @@
 view: prospect_pdt {
   derived_table: {
     sql: SELECT
-                 o.campaign_order_id as campaign_id,
+                 c.c_id as campaign,
                  0        AS prospect_cnt,
                  COUNT(distinct o.customers_email_address) AS customer_cnt,
                  ROUND(SUM(ot.main_product_amount_shipping_tax + (
@@ -46,13 +46,14 @@ view: prospect_pdt {
                  o.parent_order_id = 0
               AND
                  {% condition orders.t_stamp_date %} o.t_stamp {% endcondition %}
-                 AND o.is_test_cc IN (0, 1)
+              AND
+                 o.is_test_cc IN (0, 1)
 
          GROUP BY
-                 campaign_id
+                 campaign
             UNION ALL
            SELECT
-                 p.campaign_id AS campaign_id,
+                 c.c_id as campaign,
                  COUNT(1) AS prospect_cnt,
                  0        AS customer_cnt,
                  0        AS avg_rev,
@@ -66,9 +67,9 @@ view: prospect_pdt {
                  {% condition orders.t_stamp_date %} p.pDate {% endcondition %}
 
          GROUP BY
-                 campaign_id
+                 campaign
  ;;
-indexes: ["prospect_id,campaign_id"]
+   indexes: ["campaign"]
   }
 
   measure: count {
@@ -76,37 +77,23 @@ indexes: ["prospect_id,campaign_id"]
     drill_fields: [detail*]
   }
 
-  measure: sum_prospect {
-    type: sum
+  measure: count_prospects {
+    type: sum_distinct
     sql: ${prospect_cnt} ;;
+    sql_distinct_key: ${campaign} ;;
     drill_fields: [detail*]
   }
 
-  measure: sum_revenue {
-    type: sum
-    sql: ${total_rev} ;;
-  }
-
-  measure: count_prospect {
-    type: number
-    sql: ${sum_prospect}/NULLIF(${count},0) ;;
+  measure: count_customers {
+    type: sum_distinct
+    sql: ${customer_cnt} ;;
+    sql_distinct_key: ${campaign} ;;
     drill_fields: [detail*]
   }
 
-  measure: total_revenue {
+  dimension: campaign {
     type: number
-    sql: ${sum_revenue}/NULLIF(${count},0) ;;
-  }
-
-  measure: avg_revenue {
-    type: number
-    sql: ${avg_rev} ;;
-  }
-
-  dimension: campaign_id {
-    type: string
-    primary_key: yes
-    sql: ${TABLE}.campaign_id ;;
+    sql: ${TABLE}.campaign ;;
   }
 
   dimension: prospect_cnt {
@@ -130,6 +117,6 @@ indexes: ["prospect_id,campaign_id"]
   }
 
   set: detail {
-    fields: [campaign_id, prospect_cnt, customer_cnt, avg_rev, total_rev]
+    fields: [campaign, prospect_cnt, customer_cnt, avg_rev, total_rev]
   }
 }
