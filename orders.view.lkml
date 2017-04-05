@@ -1130,26 +1130,6 @@ view: orders {
   }
 
 
-  measure:  void_full_refund_orders {
-    type: count
-    label: "Void/Full Refund"
-    filters: {
-      field: refund_type
-      value: "2,3"
-    }
-    drill_fields: [orders_id, orders_status,order_status_name, order_total]
-  }
-
-  measure:  partial_refund_orders {
-    type: count
-    label: "Partial Refund"
-    filters: {
-      field: refund_type
-      value: "1"
-    }
-    drill_fields: [orders_id, orders_status,order_status_name, order_total]
-  }
-
   measure: count_approved {
     type: count
     label: "Successful Transactions"
@@ -2318,6 +2298,27 @@ view: orders {
     label: "Approval Rate"
     value_format_name: percent_2
     sql: ${approved_order_count_retention} / NULLIF(${order_count_retention},0) ;;
+  }
+
+
+  measure:  void_full_refund_orders {
+    type: count
+    label: "Void/Full Refund"
+    filters: {
+      field: refund_type
+      value: "2,3"
+    }
+    drill_fields: [orders_id, orders_status,order_status_name, order_total]
+  }
+
+  measure:  partial_refund_orders {
+    type: count
+    label: "Partial Refund"
+    filters: {
+      field: refund_type
+      value: "1"
+    }
+    drill_fields: [orders_id, orders_status,order_status_name, order_total]
   }
 
   measure:  declined_orders_retention {
