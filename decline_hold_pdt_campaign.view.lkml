@@ -1,53 +1,6 @@
 view: decline_hold_pdt_campaign {
   derived_table: {
     sql: SELECT
-                          o.orders_id,
-                          COUNT(IF(o.orders_status IN (2,8) AND o.rebillDepth = 0, 1, NULL))                                                                         AS new_order_cnt,
-                          SUM(IF(o.orders_status IN (2,8) AND o.rebillDepth = 0, ot.current_total + f_upsell_order_total(o.orders_id), 0))                           AS new_order_rev,
-                          COUNT(IF(o.orders_status IN (2,8) AND o.parent_order_id > 0 AND o.rebillDepth > 0, 1, NULL))                                               AS recurring_order_cnt,
-                          SUM(IF(o.orders_status IN (2,8) AND o.parent_order_id > 0 AND o.rebillDepth > 0, ot.current_total + f_upsell_order_total(o.orders_id), 0)) AS recurring_order_rev,
-                          COUNT(IF(
-                             o.orders_status NOT IN(7, 10, 11) AND
-                             (o.payment_module_code = 1 OR IFNULL((SELECT MAX(payment_module_code) FROM upsell_orders uo WHERE uo.main_orders_id = o.orders_id), 0) = 1),
-                             1, NULL))                                      AS shipping_cnt,
-                          SUM(IF(
-                             o.orders_status NOT IN(7, 10, 11) AND
-                             (o.payment_module_code = 1 OR IFNULL((SELECT MAX(payment_module_code) FROM upsell_orders uo WHERE uo.main_orders_id = o.orders_id), 0) = 1) AND
-                             o.refundType < 2,
-                             ot.shipping_amount, 0))                                                                                                                 AS shipping_rev,
-                          COUNT(IF(o.orders_status IN (2,8), 1, NULL))                                                                                               AS all_new_order_cnt,
-                          SUM(IF(o.orders_status IN (2,8), ot.current_total + f_upsell_order_total(o.orders_id), 0))                                                 AS all_new_order_rev,
-                          COUNT(IF(o.orders_status IN (10, 11), 1, NULL))                                                                                            AS pending_order_cnt,
-                          SUM(IF(o.orders_status IN (10, 11), ot.current_total + f_upsell_order_total(o.orders_id), 0))                                              AS pending_order_rev,
-                          COUNT(IF(o.refundType > 1, 1, NULL))                                                                                                       AS refund_void_cnt,
-                          SUM(ot.refunded_amount)                                                                                                                    AS refund_void_rev,
-                          SUM(IF(o.orders_status NOT IN (6,7), ot.tax_factor, 0))                                                                                    AS taxable_rev,
-                          COUNT(IF(o.is_recurring AND o.orders_status IN (2,8), 1, NULL))                                                                            AS active_cnt,
-                          0                                                                                                                                          AS decline_cnt,
-                          0                                                                                                                                          AS decline_rev,
-                          0                                                                                                                                          AS hold_cnt,
-                          0                                                                                                                                          AS hold_rev,
-                          0                                                                                                                                          AS hold_cnt_outside,
-                          0                                                                                                                                          AS hold_rev_o,
-                          COUNT(IF(o.isChargeback = 1, 1, NULL))                                                                                                     AS chargeback_cnt
-                       FROM
-                           v_main_order_total   ot,
-                           campaigns       c,
-                           orders          o
-                      WHERE
-                           o.deleted           = 0
-                        AND
-                           o.campaign_order_id = c.c_id
-                        AND
-                           o.orders_id         = ot.orders_id
-                        AND
-                           {% condition orders.t_stamp_date %} o.t_stamp {% endcondition %}
-                           AND o.is_test_cc IN (0, 1)
-
-                   GROUP BY
-                           o.orders_id
-                  UNION ALL
-                     SELECT
                            d.orders_id,
                            0                                         AS new_order_cnt,
                            0                                         AS new_order_rev,
@@ -124,7 +77,7 @@ view: decline_hold_pdt_campaign {
 
   measure: decline_revenue {
     type: number
-    sql: ${decline_revenue_hide}/2 ;;
+    sql: ${decline_revenue_hide} ;;
     value_format_name: decimal_2
     drill_fields: [orders_id, orders.hold_date, orders.t_stamp_date]
   }
