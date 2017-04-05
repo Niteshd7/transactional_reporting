@@ -1,6 +1,15 @@
 view: prospect_pdt {
   derived_table: {
     sql: SELECT
+        campaign                                                                                                                                          AS campaign,
+        SUM(prospect_cnt)                                                                                                                                 AS prospect_cnt,
+        FORMAT(SUM(prospect_cnt), 0)                                                                                                                      AS prospect_cnt_fmt,
+        SUM(customer_cnt)                                                                                                                                 AS customer_cnt,
+        FORMAT(SUM(customer_cnt), 0)                                                                                                                      AS customer_cnt_fmt,
+        total_rev                                                                                                                                         AS total_rev,
+        CONCAT('$', FORMAT(total_rev, 2), '')                                                                   AS total_rev_fmt
+    FROM
+           (SELECT
                  c.c_id as campaign,
                  0        AS prospect_cnt,
                  COUNT(distinct o.customers_email_address) AS customer_cnt,
@@ -51,7 +60,7 @@ view: prospect_pdt {
 
          GROUP BY
                  campaign
-            UNION ALL
+            UNION
            SELECT
                  c.c_id as campaign,
                  COUNT(1) AS prospect_cnt,
@@ -67,9 +76,10 @@ view: prospect_pdt {
                  {% condition orders.t_stamp_date %} p.pDate {% endcondition %}
 
          GROUP BY
-                 campaign
- ;;
-   indexes: ["campaign"]
+                 campaign)p
+    GROUP BY
+    campaign
+ ;; indexes: ["campaign"]
   }
 
   measure: count {
@@ -91,6 +101,13 @@ view: prospect_pdt {
     drill_fields: [detail*]
   }
 
+  measure: conversion_percent {
+    type: number
+    value_format_name: percent_2
+    sql: ${count_customers}/NULLIF((${count_customers}+${count_prospects}),0) ;;
+    drill_fields: [detail*]
+  }
+
   dimension: campaign {
     type: number
     sql: ${TABLE}.campaign ;;
@@ -101,14 +118,14 @@ view: prospect_pdt {
     sql: ${TABLE}.prospect_cnt ;;
   }
 
+  dimension: prospect_cnt_fmt {
+    type: string
+    sql: ${TABLE}.prospect_cnt_fmt ;;
+  }
+
   dimension: customer_cnt {
     type: number
     sql: ${TABLE}.customer_cnt ;;
-  }
-
-  dimension: avg_rev {
-    type: number
-    sql: ${TABLE}.avg_rev ;;
   }
 
   dimension: total_rev {
@@ -116,7 +133,19 @@ view: prospect_pdt {
     sql: ${TABLE}.total_rev ;;
   }
 
+  dimension: total_rev_fmt {
+    type: string
+    sql: ${TABLE}.total_rev_fmt ;;
+  }
+
   set: detail {
-    fields: [campaign, prospect_cnt, customer_cnt, avg_rev, total_rev]
+    fields: [
+      campaign,
+      prospect_cnt,
+      prospect_cnt_fmt,
+      customer_cnt,
+      total_rev,
+      total_rev_fmt
+    ]
   }
 }

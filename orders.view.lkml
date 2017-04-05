@@ -2013,7 +2013,7 @@ view: orders {
     description: "Average Revenue Calculation for Sales by Prospect"
     html: {{ currency_symbol._value }}{{ rendered_value }};;
     value_format_name: decimal_2
-    sql: ${net_order_total_prospect}/NULLIF(${count_customers},0) ;;
+    sql: ${net_order_total_prospect}/NULLIF(${prospect_pdt.count_customers},0) ;;
   }
 
 
