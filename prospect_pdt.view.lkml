@@ -246,7 +246,7 @@ CASE
              )
       )
 END
-                 AND o.is_test_cc IN (0, 1)
+                 AND {% condition is_test %} o.is_test_cc {% endcondition %}
 
          GROUP BY
                  group_by_val
@@ -449,6 +449,11 @@ GROUP BY
     type: date
   }
 
+  filter: is_test {
+    type: string
+    default_value: "0,1"
+  }
+
   dimension: order_val {
     type: number
     sql: ${TABLE}.order_val ;;
@@ -464,12 +469,12 @@ GROUP BY
     sql: ${TABLE}.sub_group_by_type ;;
   }
 
-  dimension: group_by_val {
+  dimension: campaign {
     type: string
     sql: ${TABLE}.group_by_val ;;
   }
 
-  dimension: group_by_disp {
+  dimension: campaign_disp {
     type: string
     sql: ${TABLE}.group_by_disp ;;
   }
@@ -532,14 +537,14 @@ GROUP BY
   measure: count_prospects {
     type: sum_distinct
     sql: ${prospect_cnt} ;;
-    sql_distinct_key: ${group_by_val} ;;
+    sql_distinct_key: ${campaign} ;;
     drill_fields: [detail*]
   }
 
   measure: count_customers {
     type: sum_distinct
     sql: ${customer_cnt} ;;
-    sql_distinct_key: ${group_by_val} ;;
+    sql_distinct_key: ${campaign} ;;
     drill_fields: [detail*]
   }
 
@@ -568,11 +573,7 @@ GROUP BY
 
   set: detail {
     fields: [
-      order_val,
-      group_by_type,
-      sub_group_by_type,
-      group_by_val,
-      group_by_disp,
+      campaign,
       prospect_cnt,
       prospect_cnt_fmt,
       customer_cnt,
