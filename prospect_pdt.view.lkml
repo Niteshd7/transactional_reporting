@@ -566,7 +566,7 @@ GROUP BY
 
   measure: conversion_percent {
     type: number
-    value_format_name: percent_2
+    value_format_name: percent_1
     sql: ${count_customers}/NULLIF((${count_customers}+${count_prospects}),0) ;;
     drill_fields: [detail*]
   }
