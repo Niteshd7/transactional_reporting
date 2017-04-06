@@ -11,6 +11,8 @@ explore: countries{}
 
 explore: gateway{}
 
+explore: pdt_fulfillment_reconciliation {}
+
 explore: subscr_mgmt{}
 
 explore: orders_decline_salvage{
