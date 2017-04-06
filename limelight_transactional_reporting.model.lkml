@@ -13,6 +13,10 @@ explore: gateway{}
 
 explore: pdt_fulfillment_reconciliation {}
 
+explore: pdt_user_activity {}
+
+explore: pdt_employee_activity {}
+
 explore: subscr_mgmt{}
 
 explore: orders_decline_salvage{
