@@ -2,50 +2,33 @@ view: hold_pdt {
   derived_table: {
     sql: SELECT
                            o.orders_id,
-                           0                                                    AS new_order_cnt,
-                           0                                                    AS new_order_rev,
-                           0                                                    AS recurring_order_cnt,
-                           0                                                    AS recurring_order_rev,
-                           0                                                    AS shipping_cnt,
-                           0                                                    AS shipping_rev,
-                           0                                                    AS all_new_order_cnt,
-                           0                                                    AS all_new_order_rev,
-                           0                                                    AS pending_order_cnt,
-                           0                                                    AS pending_order_rev,
-                           0                                                    AS refund_void_cnt,
-                           0                                                    AS refund_void_rev,
-                           0                                                    AS taxable_rev,
-                           0                                                    AS active_cnt,
-                           0                                                    AS decline_cnt,
-                           0                                                    AS decline_rev,
                            COUNT(IF(outside = 0, 1, NULL))                      AS hold_cnt,
                            SUM(IF(outside = 0, IFNULL(o.currency_value, 0), 0)) AS hold_rev,
                            COUNT(IF(outside = 1, 1, NULL))                      AS hold_cnt_outside,
-                           SUM(IF(outside = 1, IFNULL(o.currency_value, 0), 0)) AS hold_rev_o,
-                           0                                                    AS chargeback_cnt
+                           SUM(IF(outside = 1, IFNULL(o.currency_value, 0), 0)) AS hold_rev_o
                        FROM
                            orders o,
                            (
                               SELECT
                                     o.orders_id,
                                     IFNULL(currency_value, 0) AS currency_value,
-                                    IF(({% condition orders.t_stamp_date %} o.hold_date {% endcondition %}) AND (NOT {% condition orders.t_stamp_date %} o.t_stamp {% endcondition %}), 1, 0) AS outside
+                                    IF((o.hold_date BETWEEN (SELECT TIMESTAMP({% date_start orders.t_stamp_date %})) AND (SELECT TIMESTAMP({% date_end orders.t_stamp_date %}))) AND (o.t_stamp NOT BETWEEN (SELECT TIMESTAMP({% date_start orders.t_stamp_date %})) AND (SELECT TIMESTAMP({% date_end orders.t_stamp_date %}))), 1, 0) AS outside
                                 FROM
                                     orders o
                                WHERE
                                     o.is_hold = 1
                                  AND
                                     (
-                                       {% condition orders.t_stamp_date %} o.t_stamp {% endcondition %}
+                                       (o.t_stamp BETWEEN (SELECT TIMESTAMP({% date_start orders.t_stamp_date %})) AND (SELECT TIMESTAMP({% date_end orders.t_stamp_date %})))
                                         OR
-                                                   {% condition orders.t_stamp_date %} o.hold_date {% endcondition %}
+                                                   (o.hold_date BETWEEN (SELECT TIMESTAMP({% date_start orders.t_stamp_date %})) AND (SELECT TIMESTAMP({% date_end orders.t_stamp_date %})))
                                     )
 
                            UNION ALL
                               SELECT
                                     o.orders_id,
                                     IFNULL(uo.currency_value, 0) AS currency_value,
-                                    IF(({% condition orders.t_stamp_date %} o.hold_date {% endcondition %}) AND (NOT {% condition orders.t_stamp_date %} uo.t_stamp {% endcondition %}), 1, 0) AS outside
+                                    IF((uo.hold_date BETWEEN (SELECT TIMESTAMP({% date_start orders.t_stamp_date %})) AND (SELECT TIMESTAMP({% date_end orders.t_stamp_date %}))) AND (uo.t_stamp NOT BETWEEN (SELECT TIMESTAMP({% date_start orders.t_stamp_date %})) AND (SELECT TIMESTAMP({% date_end orders.t_stamp_date %}))), 1, 0) AS outside
                                 FROM
                                     orders        o,
                                     upsell_orders uo
@@ -55,9 +38,9 @@ view: hold_pdt {
                                     uo.is_hold = 1
                                  AND
                                     (
-                                       {% condition orders.t_stamp_date %} uo.t_stamp {% endcondition %}
+                                       (uo.t_stamp BETWEEN (SELECT TIMESTAMP({% date_start orders.t_stamp_date %})) AND (SELECT TIMESTAMP({% date_end orders.t_stamp_date %})))
                                         OR
-                                                   {% condition orders.t_stamp_date %} uo.hold_date {% endcondition %}
+                                                   (uo.hold_date BETWEEN (SELECT TIMESTAMP({% date_start orders.t_stamp_date %})) AND (SELECT TIMESTAMP({% date_end orders.t_stamp_date %})))
 
                                     )
                                     AND o.is_test_cc IN (0, 1)
@@ -68,7 +51,7 @@ view: hold_pdt {
                         AND
                            o.deleted   = 0
                    GROUP BY
-                           o.orders_id
+                           oh.orders_id
  ;;
     indexes: ["orders_id"]
   }
@@ -80,30 +63,38 @@ view: hold_pdt {
 
 
   measure: count_hold {
-    type: sum_distinct
+    type: sum
     sql: ${hold_cnt} ;;
-    sql_distinct_key: ${orders_id} ;;
+    #sql_distinct_key: ${orders_id} ;;
     drill_fields: [detail*]
   }
 
 
   measure: sum_hold {
-    type: sum_distinct
+    type: sum
     sql: ${hold_rev};;
     value_format_name: decimal_2
-    sql_distinct_key: ${orders_id} ;;
+    #sql_distinct_key: ${orders_id} ;;
+    drill_fields: [detail*]
+  }
+
+  measure: sum_hold_outside {
+    type: sum
+    sql: ${hold_rev_o};;
+    value_format_name: decimal_2
+    #sql_distinct_key: ${orders_id} ;;
     drill_fields: [detail*]
   }
 
   measure: count_prior_hold {
-    type: sum_distinct
+    type: sum
     sql: ${hold_cnt_outside} ;;
-    sql_distinct_key: ${orders_id} ;;
+    #sql_distinct_key: ${orders_id} ;;
     drill_fields: [detail*]
   }
 
   dimension: orders_id {
-    primary_key: yes
+    #primary_key: yes
     type: number
     sql: ${TABLE}.orders_id ;;
   }
