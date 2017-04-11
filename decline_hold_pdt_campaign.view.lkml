@@ -2,20 +2,6 @@ view: decline_hold_pdt_campaign {
   derived_table: {
     sql: SELECT
                            d.orders_id,
-                           0                                         AS new_order_cnt,
-                           0                                         AS new_order_rev,
-                           0                                         AS recurring_order_cnt,
-                           0                                         AS recurring_order_rev,
-                           0                                         AS shipping_cnt,
-                           0                                         AS shipping_rev,
-                           0                                         AS all_new_order_cnt,
-                           0                                         AS all_new_order_rev,
-                           0                                         AS pending_order_cnt,
-                           0                                         AS pending_order_rev,
-                           0                                         AS refund_void_cnt,
-                           0                                         AS refund_void_rev,
-                           0                                         AS taxable_rev,
-                           0                                         AS active_cnt,
                            d.cnt                                     AS decline_cnt,
                            d.rev                                     AS decline_rev,
                            0                                         AS hold_cnt,
@@ -107,76 +93,6 @@ view: decline_hold_pdt_campaign {
     sql: ${TABLE}.orders_id ;;
   }
 
-  dimension: new_order_cnt {
-    type: number
-    sql: ${TABLE}.new_order_cnt ;;
-  }
-
-  dimension: new_order_rev {
-    type: number
-    sql: ${TABLE}.new_order_rev ;;
-  }
-
-  dimension: recurring_order_cnt {
-    type: number
-    sql: ${TABLE}.recurring_order_cnt ;;
-  }
-
-  dimension: recurring_order_rev {
-    type: number
-    sql: ${TABLE}.recurring_order_rev ;;
-  }
-
-  dimension: shipping_cnt {
-    type: number
-    sql: ${TABLE}.shipping_cnt ;;
-  }
-
-  dimension: shipping_rev {
-    type: number
-    sql: ${TABLE}.shipping_rev ;;
-  }
-
-  dimension: all_new_order_cnt {
-    type: number
-    sql: ${TABLE}.all_new_order_cnt ;;
-  }
-
-  dimension: all_new_order_rev {
-    type: number
-    sql: ${TABLE}.all_new_order_rev ;;
-  }
-
-  dimension: pending_order_cnt {
-    type: number
-    sql: ${TABLE}.pending_order_cnt ;;
-  }
-
-  dimension: pending_order_rev {
-    type: number
-    sql: ${TABLE}.pending_order_rev ;;
-  }
-
-  dimension: refund_void_cnt {
-    type: number
-    sql: ${TABLE}.refund_void_cnt ;;
-  }
-
-  dimension: refund_void_rev {
-    type: number
-    sql: ${TABLE}.refund_void_rev ;;
-  }
-
-  dimension: taxable_rev {
-    type: number
-    sql: ${TABLE}.taxable_rev ;;
-  }
-
-  dimension: active_cnt {
-    type: number
-    sql: ${TABLE}.active_cnt ;;
-  }
-
   dimension: decline_cnt {
     type: number
     sql: ${TABLE}.decline_cnt ;;
@@ -224,20 +140,6 @@ view: decline_hold_pdt_campaign {
     fields: [
       orders_id,
       created_date,
-      new_order_cnt,
-      new_order_rev,
-      recurring_order_cnt,
-      recurring_order_rev,
-      shipping_cnt,
-      shipping_rev,
-      all_new_order_cnt,
-      all_new_order_rev,
-      pending_order_cnt,
-      pending_order_rev,
-      refund_void_cnt,
-      refund_void_rev,
-      taxable_rev,
-      active_cnt,
       decline_cnt,
       decline_rev,
       hold_cnt,
