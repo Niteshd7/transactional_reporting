@@ -97,6 +97,13 @@ explore: orders {
       AND ${hold_pdt.orders_id} > '0';;
   }
 
+  join: prior_hold_pdt {
+    type: left_outer
+    relationship: one_to_one
+    sql_on: ${prior_hold_pdt.orders_id} = ${orders.orders_id}
+      AND ${prior_hold_pdt.orders_id} > '0';;
+  }
+
   join: prod_hold_pdt {
     type: left_outer
     relationship: one_to_one
