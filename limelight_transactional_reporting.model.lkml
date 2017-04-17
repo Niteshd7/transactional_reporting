@@ -111,6 +111,13 @@ explore: orders {
       AND ${prod_hold_pdt.orders_id} > '0';;
   }
 
+  join: prod_hold_pdt_1 {
+    type: left_outer
+    relationship: one_to_one
+    sql_on: ${prod_hold_pdt_1.group_by_val} = ${orders.products_id}
+;;
+  }
+
   join: decline_hold_pdt_campaign {
     type: left_outer
     relationship: one_to_one
@@ -218,7 +225,6 @@ explore:  tlkp_orders_history_type {
   }
 
 }
-explore: sessions{}
 
 explore: upsell_orders{}
 

@@ -29,7 +29,7 @@ view: prod_hold_pdt {
                                    IFNULL(currency_value, 0)                          AS currency_value,
                                    CONCAT('(', p.products_id, ') ', pd.products_name) AS products_id_disp,
                                    p.products_quantity                                AS prod_cnt,
-                                    IF(({% condition orders.t_stamp_date %} o.hold_date {% endcondition %}) AND (NOT {% condition orders.t_stamp_date %} o.t_stamp {% endcondition %}), 1, 0) AS outside
+                                    IF((o.hold_date BETWEEN (SELECT TIMESTAMP({% date_start orders.t_stamp_date %})) AND (SELECT TIMESTAMP({% date_end orders.t_stamp_date %}))) AND (o.t_stamp NOT BETWEEN (SELECT TIMESTAMP({% date_start orders.t_stamp_date %})) AND (SELECT TIMESTAMP({% date_end orders.t_stamp_date %}))), 1, 0) AS outside
                                 FROM
                                    orders               o,
                                    orders_products      p,
@@ -57,7 +57,7 @@ view: prod_hold_pdt {
                                    IFNULL(uo.currency_value, 0)                       AS currency_value,
                                    CONCAT('(', p.products_id, ') ', pd.products_name) AS products_id_disp,
                                    p.products_quantity                                AS prod_cnt,
-                                    IF(({% condition orders.t_stamp_date %} o.hold_date {% endcondition %}) AND (NOT {% condition orders.t_stamp_date %} uo.t_stamp {% endcondition %}), 1, 0) AS outside
+                                    IF((uo.hold_date BETWEEN (SELECT TIMESTAMP({% date_start orders.t_stamp_date %})) AND (SELECT TIMESTAMP({% date_end orders.t_stamp_date %}))) AND (uo.t_stamp NOT BETWEEN (SELECT TIMESTAMP({% date_start orders.t_stamp_date %})) AND (SELECT TIMESTAMP({% date_end orders.t_stamp_date %}))), 1, 0) AS outside
                                 FROM
                                     orders                 o,
                                    upsell_orders          uo,
@@ -100,9 +100,9 @@ view: prod_hold_pdt {
 
 
   measure: count_hold {
-    type: sum_distinct
-    sql: ${hold_cnt} ;;
-    sql_distinct_key: ${orders_id} ;;
+    type: sum
+    sql: ${prod_hold_cnt} ;;
+    #sql_distinct_key: ${orders_id} ;;
     drill_fields: [detail*]
   }
 
@@ -116,9 +116,9 @@ view: prod_hold_pdt {
   }
 
   measure: count_prior_hold {
-    type: sum_distinct
+    type: sum
     sql: ${hold_cnt_outside} ;;
-    sql_distinct_key: ${orders_id} ;;
+    #sql_distinct_key: ${orders_id} ;;
     drill_fields: [detail*]
   }
 
@@ -213,6 +213,11 @@ view: prod_hold_pdt {
     sql: ${TABLE}.hold_cnt ;;
   }
 
+  dimension: prod_hold_cnt {
+    type: number
+    sql: ${TABLE}.prod_hold_cnt ;;
+  }
+
   dimension: hold_rev {
     type: number
     sql: ${TABLE}.hold_rev ;;
@@ -221,6 +226,11 @@ view: prod_hold_pdt {
   dimension: hold_cnt_outside {
     type: number
     sql: ${TABLE}.hold_cnt_outside ;;
+  }
+
+  dimension: prod_hold_cnt_outside {
+    type: number
+    sql: ${TABLE}.prod_hold_cnt_outside ;;
   }
 
   dimension: hold_rev_o {
