@@ -11,6 +11,8 @@ explore: countries{}
 
 explore: gateway{}
 
+explore: pdt_sales_by_product {}
+
 explore: pdt_fulfillment_reconciliation {}
 
 explore: pdt_user_activity {}
