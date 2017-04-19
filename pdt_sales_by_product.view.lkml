@@ -9,24 +9,24 @@ view: pdt_sales_by_product {
         IF(LENGTH(IFNULL(group_by_val, '')) = 0, 0, MAX(display_link))        AS display_link,
         SUM(new_products_cnt)                                                 AS new_products_cnt,
         FORMAT(SUM(new_products_cnt), 0)                                      AS new_products_cnt_fmt,
-        FORMAT(SUM(new_products_rev), 2)                         AS new_products_rev,
+        new_products_rev                       AS new_products_rev,
 
         SUM(rec_products_cnt)                                                 AS rec_products_cnt,
         FORMAT(SUM(rec_products_cnt), 0)                                      AS rec_products_cnt_fmt,
-        FORMAT(SUM(rec_products_rev), 2)                         AS rec_products_rev,
+        rec_products_rev                        AS rec_products_rev,
 
         SUM(all_products_cnt)                                                 AS all_products_cnt,
         FORMAT(SUM(all_products_cnt), 0)                                      AS all_products_cnt_fmt,
-        FORMAT(SUM(all_products_rev), 2)                         AS all_products_rev,
+        all_products_rev                         AS all_products_rev,
 
         SUM(pending_products_cnt)                                             AS pending_products_cnt,
         FORMAT(SUM(pending_products_cnt), 0)                                  AS pending_products_cnt_fmt,
-        FORMAT(SUM(pending_products_rev), 2)                     AS pending_products_rev,
+        pending_products_rev                     AS pending_products_rev,
 
         SUM(hold_cnt)                                                         AS hold_cnt,
         FORMAT(SUM(hold_cnt), 0)                                              AS hold_cnt_fmt,
-        FORMAT(SUM(hold_rev), 2)                                 AS hold_rev,
-        FORMAT(SUM(hold_rev_o), 2)                                 AS hold_rev_o,
+        hold_rev                                AS hold_rev,
+        hold_rev_o                                AS hold_rev_o,
 
         SUM(hold_cnt_outside)                                                 AS hold_cnt_outside,
         FORMAT(SUM(hold_cnt_outside), 0)                                      AS hold_cnt_outside_fmt,
@@ -523,32 +523,6 @@ GROUP BY
       suggestions: ["1","2","3"]
     }
 
-    measure: count {
-      type: count
-      drill_fields: [detail*]
-    }
-
-    measure: count_hold {
-      type: sum
-      sql: ${hold_cnt} ;;
-      #sql_distinct_key: ${orders_id} ;;
-      drill_fields: [detail*]
-    }
-
-    measure: count_prior_hold {
-      type: sum
-      sql: ${hold_cnt_outside_fmt} ;;
-      #sql_distinct_key: ${orders_id} ;;
-      drill_fields: [detail*]
-    }
-
-    measure: count_prior_hold_prod {
-      type: sum
-      sql: ${prod_hold_cnt_outside_fmt} ;;
-      #sql_distinct_key: ${orders_id} ;;
-      drill_fields: [detail*]
-    }
-
     dimension: currency_fmt_hide {
       hidden: yes
       type: number
@@ -784,8 +758,29 @@ GROUP BY
     }
 
     measure: holds_cancel_revenue {
-      type: number
-      sql: ${hold_rev} + ${hold_rev_o} ;;
+      type: sum
+      sql: (${hold_rev} + ${hold_rev_o}) ;;
+    }
+
+    measure: count {
+      type: count
+      drill_fields: [detail*]
+    }
+
+    measure: count_hold {
+      label: "Holds/Cancels"
+      type: sum
+      sql: ${hold_cnt} ;;
+      #sql_distinct_key: ${orders_id} ;;
+      drill_fields: [detail*]
+    }
+
+    measure: count_prior_hold {
+      label: "Prior Holds/Cancels"
+      type: sum
+      sql: ${hold_cnt_outside_fmt} ;;
+      #sql_distinct_key: ${orders_id} ;;
+      drill_fields: [detail*]
     }
 
     set: detail {
