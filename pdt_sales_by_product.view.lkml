@@ -1,6 +1,7 @@
 view: pdt_sales_by_product {
     derived_table: {
       sql: SELECT  * FROM (  SELECT
+        currency_id                                                           AS currency_id,
         IF(LENGTH(group_by_val) = 0, 1, 2)                                    AS order_val,
         IF(LENGTH(group_by_type) = 0, '', group_by_type)                      AS group_by_type,
         IF(LENGTH(sub_group_by_type) = 0, '', sub_group_by_type)              AS sub_group_by_type,
@@ -210,7 +211,8 @@ view: pdt_sales_by_product {
                  SUM(hold_rev_o)                      AS hold_rev_o,
                  SUM(IFNULL(hold_cnt_outside,0))      AS hold_cnt_outside,
                  SUM(prod_hold_cnt)                   AS prod_hold_cnt,
-                 SUM(prod_hold_cnt_outside)           AS prod_hold_cnt_outside
+                 SUM(prod_hold_cnt_outside)           AS prod_hold_cnt_outside,
+                 currency_id                                                           AS currency_id
              FROM
                  orders o,
                  campaigns c,
@@ -258,9 +260,11 @@ view: pdt_sales_by_product {
                           0 AS hold_cnt_outside,
                           0 AS hold_rev_o,
                           0 AS prod_hold_cnt,
-                          0 AS prod_hold_cnt_outside
+                          0 AS prod_hold_cnt_outside,
+                          r.currency_id AS currency_id
                       FROM
                           orders               o,
+                          order_report           r,
                           orders_products      p,
                           orders_total         ot,
                           products_description pd
@@ -268,6 +272,8 @@ view: pdt_sales_by_product {
                           o.deleted     = 0
                        AND
                           p.orders_id   = o.orders_id
+                       AND
+                          o.orders_id         = r.order_id
                        AND
                           ot.orders_id  = o.orders_id
                        AND
@@ -327,9 +333,11 @@ view: pdt_sales_by_product {
                           0 AS hold_cnt_outside,
                           0 AS hold_rev_o,
                           0 AS prod_hold_cnt,
-                          0 AS prod_hold_cnt_outside
+                          0 AS prod_hold_cnt_outside,
+                          r.currency_id AS currency_id
                       FROM
                           orders                 o,
+                          order_report           r,
                           upsell_orders_products p,
                           upsell_orders          uo,
                           upsell_orders_total    uot,
@@ -338,6 +346,8 @@ view: pdt_sales_by_product {
                           o.deleted           = 0
                        AND
                           o.orders_id         = uo.main_orders_id
+                       AND
+                          o.orders_id         = r.order_id
                        AND
                           p.upsell_orders_id  = uo.upsell_orders_id
                        AND
@@ -374,7 +384,8 @@ view: pdt_sales_by_product {
                           COUNT(IF(outside = 1, 1, NULL))           AS hold_cnt_outside,
                           SUM(IF(outside = 1, o.currency_value, 0)) AS hold_rev_o,
                           SUM(IF(outside = 0, oh.prod_cnt, 0))      AS prod_hold_cnt,
-                          SUM(IF(outside = 1, oh.prod_cnt, 0))      AS prod_hold_cnt_outside
+                          SUM(IF(outside = 1, oh.prod_cnt, 0))      AS prod_hold_cnt_outside,
+                          0                                                           AS currency_id
                       FROM
                           orders o,
                           (
@@ -453,41 +464,6 @@ view: pdt_sales_by_product {
               AND
                  c.c_id = o.campaign_order_id
                  AND {% condition is_test %} o.is_test_cc {% endcondition %}
-          AND
-          CASE
-             WHEN
-                 o.cc_type = 'checking'
-             THEN
-                 IF({% condition currency_select %} 1 {% endcondition %}, TRUE, FALSE)
-             WHEN
-                 c.is_load_balanced = 1
-             THEN
-                (
-                EXISTS(
-                       SELECT
-                             1
-                         FROM
-                             v_load_balance_currencies v
-                        WHERE
-                             v.lbc_id = c.lbc_id
-                          AND
-                             {% condition currency_select %} v.currency_id {% endcondition %}
-                       )
-                )
-             ELSE
-                (
-                EXISTS(
-                       SELECT
-                             1
-                         FROM
-                             v_gateway_currency gc
-                        WHERE
-                             o.gatewayId = gc.gatewayId
-                          AND
-                            {% condition currency_select %} gc.currencyId {% endcondition %}
-                       )
-                )
-          END
          GROUP BY
                  group_by_val
         ) o
@@ -517,32 +493,38 @@ GROUP BY
       default_value: "0,1"
     }
 
-    filter: currency_select {
-      type: string
-      default_value: "1"
-      suggestions: ["1","2","3"]
+    dimension: currency_id {
+      type: number
+      sql: ${TABLE}.currency_id ;;
     }
 
-    dimension: currency_fmt_hide {
-      hidden: yes
-      type: number
-      sql: |
-          (CASE WHEN {% condition currency_select %} USD {% endcondition %} THEN 1
-                WHEN {% condition currency_select %} EUR {% endcondition %} THEN 2
-                WHEN {% condition currency_select %} GBP {% endcondition %} THEN 3
-                WHEN {% condition currency_select %} CAD {% endcondition %} THEN 4
-                WHEN {% condition currency_select %} AUD {% endcondition %} THEN 5
-                WHEN {% condition currency_select %} ZAR {% endcondition %} THEN 6
-                WHEN {% condition currency_select %} JPY {% endcondition %} THEN 7
-                WHEN {% condition currency_select %} DKK {% endcondition %} THEN 8
-                WHEN {% condition currency_select %} NOK {% endcondition %} THEN 9
-                WHEN {% condition currency_select %} SEK {% endcondition %} THEN 10
-                WHEN {% condition currency_select %} BRL {% endcondition %} THEN 11
-                WHEN {% condition currency_select %} CLP {% endcondition %} THEN 12
-                WHEN {% condition currency_select %} MXN {% endcondition %} THEN 13
-                ELSE 49
-          END) ;;
-    }
+   dimension: currency_fmt {
+    hidden: no
+    suggestions: ["USD","EUR","GBP","CAD","AUD","ZAR","JPY","DKK","NOK","SEK","BRL","CLP"]
+    type: string
+    sql: CASE WHEN ${currency_id} = 1 THEN 'USD'
+            WHEN ${currency_id} = 2 THEN 'EUR'
+            WHEN ${currency_id} = 3 THEN 'GBP'
+            WHEN ${currency_id} = 4 THEN 'CAD'
+            WHEN ${currency_id} = 5 THEN 'AUD'
+            WHEN ${currency_id} = 6 THEN 'ZAR'
+            WHEN ${currency_id} = 7 THEN 'JPY'
+            WHEN ${currency_id} = 8 THEN 'DKK'
+            WHEN ${currency_id} = 9 THEN 'NOK'
+            WHEN ${currency_id} = 10 THEN 'SEK'
+            WHEN ${currency_id} = 11 THEN 'BRL'
+            WHEN ${currency_id} = 12 THEN 'CLP'
+            WHEN ${currency_id} = 13 THEN 'MXN'
+            WHEN ${currency_id} = 14 THEN 'KRW'
+            WHEN ${currency_id} = 15 THEN 'NZD'
+            WHEN ${currency_id} = 16 THEN 'PLN'
+            WHEN ${currency_id} = 17 THEN 'SGD'
+            WHEN ${currency_id} = 18 THEN 'HKD'
+            WHEN ${currency_id} = 19 THEN 'ARS'
+            ELSE 'CUR ' || ${currency_id}
+       END ;;
+   }
+
 
     dimension: order_val {
       type: number
