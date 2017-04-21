@@ -706,6 +706,7 @@ GROUP BY
 
     measure: initial_revenue {
       type: sum
+      value_format_name: decimal_2
       sql: ${new_products_rev} ;;
     }
 
@@ -716,6 +717,7 @@ GROUP BY
 
     measure: subscription_revenue {
       type: sum
+      value_format_name: decimal_2
       sql: ${rec_products_rev} ;;
     }
 
@@ -726,6 +728,7 @@ GROUP BY
 
     measure: total_revenue {
       type: sum
+      value_format_name: decimal_2
       sql: ${all_products_rev} ;;
     }
 
@@ -736,11 +739,13 @@ GROUP BY
 
     measure: pending_revenue {
       type: sum
+      value_format_name: decimal_2
       sql: ${pending_products_rev} ;;
     }
 
     measure: holds_cancel_revenue {
       type: sum
+      value_format_name: decimal_2
       sql: (${hold_rev} + ${hold_rev_o}) ;;
     }
 
@@ -760,7 +765,7 @@ GROUP BY
     measure: count_prior_hold {
       label: "Prior Holds/Cancels"
       type: sum
-      sql: ${prod_hold_cnt_outside} ;;
+      sql: ${hold_cnt_outside} ;;
       #sql_distinct_key: ${orders_id} ;;
       drill_fields: [detail*]
     }
