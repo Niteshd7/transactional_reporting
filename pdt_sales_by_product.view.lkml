@@ -521,7 +521,7 @@ GROUP BY
             WHEN ${currency_id} = 17 THEN 'SGD'
             WHEN ${currency_id} = 18 THEN 'HKD'
             WHEN ${currency_id} = 19 THEN 'ARS'
-            ELSE 'CUR ' || ${currency_id}
+            ELSE 'USD'
        END ;;
    }
 
@@ -752,7 +752,7 @@ GROUP BY
     measure: count_hold {
       label: "Holds/Cancels"
       type: sum
-      sql: ${hold_cnt} ;;
+      sql: ${prod_hold_cnt} ;;
       #sql_distinct_key: ${orders_id} ;;
       drill_fields: [detail*]
     }
@@ -760,7 +760,7 @@ GROUP BY
     measure: count_prior_hold {
       label: "Prior Holds/Cancels"
       type: sum
-      sql: ${hold_cnt_outside_fmt} ;;
+      sql: ${prod_hold_cnt_outside} ;;
       #sql_distinct_key: ${orders_id} ;;
       drill_fields: [detail*]
     }
