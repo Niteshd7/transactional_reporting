@@ -1739,7 +1739,7 @@ view: orders {
   measure: chargeback_percentage {
     type: number
     label: "Chargeback Percentage"
-    value_format_name: percent_2
+    value_format_name: percent_1
     sql: ${chargeback_count} / NULLIF(${order_count},0) ;;
   }
 
@@ -1807,7 +1807,7 @@ view: orders {
   measure: decline_percent_gateway {
     type: number
     label: "Decline Percentage - Gateway"
-    value_format_name: percent_2
+    value_format_name: percent_1
     sql: ${declined_orders_gateway} / NULLIF(${gross_order_gateway},0) ;;
   }
 
