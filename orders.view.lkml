@@ -300,7 +300,7 @@ view: orders {
               WHEN ${currency_id} = 17 THEN 'SGD'
               WHEN ${currency_id} = 18 THEN 'HKD'
               WHEN ${currency_id} = 19 THEN 'ARS'
-              ELSE 'CUR ' || ${currency_id}
+              ELSE 'USD'
          END ;;
   }
 
@@ -1620,7 +1620,7 @@ view: orders {
   measure: approved_order_percent {
     type: number
     label: "Approved %"
-    value_format_name: percent_1
+    value_format_name: percent_2
     sql: ${approved_order_count} / NULLIF(${count},0) ;;
   }
 

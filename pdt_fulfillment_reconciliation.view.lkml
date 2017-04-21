@@ -309,7 +309,7 @@ view: pdt_fulfillment_reconciliation {
                      AND
                         o.orders_status IN(2,6,8)
                      AND
-                        o.t_stamp != o.orders_date_finished
+                        (o.t_stamp NOT BETWEEN (SELECT ({% date_start date_select %})) AND (SELECT ({% date_end date_select %})))
                         AND {% condition is_test %} o.is_test_cc {% endcondition %}
 
                 GROUP BY
