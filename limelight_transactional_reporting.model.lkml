@@ -99,6 +99,13 @@ explore: orders {
       AND ${hold_pdt.orders_id} > '0';;
   }
 
+  join: hold_pdt_1 {
+    type: left_outer
+    relationship: one_to_one
+    sql_on: ${hold_pdt_1.orders_id} = ${orders.orders_id}
+      AND ${hold_pdt_1.orders_id} IS NOT NULL;;
+  }
+
   join: prod_hold_pdt {
     type: left_outer
     relationship: one_to_one
