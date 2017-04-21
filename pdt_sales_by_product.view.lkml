@@ -705,7 +705,7 @@ GROUP BY
     }
 
     measure: initial_revenue {
-      type: sum_distinct
+      type: sum
       sql: ${new_products_rev} ;;
     }
 
