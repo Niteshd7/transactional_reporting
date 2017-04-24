@@ -55,7 +55,7 @@ view: pdt_sales_by_campaign {
         (IF(SUM(all_new_order_cnt) > 0, (SUM(chargeback_cnt) / SUM(all_new_order_cnt)), 0) * 100)                                   AS chargeback_pct,
         (IF(SUM(all_new_order_cnt) > 0, (SUM(chargeback_cnt) / SUM(all_new_order_cnt)), 0) * 100)                                  AS chargeback_pct_fmt,
         IF(MAX(display_link) = 1, ':AFF_LINK', '')                                                                                             AS features,
-        CONCAT('<div id="camp-id-', group_by_val, '" class="prod-id-placeholder"><img src="../../images/limeload.gif" alt="Loading" /></div>') AS prod_ids,
+        GROUP_CONCAT(DISTINCT(products_id))                                        AS prod_ids,
         currency_id AS currency_id
     FROM
         (
@@ -196,13 +196,15 @@ view: pdt_sales_by_campaign {
                  SUM(hold_rev_o)            AS hold_rev_o,
                  SUM(hold_cnt_outside)      AS hold_cnt_outside,
                  SUM(chargeback_cnt)        AS chargeback_cnt,
-                 currency_id AS currency_id
+                 currency_id AS currency_id,
+                 products_id AS products_id
              FROM
                  orders o,
                  campaigns c,
                  (
                     SELECT
                           o.orders_id,
+                          GROUP_CONCAT(DISTINCT(op.products_id)) AS products_id,
                           COUNT(IF(o.orders_status IN (2,8) AND o.rebillDepth = 0, 1, NULL))                                                                         AS new_order_cnt,
                           SUM(IF(o.orders_status IN (2,8) AND o.rebillDepth = 0, ot.current_total + f_upsell_order_total(o.orders_id), 0))                           AS new_order_rev,
                           COUNT(IF(o.orders_status IN (2,8) AND o.parent_order_id > 0 AND o.rebillDepth > 0, 1, NULL))                                               AS recurring_order_cnt,
@@ -234,6 +236,7 @@ view: pdt_sales_by_campaign {
                           r.currency_id AS currency_id
                        FROM
                            v_main_order_total   ot,
+                           orders_products op,
                            campaigns       c,
                            orders          o,
                            order_report    r
@@ -243,6 +246,8 @@ view: pdt_sales_by_campaign {
                            o.campaign_order_id = c.c_id
                         AND
                            o.orders_id         = ot.orders_id
+                        AND
+                           o.orders_id         = op.orders_id
                         AND
                            o.orders_id         = r.order_id
                         AND
@@ -254,6 +259,7 @@ view: pdt_sales_by_campaign {
                   UNION ALL
                      SELECT
                            o.orders_id,
+                           0 AS products_id,
                            0                                                    AS new_order_cnt,
                            0                                                    AS new_order_rev,
                            0                                                    AS recurring_order_cnt,
@@ -325,6 +331,7 @@ view: pdt_sales_by_campaign {
                   UNION ALL
                      SELECT
                            d.orders_id,
+                           0 AS products_id,
                            0                                         AS new_order_cnt,
                            0                                         AS new_order_rev,
                            0                                         AS recurring_order_cnt,
