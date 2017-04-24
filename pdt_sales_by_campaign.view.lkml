@@ -1,118 +1,67 @@
-view: hold_pdt_1 {
+view: pdt_sales_by_campaign {
   derived_table: {
     sql: SELECT  * FROM (  SELECT
         IF(LENGTH(group_by_val) = 0, 1, 2)                                                                                                     AS order_val,
-        IF(LENGTH(group_by_type) = 0, '', group_by_type)                                                                                       AS group_by_type,
-        IF(LENGTH(sub_group_by_type) = 0, '', sub_group_by_type)                                                                               AS sub_group_by_type,
-        IF(LENGTH(IFNULL(group_by_val, '')) = 0, 'BLANK', group_by_val)                                                                        AS group_by_val,
-        IF(LENGTH(IFNULL(group_by_val, '')) = 0, 'BLANK', group_by_val_disp)                                                                   AS group_by_disp,
+        IF(LENGTH(IFNULL(group_by_val, '')) = 0, 'BLANK', group_by_val)                                                                        AS campaign_id,
+        IF(LENGTH(IFNULL(group_by_val, '')) = 0, 'BLANK', group_by_val_disp)                                                                   AS campaign,
         SUM(new_order_cnt)                                                                                                                     AS new_order_cnt,
         FORMAT(SUM(new_order_cnt), 0)                                                                                                          AS new_order_cnt_fmt,
         FORMAT(SUM(new_order_rev), 2)                                                                                             AS new_order_rev,
-        CONCAT('$', FORMAT(SUM(new_order_rev), 2), '')                                               AS new_order_rev_fmt,
+        FORMAT(SUM(new_order_rev), 2)                                              AS new_order_rev_fmt,
         SUM(recurring_order_cnt)                                                                                                               AS recurring_order_cnt,
         FORMAT(SUM(recurring_order_cnt), 0)                                                                                                    AS recurring_order_cnt_fmt,
-        FORMAT(SUM(recurring_order_rev), 2)                                                                                       AS recurring_order_rev,
-        CONCAT('$', FORMAT(SUM(recurring_order_rev), 2), '')                                         AS recurring_order_rev_fmt,
+        SUM(recurring_order_rev)                                                                                      AS recurring_order_rev,
+        SUM(recurring_order_rev)                                        AS recurring_order_rev_fmt,
         SUM(shipping_cnt)                                                                                                                      AS shipping_cnt,
         FORMAT(SUM(shipping_cnt), 0)                                                                                                           AS shipping_cnt_fmt,
-        FORMAT(SUM(shipping_rev), 2)                                                                                              AS shipping_rev,
-        CONCAT('$', FORMAT(SUM(shipping_rev), 2), '')                                                AS shipping_rev_fmt,
+        SUM(shipping_rev)                                                                                             AS shipping_rev,
+        SUM(shipping_rev)                                               AS shipping_rev_fmt,
         SUM(all_new_order_cnt)                                                                                                                 AS all_new_order_cnt,
         FORMAT(SUM(all_new_order_cnt), 0)                                                                                                      AS all_new_order_cnt_fmt,
-        FORMAT(SUM(all_new_order_rev), 2)                                                                                         AS all_new_order_rev,
-        CONCAT('$', FORMAT(SUM(all_new_order_rev), 2), '')                                           AS all_new_order_rev_fmt,
+        SUM(all_new_order_rev)                                                                                         AS all_new_order_rev,
+        SUM(all_new_order_rev)                                           AS all_new_order_rev_fmt,
         SUM(pending_order_cnt)                                                                                                                 AS pending_order_cnt,
         FORMAT(SUM(pending_order_cnt), 0)                                                                                                      AS pending_order_cnt_fmt,
-        FORMAT(SUM(pending_order_rev), 2)                                                                                         AS pending_order_rev,
-        CONCAT('$', FORMAT(SUM(pending_order_rev), 2), '')                                           AS pending_order_rev_fmt,
+        SUM(pending_order_rev)                                                                                         AS pending_order_rev,
+        SUM(pending_order_rev)                                           AS pending_order_rev_fmt,
         FORMAT(SUM(taxable_rev), 2)                                                                                               AS taxable_rev,
-        CONCAT('$', FORMAT(SUM(taxable_rev), 2), '')                                                 AS taxable_rev_fmt,
+        SUM(taxable_rev)                                                 AS taxable_rev_fmt,
         SUM(decline_cnt)                                                                                                                       AS decline_cnt,
         FORMAT(SUM(decline_cnt), 0)                                                                                                            AS decline_cnt_fmt,
-        FORMAT(SUM(decline_rev), 2)                                                                                               AS decline_rev,
-        CONCAT('$', FORMAT(SUM(decline_rev), 2), '')                                                 AS decline_rev_fmt,
+        SUM(decline_rev)                                                                                               AS decline_rev,
+        SUM(decline_rev)                                                 AS decline_rev_fmt,
         SUM(refund_void_cnt)                                                                                                                   AS refund_void_cnt,
         FORMAT(SUM(refund_void_cnt), 0)                                                                                                        AS refund_void_cnt_fmt,
-        FORMAT(SUM(refund_void_rev), 2)                                                                                           AS refund_void_rev,
-        CONCAT('$', FORMAT(SUM(refund_void_rev), 2), '')                                             AS refund_void_rev_fmt,
+        SUM(refund_void_rev)                                                                                           AS refund_void_rev,
+        SUM(refund_void_rev)                                             AS refund_void_rev_fmt,
         SUM(active_cnt)                                                                                                                        AS active_cnt,
-        FORMAT(SUM(active_cnt), 0)                                                                                                             AS active_cnt_fmt,)                                                                                                                          AS hold_cnt,
-        FORMAT(SUM(hold_rev), 2)                                                                                                  AS hold_rev,
+        FORMAT(SUM(active_cnt), 0)                                                                                                             AS active_cnt_fmt,
+        IF(SUM(all_new_order_cnt) > 0,
+           SUM(all_new_order_rev) / SUM(all_new_order_cnt),
+           0
+        )                                                                                                                     AS avg_rev,
+        IF(SUM(all_new_order_cnt) > 0,
+           SUM(all_new_order_rev) / SUM(all_new_order_cnt),
+           0
+        )                                                                                                 AS avg_rev_fmt,
+        SUM(hold_cnt)                                                                                                                          AS hold_cnt,
+        FORMAT(SUM(hold_cnt), 0)                                                                                                               AS hold_cnt_fmt,
+        SUM(hold_rev)                                AS hold_rev,
+        SUM(hold_rev_o)                                AS hold_rev_o,
         SUM(hold_cnt_outside)                                                                                                                  AS hold_cnt_outside,
+        FORMAT(SUM(hold_cnt_outside), 0)                                                                                                       AS hold_cnt_outside_fmt,
         SUM(chargeback_cnt)                                                                                                                    AS chargeback_cnt,
         FORMAT(SUM(chargeback_cnt), 0)                                                                                                         AS chargeback_cnt_fmt,
-        FORMAT((IF(SUM(all_new_order_cnt) > 0, (SUM(chargeback_cnt) / SUM(all_new_order_cnt)), 0) * 100), 1)                                   AS chargeback_pct,
-        CONCAT(FORMAT((IF(SUM(all_new_order_cnt) > 0, (SUM(chargeback_cnt) / SUM(all_new_order_cnt)), 0) * 100), 1), '%')                      AS chargeback_pct_fmt,
+        (IF(SUM(all_new_order_cnt) > 0, (SUM(chargeback_cnt) / SUM(all_new_order_cnt)), 0) * 100)                                   AS chargeback_pct,
+        (IF(SUM(all_new_order_cnt) > 0, (SUM(chargeback_cnt) / SUM(all_new_order_cnt)), 0) * 100)                                  AS chargeback_pct_fmt,
         IF(MAX(display_link) = 1, ':AFF_LINK', '')                                                                                             AS features,
         CONCAT('<div id="camp-id-', group_by_val, '" class="prod-id-placeholder"><img src="../../images/limeload.gif" alt="Loading" /></div>') AS prod_ids,
-        orders_id                  AS orders_id,
-        t_stamp                    AS t_stamp
+        currency_id AS currency_id
     FROM
         (
            SELECT
                  o.orders_id AS orders_id,
-                 CASE 'CID'
-                    WHEN 'ALL' THEN
-                       CASE
-                          WHEN LENGTH(o.AFID)  > 0 THEN 'AFID'
-                          WHEN LENGTH(o.AID)   > 0 THEN 'AID'
-                          WHEN LENGTH(o.AFFID) > 0 THEN 'AFFID'
-                          ELSE ''
-                       END
-                    WHEN 'ALL_SUB' THEN
-                       CASE
-                          WHEN LENGTH(o.AFID) > 0 AND LENGTH(o.SID) > 0 THEN 'SID'
-                          WHEN LENGTH(o.AFFID) > 0 AND LENGTH(o.C1) > 0 THEN 'C1'
-                          WHEN LENGTH(o.AID) > 0 AND LENGTH(o.OPT) > 0 THEN  'OPT'
-                          ELSE ''
-                       END
-                    WHEN 'ALL_SUB2' THEN
-                       CASE
-                          WHEN LENGTH(o.AFFID) > 0 AND LENGTH(o.C1) > 0 AND LENGTH(o.C2) > 0 THEN 'C2'
-                          ELSE ''
-                       END
-                    WHEN 'ALL_SUB3' THEN
-                       CASE
-                          WHEN LENGTH(o.AFFID) > 0 AND LENGTH(o.C1) > 0 AND LENGTH(o.C2) > 0 AND LENGTH(o.C3) > 0 THEN 'C3'
-                          ELSE ''
-                       END
-                   ELSE 'CID'
-                 END group_by_type,
-                 CASE 'CID'
-                    WHEN 'ALL' THEN
-                       CASE
-                          WHEN LENGTH(o.AFID)  > 0 THEN 'AFID'
-                          WHEN LENGTH(o.AID)   > 0 THEN 'AID'
-                          WHEN LENGTH(o.AFFID) > 0 THEN 'AFFID'
-                          ELSE ''
-                       END
-                    WHEN 'ALL_SUB' THEN
-                       CASE
-                          WHEN LENGTH(o.AFID) > 0 AND LENGTH(o.SID) > 0 THEN 'SID'
-                          WHEN LENGTH(o.AFFID) > 0 AND LENGTH(o.C1) > 0 THEN 'C1'
-                          WHEN LENGTH(o.AID) > 0 AND LENGTH(o.OPT) > 0 THEN  'OPT'
-                          ELSE ''
-                       END
-                    WHEN 'ALL_SUB2' THEN
-                       CASE
-                          WHEN LENGTH(o.AFFID) > 0 AND LENGTH(o.C1) > 0 AND LENGTH(o.C2) > 0 THEN 'C2'
-                          ELSE ''
-                       END
-                    WHEN 'ALL_SUB3' THEN
-                       CASE
-                          WHEN LENGTH(o.AFFID) > 0 AND LENGTH(o.C1) > 0 AND LENGTH(o.C2) > 0 AND LENGTH(o.C3) > 0 THEN 'C3'
-                          ELSE ''
-                       END
-                    WHEN 'AFID'  THEN 'SID'
-                    WHEN 'AID'   THEN 'OPT'
-                    WHEN 'AFFID' THEN 'C1'
-                    WHEN 'C1'    THEN 'C2'
-                    WHEN 'C2'    THEN 'C3'
-                    WHEN 'CID'   THEN 'ALL'
-                    WHEN 'DATE'  THEN 'ALL'
-                    ELSE ''
-                 END sub_group_by_type,
+
                  CASE 'CID'
                     WHEN 'ALL' THEN
                        CASE
@@ -144,7 +93,7 @@ view: hold_pdt_1 {
                     WHEN 'C1'    THEN o.C2
                     WHEN 'C2'    THEN o.C3
                     WHEN 'DATE'  THEN
-                       IF(o.hold_date BETWEEN (SELECT ({% date_start orders.t_stamp_date %})) AND (SELECT ({% date_end orders.t_stamp_date %}))) AND (o.t_stamp NOT BETWEEN (SELECT ({% date_start orders.t_stamp_date %})) AND (SELECT ({% date_end orders.t_stamp_date %}))),
+                       IF((o.hold_date BETWEEN (SELECT ({% date_start date_select %})) AND (SELECT ({% date_end date_select %}))) AND (o.t_stamp NOT BETWEEN (SELECT ({% date_start date_select %})) AND (SELECT ({% date_end date_select %}))),
                           DATE(o.hold_date),
                           DATE(o.t_stamp)
                        )
@@ -181,7 +130,7 @@ view: hold_pdt_1 {
                     WHEN 'C1'    THEN o.C2
                     WHEN 'C2'    THEN o.C3
                     WHEN 'DATE'  THEN
-                       IF(o.hold_date BETWEEN (SELECT ({% date_start orders.t_stamp_date %})) AND (SELECT ({% date_end orders.t_stamp_date %}))) AND (o.t_stamp NOT BETWEEN (SELECT ({% date_start orders.t_stamp_date %})) AND (SELECT ({% date_end orders.t_stamp_date %}))),
+                       IF((o.hold_date BETWEEN (SELECT ({% date_start date_select %})) AND (SELECT ({% date_end date_select %}))) AND (o.t_stamp NOT BETWEEN (SELECT ({% date_start date_select %})) AND (SELECT ({% date_end date_select %}))),
                           DATE_FORMAT(o.hold_date, '%m/%d/%Y'),
                           DATE_FORMAT(o.t_stamp, '%m/%d/%Y')
                        )
@@ -225,7 +174,7 @@ view: hold_pdt_1 {
                        0
                  END display_link,
                  o.campaign_order_id AS campaign_order_id,
-                 o.t_stamp AS t_stamp,
+                 o.t_stamp,
                  SUM(new_order_cnt)         AS new_order_cnt,
                  SUM(new_order_rev)         AS new_order_rev,
                  SUM(recurring_order_cnt)   AS recurring_order_cnt,
@@ -243,9 +192,11 @@ view: hold_pdt_1 {
                  SUM(decline_cnt)           AS decline_cnt,
                  SUM(decline_rev)           AS decline_rev,
                  SUM(hold_cnt)              AS hold_cnt,
-                 IF('CID' = 'DATE', SUM(hold_rev), SUM(hold_rev + hold_rev_o)) AS hold_rev,
+                 SUM(hold_rev)              AS hold_rev,
+                 SUM(hold_rev_o)            AS hold_rev_o,
                  SUM(hold_cnt_outside)      AS hold_cnt_outside,
-                 SUM(chargeback_cnt)        AS chargeback_cnt
+                 SUM(chargeback_cnt)        AS chargeback_cnt,
+                 currency_id AS currency_id
              FROM
                  orders o,
                  campaigns c,
@@ -279,11 +230,13 @@ view: hold_pdt_1 {
                           0                                                                                                                                          AS hold_rev,
                           0                                                                                                                                          AS hold_cnt_outside,
                           0                                                                                                                                          AS hold_rev_o,
-                          COUNT(IF(o.isChargeback = 1, 1, NULL))                                                                                                     AS chargeback_cnt
+                          COUNT(IF(o.isChargeback = 1, 1, NULL))                                                                                                     AS chargeback_cnt,
+                          r.currency_id AS currency_id
                        FROM
                            v_main_order_total   ot,
                            campaigns       c,
-                           orders          o
+                           orders          o,
+                           order_report    r
                       WHERE
                            o.deleted           = 0
                         AND
@@ -291,8 +244,10 @@ view: hold_pdt_1 {
                         AND
                            o.orders_id         = ot.orders_id
                         AND
-                           {% condition orders.t_stamp_date %} o.t_stamp {% endcondition %}
-                           AND o.is_test_cc IN (0, 1)
+                           o.orders_id         = r.order_id
+                        AND
+                           {% condition date_select %} o.t_stamp {% endcondition %}
+                           AND {% condition is_test %} o.is_test_cc {% endcondition %}
 
                    GROUP BY
                            o.orders_id
@@ -316,33 +271,34 @@ view: hold_pdt_1 {
                            0                                                    AS decline_cnt,
                            0                                                    AS decline_rev,
                            COUNT(IF(outside = 0, 1, NULL))                      AS hold_cnt,
-                           SUM(IF(outside = 0, IFNULL(o.currency_value, 0), 0)) AS hold_rev,
+                           (IF(outside = 0, IFNULL(o.currency_value, 0), 0))                         AS hold_rev,
                            COUNT(IF(outside = 1, 1, NULL))                      AS hold_cnt_outside,
-                           SUM(IF(outside = 1, IFNULL(o.currency_value, 0), 0)) AS hold_rev_o,
-                           0                                                    AS chargeback_cnt
+                           (IF(outside = 1, IFNULL(o.currency_value, 0), 0)) AS hold_rev_o,
+                           0                                                    AS chargeback_cnt,
+                           0 as currency_id
                        FROM
                            orders o,
                            (
                               SELECT
                                     o.orders_id,
                                     IFNULL(currency_value, 0) AS currency_value,
-                                    IF((hold_date BETWEEN (SELECT ({% date_start orders.t_stamp_date %})) AND (SELECT ({% date_end orders.t_stamp_date %}))) AND (o.t_stamp NOT BETWEEN (SELECT ({% date_start orders.t_stamp_date %})) AND (SELECT ({% date_end orders.t_stamp_date %}))), 1, 0) AS outside
+                                    IF((hold_date BETWEEN (SELECT ({% date_start date_select %})) AND (SELECT ({% date_end date_select %}))) AND (o.t_stamp NOT BETWEEN (SELECT ({% date_start date_select %})) AND (SELECT ({% date_end date_select %}))), 1, 0) AS outside
                                FROM
                                     orders o
                                WHERE
                                     o.is_hold = 1
                                  AND
                                     (
-                                       {% condition orders.t_stamp_date %} o.t_stamp {% endcondition %}
+                                       {% condition date_select %} o.t_stamp {% endcondition %}
                                         OR
-                                                  {% condition orders.t_stamp_date %} o.hold_date {% endcondition %}
+                                                  {% condition date_select %} o.hold_date {% endcondition %}
                                     )
 
                            UNION ALL
                               SELECT
                                     o.orders_id,
                                     IFNULL(uo.currency_value, 0) AS currency_value,
-                                    IF((uo.hold_date BETWEEN (SELECT ({% date_start orders.t_stamp_date %})) AND (SELECT ({% date_end orders.t_stamp_date %}))) AND (uo.t_stamp NOT BETWEEN (SELECT ({% date_start orders.t_stamp_date %})) AND (SELECT ({% date_end orders.t_stamp_date %}))), 1, 0) AS outside
+                                    IF((uo.hold_date BETWEEN (SELECT ({% date_start date_select %})) AND (SELECT ({% date_end date_select %}))) AND (uo.t_stamp NOT BETWEEN (SELECT ({% date_start date_select %})) AND (SELECT ({% date_end date_select %}))), 1, 0) AS outside
                                FROM
                                     orders        o,
                                     upsell_orders uo
@@ -352,12 +308,12 @@ view: hold_pdt_1 {
                                     uo.is_hold = 1
                                  AND
                                     (
-                                       {% condition orders.t_stamp_date %} uo.t_stamp {% endcondition %}
+                                       {% condition date_select %} uo.t_stamp {% endcondition %}
                                         OR
-                                                  {% condition orders.t_stamp_date %} uo.hold_date {% endcondition %}
+                                                  {% condition date_select %} uo.hold_date {% endcondition %}
 
                                     )
-                                    AND o.is_test_cc IN (0, 1)
+                                    AND {% condition is_test %} o.is_test_cc {% endcondition %}
 
                            ) oh
                       WHERE
@@ -366,6 +322,68 @@ view: hold_pdt_1 {
                            o.deleted   = 0
                    GROUP BY
                            o.orders_id
+                  UNION ALL
+                     SELECT
+                           d.orders_id,
+                           0                                         AS new_order_cnt,
+                           0                                         AS new_order_rev,
+                           0                                         AS recurring_order_cnt,
+                           0                                         AS recurring_order_rev,
+                           0                                         AS shipping_cnt,
+                           0                                         AS shipping_rev,
+                           0                                         AS all_new_order_cnt,
+                           0                                         AS all_new_order_rev,
+                           0                                         AS pending_order_cnt,
+                           0                                         AS pending_order_rev,
+                           0                                         AS refund_void_cnt,
+                           0                                         AS refund_void_rev,
+                           0                                         AS taxable_rev,
+                           0                                         AS active_cnt,
+                           d.cnt                                     AS decline_cnt,
+                           d.rev                                     AS decline_rev,
+                           0                                         AS hold_cnt,
+                           0                                         AS hold_rev,
+                           0                                         AS hold_cnt_outside,
+                           0                                         AS hold_rev_o,
+                           0                                         AS chargeback_cnt,
+                           0 as currency_id
+                       FROM
+                           (
+                              SELECT
+                                    d.orders_id,
+                                    d.join_val,
+                                    1          AS cnt,
+                                    SUM(d.rev) AS rev
+                                FROM
+                                    (
+                                       SELECT
+                                             MAX(o.orders_id) AS orders_id,
+                                             CONCAT(o.campaign_order_id, o.customers_email_address)       AS join_val,
+                                             ot.main_product_amount_shipping_tax + f_upsell_order_total(o.orders_id) AS rev
+                                         FROM
+                                             orders o,
+                                             v_main_order_total ot
+                                        WHERE
+                                             o.deleted   = 0
+                                          AND
+                                             o.orders_id = ot.orders_id
+                                          AND
+                                             o.orders_status = 7
+                                          AND
+                                             o.wasSalvaged   = 0
+                                          AND
+                                             {% condition date_select %} o.t_stamp {% endcondition %}
+                                             AND {% condition is_test %} o.is_test_cc {% endcondition %}
+
+                                     GROUP BY
+                                             CONCAT(o.campaign_order_id, o.customers_email_address),
+                                             ot.main_product_amount_shipping_tax + f_upsell_order_total(o.orders_id)
+                                    ) d
+                            GROUP BY
+                                    d.join_val
+                           ) d
+                   GROUP BY
+                           d.orders_id
                  ) x
             WHERE
                  o.orders_id = x.orders_id
@@ -373,14 +391,14 @@ view: hold_pdt_1 {
                  o.deleted   = 0
               AND
                  o.campaign_order_id = c.c_id
-                 AND o.is_test_cc IN (0, 1)
+                 AND {% condition is_test %} o.is_test_cc {% endcondition %}
 
          GROUP BY
                  o.orders_id
         ) o
 GROUP BY
-        orders_id) a    ORDER BY order_val ASC
- ;; indexes: ["orders_id"]
+        campaign_id) a    ORDER BY order_val ASC, CAST(campaign_id AS signed) ASC
+ ;;
   }
 
   measure: count {
@@ -388,30 +406,56 @@ GROUP BY
     drill_fields: [detail*]
   }
 
+  filter: date_select {
+    type: date
+    default_value: "today"
+  }
 
-  dimension: order_val {
+  filter: is_test {
+    type: string
+    default_value: "0,1"
+  }
+
+  dimension: currency_id {
     type: number
-    sql: ${TABLE}.order_val ;;
+    sql: ${TABLE}.currency_id ;;
   }
 
-  dimension: group_by_type {
+  dimension: currency_fmt {
+    hidden: no
+    suggestions: ["USD","EUR","GBP","CAD","AUD","ZAR","JPY","DKK","NOK","SEK","BRL","CLP"]
     type: string
-    sql: ${TABLE}.group_by_type ;;
+    sql: CASE WHEN ${currency_id} = 1 THEN 'USD'
+            WHEN ${currency_id} = 2 THEN 'EUR'
+            WHEN ${currency_id} = 3 THEN 'GBP'
+            WHEN ${currency_id} = 4 THEN 'CAD'
+            WHEN ${currency_id} = 5 THEN 'AUD'
+            WHEN ${currency_id} = 6 THEN 'ZAR'
+            WHEN ${currency_id} = 7 THEN 'JPY'
+            WHEN ${currency_id} = 8 THEN 'DKK'
+            WHEN ${currency_id} = 9 THEN 'NOK'
+            WHEN ${currency_id} = 10 THEN 'SEK'
+            WHEN ${currency_id} = 11 THEN 'BRL'
+            WHEN ${currency_id} = 12 THEN 'CLP'
+            WHEN ${currency_id} = 13 THEN 'MXN'
+            WHEN ${currency_id} = 14 THEN 'KRW'
+            WHEN ${currency_id} = 15 THEN 'NZD'
+            WHEN ${currency_id} = 16 THEN 'PLN'
+            WHEN ${currency_id} = 17 THEN 'SGD'
+            WHEN ${currency_id} = 18 THEN 'HKD'
+            WHEN ${currency_id} = 19 THEN 'ARS'
+            ELSE 'USD'
+       END ;;
   }
 
-  dimension: sub_group_by_type {
+  dimension: campaign_id {
     type: string
-    sql: ${TABLE}.sub_group_by_type ;;
+    sql: ${TABLE}.campaign_id ;;
   }
 
-  dimension: group_by_val {
+  dimension: campaign {
     type: string
-    sql: ${TABLE}.group_by_val ;;
-  }
-
-  dimension: group_by_disp {
-    type: string
-    sql: ${TABLE}.group_by_disp ;;
+    sql: ${TABLE}.campaign ;;
   }
 
   dimension: new_order_cnt {
@@ -425,12 +469,12 @@ GROUP BY
   }
 
   dimension: new_order_rev {
-    type: string
+    type: number
     sql: ${TABLE}.new_order_rev ;;
   }
 
   dimension: new_order_rev_fmt {
-    type: string
+    type: number
     sql: ${TABLE}.new_order_rev_fmt ;;
   }
 
@@ -445,12 +489,12 @@ GROUP BY
   }
 
   dimension: recurring_order_rev {
-    type: string
+    type: number
     sql: ${TABLE}.recurring_order_rev ;;
   }
 
   dimension: recurring_order_rev_fmt {
-    type: string
+    type: number
     sql: ${TABLE}.recurring_order_rev_fmt ;;
   }
 
@@ -460,12 +504,12 @@ GROUP BY
   }
 
   dimension: shipping_cnt_fmt {
-    type: string
+    type: number
     sql: ${TABLE}.shipping_cnt_fmt ;;
   }
 
   dimension: shipping_rev {
-    type: string
+    type: number
     sql: ${TABLE}.shipping_rev ;;
   }
 
@@ -485,7 +529,7 @@ GROUP BY
   }
 
   dimension: all_new_order_rev {
-    type: string
+    type: number
     sql: ${TABLE}.all_new_order_rev ;;
   }
 
@@ -505,7 +549,7 @@ GROUP BY
   }
 
   dimension: pending_order_rev {
-    type: string
+    type: number
     sql: ${TABLE}.pending_order_rev ;;
   }
 
@@ -515,7 +559,7 @@ GROUP BY
   }
 
   dimension: taxable_rev {
-    type: string
+    type: number
     sql: ${TABLE}.taxable_rev ;;
   }
 
@@ -535,7 +579,7 @@ GROUP BY
   }
 
   dimension: decline_rev {
-    type: string
+    type: number
     sql: ${TABLE}.decline_rev ;;
   }
 
@@ -555,7 +599,7 @@ GROUP BY
   }
 
   dimension: refund_void_rev {
-    type: string
+    type: number
     sql: ${TABLE}.refund_void_rev ;;
   }
 
@@ -575,7 +619,7 @@ GROUP BY
   }
 
   dimension: avg_rev {
-    type: string
+    type: number
     sql: ${TABLE}.avg_rev ;;
   }
 
@@ -595,8 +639,13 @@ GROUP BY
   }
 
   dimension: hold_rev {
-    type: string
+    type: number
     sql: ${TABLE}.hold_rev ;;
+  }
+
+  dimension: hold_rev_o {
+    type: number
+    sql: ${TABLE}.hold_rev_o ;;
   }
 
   dimension: hold_rev_fmt {
@@ -620,17 +669,17 @@ GROUP BY
   }
 
   dimension: chargeback_cnt_fmt {
-    type: string
+    type: number
     sql: ${TABLE}.chargeback_cnt_fmt ;;
   }
 
   dimension: chargeback_pct {
-    type: string
+    type: number
     sql: ${TABLE}.chargeback_pct ;;
   }
 
   dimension: chargeback_pct_fmt {
-    type: string
+    type: number
     sql: ${TABLE}.chargeback_pct_fmt ;;
   }
 
@@ -644,15 +693,123 @@ GROUP BY
     sql: ${TABLE}.prod_ids ;;
   }
 
-  dimension: orders_id {
-    type: number
-    primary_key: yes
-    sql: ${TABLE}.orders_id ;;
+  measure: initial {
+    type: sum
+    sql: ${new_order_cnt} ;;
   }
 
-  dimension_group: t_stamp {
-    type: time
-    sql: ${TABLE}.t_stamp ;;
+  measure: initial_revenue {
+    type: sum
+    value_format_name: decimal_2
+    sql: ${new_order_rev} ;;
+  }
+
+  measure: shipping {
+    type: sum
+    sql: ${shipping_cnt} ;;
+  }
+
+  measure: shipping_revenue {
+    type: sum
+    value_format_name: decimal_2
+    sql: ${shipping_rev} ;;
+  }
+
+  measure: subscription {
+    type: sum
+    sql: ${recurring_order_cnt} ;;
+  }
+
+  measure: subscription_revenue {
+    type: sum
+    value_format_name: decimal_2
+    sql: ${recurring_order_rev_fmt} ;;
+  }
+
+  measure: total {
+    type: sum
+    sql: ${all_new_order_cnt} ;;
+  }
+
+  measure: total_revenue {
+    type: sum
+    value_format_name: decimal_2
+    sql: ${all_new_order_rev} ;;
+  }
+
+  measure: tax_revenue {
+    type: sum
+    value_format_name: decimal_2
+    sql: ${taxable_rev} ;;
+  }
+
+  measure: pending {
+    type: sum
+    sql: ${pending_order_cnt} ;;
+  }
+
+  measure: pending_revenue {
+    type: sum
+    value_format_name: decimal_2
+    sql: ${pending_order_rev} ;;
+  }
+
+  measure: declines {
+    type: sum
+    sql: ${decline_cnt} ;;
+  }
+
+  measure: decline_revenue {
+    type: sum
+    value_format_name: decimal_2
+    sql: ${decline_rev} ;;
+  }
+
+  measure: void_refund {
+    type: sum
+    sql: ${refund_void_cnt} ;;
+  }
+
+  measure: void_refund_revenue {
+    type: sum
+    value_format_name: decimal_2
+    sql: ${refund_void_rev} ;;
+  }
+
+  measure: holds_cancel_revenue {
+    type: sum
+    value_format_name: decimal_2
+    sql: (${hold_rev} + ${hold_rev_o}) ;;
+  }
+
+  measure: chargebacks {
+    type: sum
+    sql: ${chargeback_cnt} ;;
+    #sql_distinct_key: ${orders_id} ;;
+    drill_fields: [detail*]
+  }
+
+  measure: chargeback_percent {
+    label: "Chargeback %"
+    type: sum
+    sql: ${chargeback_pct} ;;
+    #sql_distinct_key: ${orders_id} ;;
+    drill_fields: [detail*]
+  }
+
+  measure: active_subscriptions {
+    type: sum
+    sql: ${active_cnt} ;;
+    #sql_distinct_key: ${orders_id} ;;
+    drill_fields: [detail*]
+  }
+
+  measure: avg_order {
+    type: number
+    sql: ${total_revenue}/NULLIF(${total},0) ;;
+    value_format_name: decimal_2
+    #sql_distinct_key: ${orders_id} ;;
+    drill_fields: [detail*]
   }
 
   measure: count_hold {
@@ -673,11 +830,8 @@ GROUP BY
 
   set: detail {
     fields: [
-      order_val,
-      group_by_type,
-      sub_group_by_type,
-      group_by_val,
-      group_by_disp,
+      campaign_id,
+      campaign,
       new_order_cnt,
       new_order_cnt_fmt,
       new_order_rev,
@@ -723,9 +877,7 @@ GROUP BY
       chargeback_pct,
       chargeback_pct_fmt,
       features,
-      prod_ids,
-      orders_id,
-      t_stamp_time
+      prod_ids
     ]
   }
 }

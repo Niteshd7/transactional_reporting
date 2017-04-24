@@ -13,6 +13,8 @@ explore: gateway{}
 
 explore: pdt_sales_by_product {}
 
+explore: pdt_sales_by_campaign {}
+
 explore: pdt_fulfillment_reconciliation {}
 
 explore: pdt_user_activity {}
@@ -97,13 +99,6 @@ explore: orders {
     relationship: one_to_one
     sql_on: ${hold_pdt.orders_id} = ${orders.orders_id}
       AND ${hold_pdt.orders_id} > '0';;
-  }
-
-  join: hold_pdt_1 {
-    type: left_outer
-    relationship: one_to_one
-    sql_on: ${hold_pdt_1.orders_id} = ${orders.orders_id}
-      AND ${hold_pdt_1.orders_id} IS NOT NULL;;
   }
 
   join: prod_hold_pdt {
