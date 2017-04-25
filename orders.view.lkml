@@ -2230,7 +2230,7 @@ view: orders {
     type: number
     label: "Gross Orders - Retention"
     #sql: CONCAT(${campaign_order_id}, ${customers_email_address}) ;;
-    sql: ${approved_order_count_retention} + ${declined_orders_campaign} + ${void_full_refund_orders} ;;
+    sql: ${pdt_retention.gross_orders} ;;
     drill_fields: [subscription*]
   }
 
@@ -2245,7 +2245,7 @@ view: orders {
       value: "yes"
     }
     filters: {
-      field: order_report.upsell_flag
+      field: upsell_flag
       value: "0"
     }
     filters: {
