@@ -2245,14 +2245,11 @@ view: orders {
       value: "yes"
     }
     filters: {
-      field: upsell_flag
+      field: order_report.upsell_flag
       value: "0"
     }
-    filters: {
-      field: order_report.subscription_cnt
-      value: ">0"
-    }
-    type: count
+    type: sum
+    sql: ${order_report.subscription_cnt} ;;
     drill_fields: [subscription*]
   }
 
@@ -2274,11 +2271,8 @@ view: orders {
       field: order_report.order_subscription_flag
       value: "1"
     }
-    filters: {
-      field: order_report.upsell_flag
-      value: "0"
-    }
-    type: count
+    type: sum
+    sql: ${order_report.active_subscription_cnt} ;;
     drill_fields: [subscription*]
   }
 
@@ -2309,12 +2303,17 @@ view: orders {
 
 
   measure:  void_full_refund_orders {
-    type: count
+    type: sum
     label: "Void/Full Refund"
     filters: {
       field: refund_type
       value: "2,3"
     }
+    filters: {
+      field: order_report.upsell_flag
+      value: "0"
+    }
+    sql: ${pdt_retention.gross} ;;
     drill_fields: [orders_id, orders_status,order_status_name, order_total]
   }
 
@@ -2325,26 +2324,21 @@ view: orders {
       field: refund_type
       value: "1"
     }
+    filters: {
+      field: order_report.upsell_flag
+      value: "0"
+    }
     drill_fields: [orders_id, orders_status,order_status_name, order_total]
   }
 
   measure:  declined_orders_retention {
-    type: count_distinct
-    label: "Declined Orders - Retention"
-    filters: {
-      field: orders_status
-      value: "7"
-    }
-    filters: {
-      field: was_salvaged
-      value: "no"
-    }
-    sql: CONCAT(${campaign_order_id}, ${customers_email_address}) ;;
+    type: number
+    sql: (${order_count_retention} - ${approved_order_count_retention} - ${void_full_refund_orders}) ;;
     drill_fields: [detail*]
   }
 
   measure:  hold_orders {
-    type: count
+    type: sum
     label: "Hold"
     filters: {
       field: is_archived
@@ -2363,18 +2357,15 @@ view: orders {
       value: "no"
     }
     filters: {
-      field: order_report.upsell_flag
-      value: "0"
-    }
-    filters: {
       field: order_report.straight_sale_flag
       value: "0"
     }
+    sql: ${order_report.subscription_cnt} ;;
     drill_fields: [subscription*]
   }
 
   measure:  canceled_orders {
-    type: count
+    type: sum
     label: "Canceled"
     filters: {
       field: is_archived
@@ -2389,14 +2380,36 @@ view: orders {
       value: "<2"
     }
     filters: {
-      field: order_report.upsell_flag
-      value: "0"
-    }
-    filters: {
       field: order_report.straight_sale_flag
       value: "0"
     }
+    sql: ${order_report.subscription_cnt} ;;
     drill_fields: [subscription*]
+  }
+
+  measure: net_revenue_retention {
+    type: number
+    label: "Net Revenue - Retention"
+    html: {{ currency_symbol._value }}{{ rendered_value }};;
+    value_format_name: decimal_2
+    sql: ${net_approved_total_retention} - ${void_refund_revenue};;
+  }
+
+  measure: net_approved_total_retention {
+    label: "Retention Approved Revenue"
+    hidden: yes
+    type: sum
+    filters: {
+      field: is_approved
+      value: "yes"
+    }
+    filters: {
+      field: order_report.upsell_flag
+      value: "0"
+    }
+    html: {{ currency_symbol._value }}{{ rendered_value }};;
+    value_format_name: decimal_2
+    sql: ${order_total};;
   }
 
  # ------- Sales By Retention Ends ------
