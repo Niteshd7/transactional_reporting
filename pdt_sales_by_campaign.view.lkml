@@ -251,6 +251,8 @@ view: pdt_sales_by_campaign {
                         AND
                            o.orders_id         = r.order_id
                         AND
+                           r.upsell_flag = 0
+                        AND
                            {% condition date_select %} o.t_stamp {% endcondition %}
                            AND {% condition is_test %} o.is_test_cc {% endcondition %}
 
@@ -396,6 +398,8 @@ view: pdt_sales_by_campaign {
                  o.orders_id = x.orders_id
               AND
                  o.deleted   = 0
+               AND
+                 o.cc_type   != 'offline'
               AND
                  o.campaign_order_id = c.c_id
                  AND {% condition is_test %} o.is_test_cc {% endcondition %}
@@ -405,7 +409,7 @@ view: pdt_sales_by_campaign {
         ) o
 GROUP BY
         campaign_id) a    ORDER BY order_val ASC, CAST(campaign_id AS signed) ASC
- ;;
+ ;;  indexes: ["campaign_id"]
   }
 
   measure: count {
@@ -798,8 +802,9 @@ GROUP BY
 
   measure: chargeback_percent {
     label: "Chargeback %"
-    type: sum
-    sql: ${chargeback_pct} ;;
+    type: number
+    sql: ${chargebacks}/${total} ;;
+    value_format_name: percent_1
     #sql_distinct_key: ${orders_id} ;;
     drill_fields: [detail*]
   }

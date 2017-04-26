@@ -273,6 +273,8 @@ view: pdt_sales_by_product {
                        AND
                           p.orders_id   = o.orders_id
                        AND
+                           r.upsell_flag = 0
+                       AND
                           o.orders_id         = r.order_id
                        AND
                           ot.orders_id  = o.orders_id
@@ -348,6 +350,8 @@ view: pdt_sales_by_product {
                           o.orders_id         = uo.main_orders_id
                        AND
                           o.orders_id         = r.order_id
+                       AND
+                           r.upsell_flag = 0
                        AND
                           p.upsell_orders_id  = uo.upsell_orders_id
                        AND
@@ -461,6 +465,8 @@ view: pdt_sales_by_product {
                  o.orders_id = p.orders_id
               AND
                  o.deleted   = 0
+                AND
+                 o.cc_type   != 'offline'
               AND
                  c.c_id = o.campaign_order_id
                  AND {% condition is_test %} o.is_test_cc {% endcondition %}
