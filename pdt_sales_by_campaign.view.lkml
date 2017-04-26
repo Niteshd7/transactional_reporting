@@ -6,7 +6,7 @@ view: pdt_sales_by_campaign {
         IF(LENGTH(IFNULL(group_by_val, '')) = 0, 'BLANK', group_by_val_disp)                                                                   AS campaign,
         SUM(new_order_cnt)                                                                                                                     AS new_order_cnt,
         FORMAT(SUM(new_order_cnt), 0)                                                                                                          AS new_order_cnt_fmt,
-        FORMAT(SUM(new_order_rev), 2)                                                                                             AS new_order_rev,
+        SUM(new_order_rev)                                                                                             AS new_order_rev,
         FORMAT(SUM(new_order_rev), 2)                                              AS new_order_rev_fmt,
         SUM(recurring_order_cnt)                                                                                                               AS recurring_order_cnt,
         FORMAT(SUM(recurring_order_cnt), 0)                                                                                                    AS recurring_order_cnt_fmt,
