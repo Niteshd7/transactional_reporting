@@ -442,8 +442,8 @@ view: pdt_fulfillment_reconciliation {
   }
 
   measure: avg_days_pending_tracking {
-    type: sum
-    sql: ${pending_avg} ;;
+    type: number
+    sql: ROUND(${pending_avg}) ;;
   }
 
   set: detail {
