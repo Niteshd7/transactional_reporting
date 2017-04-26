@@ -13,6 +13,8 @@ explore: gateway{}
 
 explore: pdt_sales_by_product {}
 
+explore: pdt_sales_by_date {}
+
 explore: pdt_sales_by_campaign {}
 
 explore: pdt_fulfillment_reconciliation {}
