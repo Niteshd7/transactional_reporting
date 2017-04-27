@@ -275,6 +275,8 @@ view: pdt_sales_by_product {
                        AND
                            r.upsell_flag = 0
                        AND
+                           r.lbc_id IS NOT NULL
+                       AND
                           o.orders_id         = r.order_id
                        AND
                           ot.orders_id  = o.orders_id
@@ -465,8 +467,6 @@ view: pdt_sales_by_product {
                  o.orders_id = p.orders_id
               AND
                  o.deleted   = 0
-                AND
-                 o.cc_type   != 'offline'
               AND
                  c.c_id = o.campaign_order_id
                  AND {% condition is_test %} o.is_test_cc {% endcondition %}
