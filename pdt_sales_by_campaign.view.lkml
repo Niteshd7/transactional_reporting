@@ -399,7 +399,7 @@ view: pdt_sales_by_campaign {
               AND
                  o.deleted   = 0
                AND
-                 o.cc_type   != 'offline'
+                o.gatewayId IS NOT NULL
               AND
                  o.campaign_order_id = c.c_id
                  AND {% condition is_test %} o.is_test_cc {% endcondition %}
