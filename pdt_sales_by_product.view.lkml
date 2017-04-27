@@ -275,8 +275,6 @@ view: pdt_sales_by_product {
                        AND
                            r.upsell_flag = 0
                        AND
-                           r.lbc_id IS NOT NULL
-                       AND
                           o.orders_id         = r.order_id
                        AND
                           ot.orders_id  = o.orders_id
@@ -470,6 +468,8 @@ view: pdt_sales_by_product {
               AND
                  c.c_id = o.campaign_order_id
                  AND {% condition is_test %} o.is_test_cc {% endcondition %}
+                 AND
+                           o.gatewayId IS NOT NULL
          GROUP BY
                  group_by_val
         ) o
