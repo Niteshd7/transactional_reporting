@@ -506,7 +506,9 @@ view: orders {
   dimension: gateway {
     full_suggestions: yes
     type: string
-    sql:  CONCAT('(',${gateway_id}, ') ', ${gateway.gateway_alias}) ;;
+    sql:  CASE WHEN ${gateway_id} IS NULL THEN 'NULL'
+               WHEN ${gateway_id} = '0' THEN 'Offline'
+               ELSE CONCAT('(',${gateway_id}, ') ', ${gateway.gateway_alias}) END ;;
   }
 
   dimension: gateway_preserve {
