@@ -43,7 +43,7 @@ view: hold_pdt {
                                                    (uo.hold_date BETWEEN (SELECT TIMESTAMP({% date_start orders.t_stamp_date %})) AND (SELECT TIMESTAMP({% date_end orders.t_stamp_date %})))
 
                                     )
-                                    AND o.is_test_cc IN (0, 1)
+                                    AND {% condition orders.is_test_cc %} o.is_test_cc {% endcondition %}
 
                            ) oh
                       WHERE
