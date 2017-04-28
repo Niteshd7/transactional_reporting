@@ -56,7 +56,8 @@ view: pdt_sales_by_campaign {
         (IF(SUM(all_new_order_cnt) > 0, (SUM(chargeback_cnt) / SUM(all_new_order_cnt)), 0) * 100)                                  AS chargeback_pct_fmt,
         IF(MAX(display_link) = 1, ':AFF_LINK', '')                                                                                             AS features,
         GROUP_CONCAT(DISTINCT(products_id))                                        AS prod_ids,
-        currency_id AS currency_id
+        currency_id AS currency_id,
+        currency_symbol                                                           AS currency_symbol
     FROM
         (
            SELECT
@@ -196,8 +197,9 @@ view: pdt_sales_by_campaign {
                  SUM(hold_rev_o)            AS hold_rev_o,
                  SUM(hold_cnt_outside)      AS hold_cnt_outside,
                  SUM(chargeback_cnt)        AS chargeback_cnt,
-                 currency_id AS currency_id,
-                 products_id AS products_id
+                 currency_id                AS currency_id,
+                 products_id                AS products_id,
+                currency_symbol             AS currency_symbol
              FROM
                  orders o,
                  campaigns c,
@@ -233,7 +235,8 @@ view: pdt_sales_by_campaign {
                           0                                                                                                                                          AS hold_cnt_outside,
                           0                                                                                                                                          AS hold_rev_o,
                           COUNT(IF(o.isChargeback = 1, 1, NULL))                                                                                                     AS chargeback_cnt,
-                          r.currency_id AS currency_id
+                          r.currency_id AS currency_id,
+                          r.currency_symbol AS currency_symbol
                        FROM
                            v_main_order_total   ot,
                            orders_products op,
@@ -283,7 +286,8 @@ view: pdt_sales_by_campaign {
                            COUNT(IF(outside = 1, 1, NULL))                      AS hold_cnt_outside,
                            (IF(outside = 1, IFNULL(o.currency_value, 0), 0)) AS hold_rev_o,
                            0                                                    AS chargeback_cnt,
-                           0 as currency_id
+                           0 as currency_id,
+                           0 as currency_symbol
                        FROM
                            orders o,
                            (
@@ -355,7 +359,8 @@ view: pdt_sales_by_campaign {
                            0                                         AS hold_cnt_outside,
                            0                                         AS hold_rev_o,
                            0                                         AS chargeback_cnt,
-                           0 as currency_id
+                           0 as currency_id,
+                           0 as currency_symbol
                        FROM
                            (
                               SELECT
@@ -430,6 +435,11 @@ GROUP BY
   dimension: currency_id {
     type: number
     sql: ${TABLE}.currency_id ;;
+  }
+
+  dimension: currency_symbol {
+    type: string
+    sql: CASE WHEN ${TABLE}.currency_symbol = '0' THEN '$' ELSE ${TABLE}.currency_symbol END ;;
   }
 
   dimension: currency_fmt {
@@ -710,9 +720,9 @@ GROUP BY
   }
 
   measure: initial_revenue {
-    type: sum
+    type: string
     value_format_name: decimal_2
-    sql: ${new_order_rev} ;;
+    sql: CONCAT(${currency_symbol},FORMAT(SUM(${new_order_rev}), 2)) ;;
   }
 
   measure: shipping {
@@ -721,9 +731,9 @@ GROUP BY
   }
 
   measure: shipping_revenue {
-    type: sum
+    type: string
     value_format_name: decimal_2
-    sql: ${shipping_rev} ;;
+    sql: CONCAT(${currency_symbol},FORMAT(SUM(${shipping_rev}), 2)) ;;
   }
 
   measure: subscription {
@@ -732,9 +742,9 @@ GROUP BY
   }
 
   measure: subscription_revenue {
-    type: sum
+    type: string
     value_format_name: decimal_2
-    sql: ${recurring_order_rev_fmt} ;;
+    sql: CONCAT(${currency_symbol},FORMAT(SUM(${recurring_order_rev_fmt}), 2)) ;;
   }
 
   measure: total {
@@ -743,15 +753,22 @@ GROUP BY
   }
 
   measure: total_revenue {
+    type: string
+    value_format_name: decimal_2
+    sql: CONCAT(${currency_symbol},FORMAT(SUM(${all_new_order_rev}), 2)) ;;
+  }
+
+  measure: total_revenue_hide {
+    hidden: yes
     type: sum
     value_format_name: decimal_2
     sql: ${all_new_order_rev} ;;
   }
 
   measure: tax_revenue {
-    type: sum
+    type: string
     value_format_name: decimal_2
-    sql: ${taxable_rev} ;;
+    sql: CONCAT(${currency_symbol},FORMAT(SUM(${taxable_rev}), 2)) ;;
   }
 
   measure: pending {
@@ -760,9 +777,9 @@ GROUP BY
   }
 
   measure: pending_revenue {
-    type: sum
+    type: string
     value_format_name: decimal_2
-    sql: ${pending_order_rev} ;;
+    sql: CONCAT(${currency_symbol},FORMAT(SUM(${pending_order_rev}), 2)) ;;
   }
 
   measure: declines {
@@ -771,9 +788,9 @@ GROUP BY
   }
 
   measure: decline_revenue {
-    type: sum
+    type: string
     value_format_name: decimal_2
-    sql: ${decline_rev} ;;
+    sql: CONCAT(${currency_symbol},FORMAT(SUM(${decline_rev}), 2)) ;;
   }
 
   measure: void_refund {
@@ -782,15 +799,15 @@ GROUP BY
   }
 
   measure: void_refund_revenue {
-    type: sum
+    type: string
     value_format_name: decimal_2
-    sql: ${refund_void_rev} ;;
+    sql: CONCAT(${currency_symbol},FORMAT(SUM(${refund_void_rev}), 2)) ;;
   }
 
   measure: holds_cancel_revenue {
-    type: sum
+    type: string
     value_format_name: decimal_2
-    sql: (${hold_rev} + ${hold_rev_o}) ;;
+    sql: CONCAT(${currency_symbol},FORMAT(SUM((${hold_rev} + ${hold_rev_o})), 2)) ;;
   }
 
   measure: chargebacks {
@@ -818,7 +835,8 @@ GROUP BY
 
   measure: avg_order {
     type: number
-    sql: ${total_revenue}/NULLIF(${total},0) ;;
+    html: {{ currency_symbol._value }}{{ rendered_value }};;
+    sql: ${total_revenue_hide}/NULLIF(${total},0) ;;
     value_format_name: decimal_2
     #sql_distinct_key: ${orders_id} ;;
     drill_fields: [detail*]
