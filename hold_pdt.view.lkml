@@ -72,6 +72,7 @@ view: hold_pdt {
 
   measure: sum_hold {
     type: sum
+    html: {{ currency_symbol._value }}{{ rendered_value }};;
     sql: ${hold_rev};;
     value_format_name: decimal_2
     #sql_distinct_key: ${orders_id} ;;
@@ -80,6 +81,7 @@ view: hold_pdt {
 
   measure: sum_hold_outside {
     type: sum
+    html: {{ currency_symbol._value }}{{ rendered_value }};;
     sql: ${hold_rev_o};;
     value_format_name: decimal_2
     #sql_distinct_key: ${orders_id} ;;
@@ -97,6 +99,11 @@ view: hold_pdt {
     #primary_key: yes
     type: number
     sql: ${TABLE}.orders_id ;;
+  }
+
+  dimension: currency_symbol {
+    type: string
+    sql: ${orders.currency_symbol} ;;
   }
 
   dimension: new_order_cnt {

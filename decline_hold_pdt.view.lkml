@@ -120,34 +120,28 @@ view: decline_hold_pdt {
     drill_fields: [detail*]
   }
 
-  measure: prior_hold_count {
-    type: number
-    sql: SUM(${hold_cnt_outside}) ;;
-    drill_fields: [orders_id, orders.hold_date, orders.t_stamp_date]
-  }
-
   measure: decline_revenue {
     type: sum
     filters: {
       field: orders.upsell_flag
       value: "0"
     }
+    html: {{ currency_symbol._value }}{{ rendered_value }};;
     sql: ${decline_rev} ;;
     value_format_name: decimal_2
     drill_fields: [orders_id, orders.hold_date, orders.t_stamp_date]
   }
 
 
-  measure: current_hold_count {
-    type: sum
-    sql: ${hold_cnt};;
-    drill_fields: [orders_id, orders.hold_date, orders.t_stamp_date]
-  }
-
   dimension: orders_id {
     type: number
     primary_key: yes
     sql: ${TABLE}.orders_id ;;
+  }
+
+  dimension: currency_symbol {
+    type: string
+    sql: ${orders.currency_symbol} ;;
   }
 
   dimension: new_order_cnt {
