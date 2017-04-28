@@ -1415,6 +1415,7 @@ view: orders {
       field: order_report.upsell_flag
       value: "0"
     }
+    html: {{ currency_symbol._value }}{{ rendered_value }};;
     value_format_name: decimal_2
     sql:(${v_main_order_total.current_total} + ${order_report.upsell_amt}) ;;
   }
