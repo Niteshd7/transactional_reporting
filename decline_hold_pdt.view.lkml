@@ -46,7 +46,7 @@ view: decline_hold_pdt {
                            o.orders_id         = ot.orders_id
                         AND
                            {% condition orders.t_stamp_date %} o.t_stamp {% endcondition %}
-                           AND o.is_test_cc IN (0, 1)
+                           AND {% condition orders.is_test_cc %} o.is_test_cc {% endcondition %}
 
                    GROUP BY
                            o.orders_id
@@ -100,7 +100,7 @@ view: decline_hold_pdt {
                                              o.wasSalvaged   = 0
                                           AND
                                              {% condition orders.t_stamp_date %} o.t_stamp {% endcondition %}
-                                             AND o.is_test_cc IN (0, 1)
+                                             AND {% condition orders.is_test_cc %} o.is_test_cc {% endcondition %}
 
                                      GROUP BY
                                              CONCAT(o.campaign_order_id, o.customers_email_address, DATE(o.t_stamp)),
