@@ -2,6 +2,7 @@ view: pdt_sales_by_product {
     derived_table: {
       sql: SELECT  * FROM (  SELECT
         currency_id                                                           AS currency_id,
+        currency_symbol                                                           AS currency_symbol,
         IF(LENGTH(group_by_val) = 0, 1, 2)                                    AS order_val,
         IF(LENGTH(group_by_type) = 0, '', group_by_type)                      AS group_by_type,
         IF(LENGTH(sub_group_by_type) = 0, '', sub_group_by_type)              AS sub_group_by_type,
@@ -212,7 +213,8 @@ view: pdt_sales_by_product {
                  SUM(IFNULL(hold_cnt_outside,0))      AS hold_cnt_outside,
                  SUM(prod_hold_cnt)                   AS prod_hold_cnt,
                  SUM(prod_hold_cnt_outside)           AS prod_hold_cnt_outside,
-                 currency_id                                                           AS currency_id
+                 currency_id                                                           AS currency_id,
+                currency_symbol                       AS currency_symbol
              FROM
                  orders o,
                  campaigns c,
@@ -261,7 +263,8 @@ view: pdt_sales_by_product {
                           0 AS hold_rev_o,
                           0 AS prod_hold_cnt,
                           0 AS prod_hold_cnt_outside,
-                          r.currency_id AS currency_id
+                          r.currency_id AS currency_id,
+                          r.currency_symbol AS currency_symbol
                       FROM
                           orders               o,
                           order_report           r,
@@ -336,7 +339,8 @@ view: pdt_sales_by_product {
                           0 AS hold_rev_o,
                           0 AS prod_hold_cnt,
                           0 AS prod_hold_cnt_outside,
-                          r.currency_id AS currency_id
+                          r.currency_id AS currency_id,
+                          0                       AS currency_symbol
                       FROM
                           orders                 o,
                           order_report           r,
@@ -389,7 +393,8 @@ view: pdt_sales_by_product {
                           SUM(IF(outside = 1, o.currency_value, 0)) AS hold_rev_o,
                           SUM(IF(outside = 0, oh.prod_cnt, 0))      AS prod_hold_cnt,
                           SUM(IF(outside = 1, oh.prod_cnt, 0))      AS prod_hold_cnt_outside,
-                          0                                                           AS currency_id
+                          0                                                           AS currency_id,
+                          0                       AS currency_symbol
                       FROM
                           orders o,
                           (
@@ -503,6 +508,11 @@ GROUP BY
       type: number
       sql: ${TABLE}.currency_id ;;
     }
+
+  dimension: currency_symbol {
+    type: string
+    sql: ${TABLE}.currency_symbol ;;
+  }
 
    dimension: currency_fmt {
     hidden: no
@@ -711,9 +721,9 @@ GROUP BY
     }
 
     measure: initial_revenue {
-      type: sum
+      type: string
       value_format_name: decimal_2
-      sql: ${new_products_rev} ;;
+      sql: CONCAT(${currency_symbol},FORMAT(SUM(${new_products_rev}), 2)) ;;
     }
 
     measure: subscription {
@@ -722,9 +732,9 @@ GROUP BY
     }
 
     measure: subscription_revenue {
-      type: sum
+      type: string
       value_format_name: decimal_2
-      sql: ${rec_products_rev} ;;
+      sql: CONCAT(${currency_symbol},FORMAT(SUM(${rec_products_rev}), 2)) ;;
     }
 
     measure: total {
@@ -733,9 +743,9 @@ GROUP BY
     }
 
     measure: total_revenue {
-      type: sum
+      type: string
       value_format_name: decimal_2
-      sql: ${all_products_rev} ;;
+      sql: CONCAT(${currency_symbol},FORMAT(SUM(${all_products_rev}), 2)) ;;
     }
 
     measure: pending {
@@ -744,15 +754,15 @@ GROUP BY
     }
 
     measure: pending_revenue {
-      type: sum
+      type: string
       value_format_name: decimal_2
-      sql: ${pending_products_rev} ;;
+      sql: CONCAT(${currency_symbol},FORMAT(SUM(${pending_products_rev}), 2)) ;;
     }
 
     measure: holds_cancel_revenue {
-      type: sum
+      type: string
       value_format_name: decimal_2
-      sql: (${hold_rev} + ${hold_rev_o}) ;;
+      sql: CONCAT(${currency_symbol},FORMAT(SUM((${hold_rev} + ${hold_rev_o})), 2)) ;;
     }
 
     measure: count {
