@@ -8,6 +8,7 @@ view: admin {
 
   dimension: admin_id {
     type: number
+    value_format: "#"
     sql: ${TABLE}.admin_id ;;
   }
 

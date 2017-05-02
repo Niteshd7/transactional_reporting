@@ -94,6 +94,7 @@ LEFT OUTER JOIN
 
   dimension: user {
     type: number
+    value_format: "#"
     sql: ${TABLE}.user ;;
   }
 

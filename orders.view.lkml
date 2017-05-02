@@ -44,7 +44,7 @@ view: orders {
     sql: "Affiliate ID" ;;
     link: {
       label: "Affiliate Breakdown"
-      url: "https://analytics.limelightcrm.com/looks/406"
+      url: "https://analytics.limelightcrm.com/embed/looks/406"
       icon_url: "https://cdn.limelightcrm.com/logo1.png"
     }
   }
@@ -990,7 +990,7 @@ view: orders {
     }
     label: "Activity Count"
     link: {
-      url: "https://analytics.limelightcrm.com/looks/579"
+      url: "https://analytics.limelightcrm.com/embed/looks/579"
     }
     drill_fields: [orders_id, admin.admin_id, admin.admin_fullname, activity, t_stamp_date]
   }
