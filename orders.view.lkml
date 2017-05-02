@@ -1788,7 +1788,7 @@ view: orders {
   measure: chargeback_percentage_gateway {
     type: number
     label: "Chargeback Percentage - Gateway"
-    value_format_name: percent_2
+    value_format_name: percent_1
     sql: ${chargeback_count} / NULLIF(${gross_order_gateway},0) ;;
   }
 
@@ -2300,7 +2300,7 @@ view: orders {
   measure: approval_rate_retention {
     type: number
     label: "Approval Rate"
-    value_format_name: percent_2
+    value_format_name: percent_1
     sql: ${approved_order_count_retention} / NULLIF(${order_count_retention},0) ;;
   }
 
