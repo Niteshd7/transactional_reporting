@@ -471,6 +471,7 @@ GROUP BY
 
   dimension: campaign {
     type: string
+    suggestable: yes
     sql: ${TABLE}.group_by_val ;;
   }
 

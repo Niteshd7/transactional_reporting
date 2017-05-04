@@ -59,6 +59,42 @@ view: orders {
     sql: ${TABLE}.AID ;;
   }
 
+  dimension: affiliate_id {
+    type: string
+    sql: CASE
+                          WHEN LENGTH(${affid})  > 0 THEN ${affid}
+                          WHEN LENGTH(${aid})  > 0 THEN ${aid}
+                          WHEN LENGTH(${afid})  > 0 THEN ${afid}
+                          ELSE ''
+                 END ;;
+  }
+
+  dimension: sub_affiliate_id {
+    type: string
+    sql: CASE
+                          WHEN LENGTH(${afid}) > 0 AND LENGTH(${sid}) > 0 THEN ${sid}
+                          WHEN LENGTH(${affid}) > 0 AND LENGTH(${c1}) > 0 THEN ${c1}
+                          WHEN LENGTH(${aid}) > 0 AND LENGTH(${opt}) > 0 THEN  ${opt}
+                          ELSE ''
+                       END;;
+  }
+
+  dimension: sub_affiliate_2 {
+    type: string
+    sql: CASE
+                          WHEN LENGTH(${affid}) > 0 AND LENGTH(${c1}) > 0 AND LENGTH(${c2}) > 0 THEN ${c2}
+                          ELSE ''
+                       END;;
+  }
+
+  dimension: sub_affiliate_3 {
+    type: string
+    sql: CASE
+                          WHEN LENGTH(${affid}) > 0 AND LENGTH(${c1}) > 0 AND LENGTH(${c2}) > 0 AND LENGTH(${c3}) > 0 THEN ${c3}
+                          ELSE ''
+                       END;;
+  }
+
   dimension: amount_0 {
     type: number
     sql: ${TABLE}.amount_0 ;;
@@ -180,6 +216,7 @@ view: orders {
   }
 
   dimension: campaign_order_id {
+    full_suggestions: yes
     type: string
     sql: ${TABLE}.campaign_order_id ;;
   }
@@ -499,6 +536,7 @@ view: orders {
 
   dimension: gateway_id {
     type: number
+    suggestable: yes
     # hidden: true
     sql: ${TABLE}.gatewayId ;;
   }
@@ -2070,6 +2108,31 @@ view: orders {
     description: "Separate measure for Decline Reasons Report"
     drill_fields: [orders_id, is_subscription, t_stamp_date, decline_reason]
   }
+
+  measure: affiliate_breakdown_decline {
+    sql: "Affiliate ID" ;;
+    label: "Affiliate Breakdown"
+    drill_fields: [decline_reason*]
+  }
+
+  measure: sub_affiliate_breakdown_decline {
+    sql: "Sub-Affiliate ID" ;;
+    label: "Sub-Affiliate Breakdown"
+    drill_fields: [decline_reason_1*]
+  }
+
+  measure: sub_affiliate_breakdown_decline_2 {
+    sql: "Sub-Affiliate ID" ;;
+    label: "Sub-Affiliate Breakdown"
+    drill_fields: [decline_reason_2*]
+  }
+
+  measure: sub_affiliate_breakdown_decline_3 {
+    sql: "Sub-Affiliate ID" ;;
+    label: "Sub-Affiliate Breakdown"
+    drill_fields: [decline_reason_3*]
+  }
+
 #-----Decline Reasons End----------------------------
 #-----Sales by Product ----------------------------
 
@@ -2425,6 +2488,23 @@ view: orders {
   set: subscription {
     fields: [orders_id, attempt, t_stamp_date, order_status_name, discount_percent, discount_amount, approved_revenue]
   }
+
+  set: decline_reason {
+    fields: [affiliate_id, cc_type_fmt, decline_reason, count_decl_reas , initial_orders_decline_reasons, subscription_decline_reason,sub_affiliate_breakdown_decline]
+  }
+
+  set: decline_reason_1 {
+    fields: [sub_affiliate_id, cc_type_fmt, decline_reason, count_decl_reas , initial_orders_decline_reasons, subscription_decline_reason, sub_affiliate_breakdown_decline_2]
+  }
+
+  set: decline_reason_2 {
+    fields: [sub_affiliate_2, cc_type_fmt, decline_reason, count_decl_reas , initial_orders_decline_reasons, subscription_decline_reason, sub_affiliate_breakdown_decline_2]
+  }
+
+  set: decline_reason_3 {
+    fields: [sub_affiliate_3, cc_type_fmt, decline_reason, count_decl_reas , initial_orders_decline_reasons, subscription_decline_reason]
+  }
+
 
   set: gateway {
     fields: [orders_id, cc_type_fmt, net_order_total, void_refund_revenue_gateway, refund_type, is_chargeback, is_declined, t_stamp_date]
