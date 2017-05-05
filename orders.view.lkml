@@ -1701,6 +1701,50 @@ view: orders {
     sql: ${v_orders.retry_discount_amt};;
   }
 
+  measure: affiliate_breakdown_subscription {
+    sql: "Affiliate ID" ;;
+    description: "Sales by Subscription"
+    label: "Affiliate Breakdown"
+    drill_fields: [subscription_drill*]
+  }
+
+  measure: sub_affiliate_breakdown_subscription {
+    sql: "Sub-Affiliate ID" ;;
+    description: "Sales by Subscription"
+    label: "Sub-Affiliate Breakdown"
+    drill_fields: [subscription_drill_1*]
+  }
+
+  measure: sub_affiliate_breakdown_subscription_2 {
+    sql: "Sub-Affiliate ID" ;;
+    description: "Sales by Subscription"
+    label: "Sub-Affiliate Breakdown"
+    drill_fields: [subscription_drill_2*]
+  }
+
+  measure: sub_affiliate_breakdown_subscription_3 {
+    sql: "Sub-Affiliate ID" ;;
+    description: "Sales by Subscription"
+    label: "Sub-Affiliate Breakdown"
+    drill_fields: [subscription_drill_3*]
+  }
+
+  set: subscription_drill {
+    fields: [affiliate_id, attempt, gross_order_count , approved_order_count,declined_orders_subscriptions, approved_order_percent,average_discount_percent,approved_revenue_subscription, sub_affiliate_breakdown_subscription]
+  }
+
+  set: subscription_drill_1 {
+    fields: [sub_affiliate_id, attempt, gross_order_count , approved_order_count,declined_orders_subscriptions, approved_order_percent,average_discount_percent,approved_revenue_subscription, sub_affiliate_breakdown_subscription_2]
+  }
+
+  set: subscription_drill_2 {
+    fields: [sub_affiliate_2, attempt, gross_order_count , approved_order_count,declined_orders_subscriptions, approved_order_percent,average_discount_percent,approved_revenue_subscription, sub_affiliate_breakdown_subscription_3]
+  }
+
+  set: subscription_drill_3 {
+    fields: [sub_affiliate_3, attempt, gross_order_count , approved_order_count,declined_orders_subscriptions, approved_order_percent,average_discount_percent,approved_revenue_subscription, subscription_decline_reason]
+  }
+
   # ------- Sales By Subscription End------
 
  # ------- Sales By Gateway ------
@@ -2133,6 +2177,22 @@ view: orders {
     drill_fields: [decline_reason_3*]
   }
 
+  set: decline_reason {
+    fields: [affiliate_id, cc_type_fmt, decline_reason, count_decl_reas , initial_orders_decline_reasons, subscription_decline_reason,sub_affiliate_breakdown_decline]
+  }
+
+  set: decline_reason_1 {
+    fields: [sub_affiliate_id, cc_type_fmt, decline_reason, count_decl_reas , initial_orders_decline_reasons, subscription_decline_reason, sub_affiliate_breakdown_decline_2]
+  }
+
+  set: decline_reason_2 {
+    fields: [sub_affiliate_2, cc_type_fmt, decline_reason, count_decl_reas , initial_orders_decline_reasons, subscription_decline_reason, sub_affiliate_breakdown_decline_2]
+  }
+
+  set: decline_reason_3 {
+    fields: [sub_affiliate_3, cc_type_fmt, decline_reason, count_decl_reas , initial_orders_decline_reasons, subscription_decline_reason]
+  }
+
 #-----Decline Reasons End----------------------------
 #-----Sales by Product ----------------------------
 
@@ -2489,21 +2549,7 @@ view: orders {
     fields: [orders_id, attempt, t_stamp_date, order_status_name, discount_percent, discount_amount, approved_revenue]
   }
 
-  set: decline_reason {
-    fields: [affiliate_id, cc_type_fmt, decline_reason, count_decl_reas , initial_orders_decline_reasons, subscription_decline_reason,sub_affiliate_breakdown_decline]
-  }
 
-  set: decline_reason_1 {
-    fields: [sub_affiliate_id, cc_type_fmt, decline_reason, count_decl_reas , initial_orders_decline_reasons, subscription_decline_reason, sub_affiliate_breakdown_decline_2]
-  }
-
-  set: decline_reason_2 {
-    fields: [sub_affiliate_2, cc_type_fmt, decline_reason, count_decl_reas , initial_orders_decline_reasons, subscription_decline_reason, sub_affiliate_breakdown_decline_2]
-  }
-
-  set: decline_reason_3 {
-    fields: [sub_affiliate_3, cc_type_fmt, decline_reason, count_decl_reas , initial_orders_decline_reasons, subscription_decline_reason]
-  }
 
 
   set: gateway {
