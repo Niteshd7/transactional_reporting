@@ -437,7 +437,7 @@ END
         ) p
 GROUP BY
         group_by_val) a    ORDER BY order_val ASC, CAST(group_by_val AS signed) ASC
- ;;
+ ;; indexes: ["group_by_val"]
   }
 
   measure: count {
@@ -471,7 +471,7 @@ GROUP BY
 
   dimension: campaign {
     type: string
-    suggestable: yes
+    full_suggestions: yes
     sql: ${TABLE}.group_by_val ;;
   }
 
