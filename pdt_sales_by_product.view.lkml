@@ -511,7 +511,7 @@ GROUP BY
 
   dimension: currency_symbol {
     type: string
-    sql: ${TABLE}.currency_symbol ;;
+    sql: CASE WHEN ${TABLE}.currency_symbol = '0' THEN '$' ELSE ${TABLE}.currency_symbol END ;;
   }
 
    dimension: currency_fmt {

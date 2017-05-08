@@ -16,10 +16,14 @@ view: prospect_pdt {
         CONCAT('$', FORMAT(avg_rev, 2), '')                                                                     AS avg_rev_fmt,
         total_rev                                                                                                                                         AS total_rev,
         CONCAT('$', FORMAT(total_rev, 2), '')                                                                   AS total_rev_fmt,
-        IF(display_link = 1, ':AFF_LINK', '')                                                                                                             AS features
+        IF(display_link = 1, ':AFF_LINK', '')                                                                                                             AS features,
+        currency_id AS currency_id,
+        currency_symbol  AS currency_symbol
     FROM
         (
            SELECT
+                 r.currency_id    AS currency_id,
+                r.currency_symbol  AS currency_symbol,
                  CASE 'BASE'
                     WHEN 'ALL' THEN
                        CASE
@@ -196,11 +200,16 @@ view: prospect_pdt {
              FROM
                  campaigns          c,
                  orders             o,
+                 order_report       r,
                  v_main_order_total ot
             WHERE
                  o.orders_status NOT IN (7, 10, 11)
               AND
                  o.orders_id = ot.orders_id
+              AND
+                 r.upsell_flag = 0
+              AND
+                 o.orders_id         = r.order_id
               AND
                  o.campaign_order_id = c.c_id
               AND
@@ -211,47 +220,15 @@ view: prospect_pdt {
                  o.parent_order_id = 0
               AND
                  {% condition date_select %} o.t_stamp {% endcondition %}
-                 AND
-CASE
-   WHEN
-       o.cc_type = 'checking'
-   THEN
-       IF('1' = 1, TRUE, FALSE)
-   WHEN
-       c.is_load_balanced = 1
-   THEN
-      (
-      EXISTS(
-             SELECT
-                   1
-               FROM
-                   v_load_balance_currencies v
-              WHERE
-                   v.lbc_id = c.lbc_id
-                AND
-                   v.currency_id = '1'
-             )
-      )
-   ELSE
-      (
-      EXISTS(
-             SELECT
-                   1
-               FROM
-                   v_gateway_currency gc
-              WHERE
-                   o.gatewayId = gc.gatewayId
-                AND
-                   gc.currencyId = '1'
-             )
-      )
-END
+
                  AND {% condition is_test %} o.is_test_cc {% endcondition %}
 
          GROUP BY
                  group_by_val
             UNION
            SELECT
+                 0  AS currency_id,
+                 0  AS currency_symbol,
                  CASE 'BASE'
                     WHEN 'ALL' THEN
                        CASE
@@ -400,37 +377,6 @@ END
                  p.campaign_id = c.c_id
               AND
                  {% condition date_select %} p.pDate {% endcondition %}
-              AND
-                 CASE
-                 WHEN c.is_load_balanced = 1 THEN
-                    (
-                       EXISTS
-                       (
-                          SELECT
-                                1
-                            FROM
-                                v_load_balance_currencies v
-                           WHERE
-                                v.lbc_id      = c.lbc_id AND
-                                v.currency_id = '1'
-                       )
-                    )
-                 ELSE
-                    (
-
-                       EXISTS
-                       (
-                          SELECT
-                                1
-                            FROM
-                                v_gateway_currency gc
-                           WHERE
-                                c.gateway_id  = gc.gatewayId
-                             AND
-                                gc.currencyId = '1'
-                       )
-                    )
-                 END
 
          GROUP BY
                  group_by_val
@@ -452,6 +398,43 @@ GROUP BY
   filter: is_test {
     type: string
     default_value: "0,1"
+  }
+
+  dimension: currency_id {
+    type: number
+    sql: ${TABLE}.currency_id ;;
+  }
+
+  dimension: currency_symbol {
+    type: string
+    sql: CASE WHEN ${TABLE}.currency_symbol = '0' THEN '$' ELSE ${TABLE}.currency_symbol END ;;
+  }
+
+  dimension: currency_fmt {
+    hidden: no
+    suggestions: ["USD","EUR","GBP","CAD","AUD","ZAR","JPY","DKK","NOK","SEK","BRL","CLP"]
+    type: string
+    sql: CASE WHEN ${currency_id} = 1 THEN 'USD'
+            WHEN ${currency_id} = 2 THEN 'EUR'
+            WHEN ${currency_id} = 3 THEN 'GBP'
+            WHEN ${currency_id} = 4 THEN 'CAD'
+            WHEN ${currency_id} = 5 THEN 'AUD'
+            WHEN ${currency_id} = 6 THEN 'ZAR'
+            WHEN ${currency_id} = 7 THEN 'JPY'
+            WHEN ${currency_id} = 8 THEN 'DKK'
+            WHEN ${currency_id} = 9 THEN 'NOK'
+            WHEN ${currency_id} = 10 THEN 'SEK'
+            WHEN ${currency_id} = 11 THEN 'BRL'
+            WHEN ${currency_id} = 12 THEN 'CLP'
+            WHEN ${currency_id} = 13 THEN 'MXN'
+            WHEN ${currency_id} = 14 THEN 'KRW'
+            WHEN ${currency_id} = 15 THEN 'NZD'
+            WHEN ${currency_id} = 16 THEN 'PLN'
+            WHEN ${currency_id} = 17 THEN 'SGD'
+            WHEN ${currency_id} = 18 THEN 'HKD'
+            WHEN ${currency_id} = 19 THEN 'ARS'
+            ELSE 'USD'
+       END ;;
   }
 
   dimension: order_val {
@@ -551,6 +534,7 @@ GROUP BY
 
   measure: average_revenue {
     type: number
+    html: {{ currency_symbol._value }}{{ rendered_value }};;
     sql: ${total_revenue}/NULLIF(${count_customers},0) ;;
     value_format_name: decimal_2
     #sql_distinct_key: ${group_by_val} ;;
@@ -558,9 +542,8 @@ GROUP BY
   }
 
   measure: total_revenue {
-    type: sum
-    sql: ${total_rev} ;;
-    value_format_name: decimal_2
+    type: string
+    sql: CONCAT(${currency_symbol},FORMAT(SUM(${total_rev}), 2)) ;;
     #sql_distinct_key: ${group_by_val} ;;
     drill_fields: [detail*]
   }

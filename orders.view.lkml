@@ -535,8 +535,8 @@ view: orders {
   }
 
   dimension: gateway_id {
-    type: number
-    suggestable: yes
+    type: string
+    full_suggestions: yes
     # hidden: true
     sql: ${TABLE}.gatewayId ;;
   }
