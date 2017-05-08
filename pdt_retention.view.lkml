@@ -190,8 +190,8 @@ view: pdt_retention {
 
       ) x
 GROUP BY
-        order_id) a    ORDER BY CAST(campaign_id AS signed) ASC
- ;; indexes: ["order_id","campaign_id"]
+        order_id,campaign_id) a    ORDER BY CAST(campaign_id AS signed) ASC
+ ;; indexes: ["order_id"]
   }
 
   measure: count {
