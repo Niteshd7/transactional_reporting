@@ -661,6 +661,11 @@ view: orders {
     sql: ${TABLE}.is_test_cc ;;
   }
 
+  dimension: is_test {
+    type: yesno
+    sql: ${TABLE}.is_test_cc = 1 ;;
+  }
+
   dimension_group: last_modified {
     type: time
     timeframes: [time, date, week, month]
