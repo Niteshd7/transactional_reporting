@@ -111,6 +111,76 @@ view: decline_hold_pdt {
                            ) d
                    GROUP BY
                            d.orders_id
+                  UNION ALL
+                    SELECT
+                           o.orders_id,
+                          0                                         AS new_order_cnt,
+                           0                                         AS new_order_rev,
+                           0                                         AS recurring_order_cnt,
+                           0                                         AS recurring_order_rev,
+                           0                                         AS shipping_cnt,
+                           0                                         AS shipping_rev,
+                           0                                         AS all_new_order_cnt,
+                           0                                         AS all_new_order_rev,
+                           0                                         AS pending_order_cnt,
+                           0                                         AS pending_order_rev,
+                           0                                         AS refund_void_cnt,
+                           0                                         AS refund_void_rev,
+                           0                                         AS taxable_rev,
+                           0                                         AS active_cnt,
+                           0                                     AS decline_cnt,
+                           0                                     AS decline_rev,
+                           COUNT(IF(outside = 0, 1, NULL))                      AS hold_cnt,
+                           SUM(IF(outside = 0, IFNULL(o.currency_value, 0), 0)) AS hold_rev,
+                           COUNT(IF(outside = 1, 1, NULL))                      AS hold_cnt_outside,
+                           SUM(IF(outside = 1, IFNULL(o.currency_value, 0), 0)) AS hold_rev_o,
+                          0                                         AS chargeback_cnt
+                       FROM
+                           orders o,
+                           (
+                              SELECT
+                                    o.orders_id,
+                                    IFNULL(currency_value, 0) AS currency_value,
+                                    IF((o.hold_date BETWEEN (SELECT TIMESTAMP({% date_start orders.t_stamp_date %})) AND (SELECT TIMESTAMP({% date_end orders.t_stamp_date %}))) AND (o.t_stamp NOT BETWEEN (SELECT TIMESTAMP({% date_start orders.t_stamp_date %})) AND (SELECT TIMESTAMP({% date_end orders.t_stamp_date %}))), 1, 0) AS outside
+                                FROM
+                                    orders o
+                               WHERE
+                                    o.is_hold = 1
+                                 AND
+                                    (
+                                       (o.t_stamp BETWEEN (SELECT TIMESTAMP({% date_start orders.t_stamp_date %})) AND (SELECT TIMESTAMP({% date_end orders.t_stamp_date %})))
+                                        OR
+                                                   (o.hold_date BETWEEN (SELECT TIMESTAMP({% date_start orders.t_stamp_date %})) AND (SELECT TIMESTAMP({% date_end orders.t_stamp_date %})))
+                                    )
+
+                           UNION ALL
+                              SELECT
+                                    o.orders_id,
+                                    IFNULL(uo.currency_value, 0) AS currency_value,
+                                    IF((uo.hold_date BETWEEN (SELECT TIMESTAMP({% date_start orders.t_stamp_date %})) AND (SELECT TIMESTAMP({% date_end orders.t_stamp_date %}))) AND (uo.t_stamp NOT BETWEEN (SELECT TIMESTAMP({% date_start orders.t_stamp_date %})) AND (SELECT TIMESTAMP({% date_end orders.t_stamp_date %}))), 1, 0) AS outside
+                                FROM
+                                    orders        o,
+                                    upsell_orders uo
+                               WHERE
+                                    o.orders_id = uo.main_orders_id
+                                 AND
+                                    uo.is_hold = 1
+                                 AND
+                                    (
+                                       (uo.t_stamp BETWEEN (SELECT TIMESTAMP({% date_start orders.t_stamp_date %})) AND (SELECT TIMESTAMP({% date_end orders.t_stamp_date %})))
+                                        OR
+                                                   (uo.hold_date BETWEEN (SELECT TIMESTAMP({% date_start orders.t_stamp_date %})) AND (SELECT TIMESTAMP({% date_end orders.t_stamp_date %})))
+
+                                    )
+                                    AND {% condition orders.is_test_cc %} o.is_test_cc {% endcondition %}
+
+                           ) oh
+                      WHERE
+                           o.orders_id = oh.orders_id
+                        AND
+                           o.deleted   = 0
+                   GROUP BY
+                           oh.orders_id
  ;;
     indexes: ["orders_id"]
   }
@@ -130,6 +200,23 @@ view: decline_hold_pdt {
     sql: ${decline_rev} ;;
     value_format_name: decimal_2
     drill_fields: [orders_id, orders.hold_date, orders.t_stamp_date]
+  }
+
+  measure: count_hold {
+    type: sum
+    sql: ${hold_cnt} ;;
+    #sql_distinct_key: ${orders_id} ;;
+    drill_fields: [detail*]
+  }
+
+
+  measure: sum_hold {
+    type: sum
+    html: {{ currency_symbol._value }}{{ rendered_value }};;
+    sql: ${hold_rev};;
+    value_format_name: decimal_2
+    #sql_distinct_key: ${orders_id} ;;
+    drill_fields: [detail*]
   }
 
 
