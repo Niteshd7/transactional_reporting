@@ -14,7 +14,7 @@ view: prospect_pdt {
         CONCAT(IF(SUM(customer_cnt) > 0 OR SUM(prospect_cnt) > 0, ROUND((SUM(customer_cnt) / SUM(customer_cnt + prospect_cnt)) * 100, 2), 0), '%') AS conversion_pct_fmt,
         FORMAT(avg_rev, 2)                                                                                                                   AS avg_rev,
         CONCAT('$', FORMAT(avg_rev, 2), '')                                                                     AS avg_rev_fmt,
-        total_rev                                                                                                                                         AS total_rev,
+        IF(total_rev IS NOT NULL, total_rev,0)                                                                                                                                         AS total_rev,
         CONCAT('$', FORMAT(total_rev, 2), '')                                                                   AS total_rev_fmt,
         IF(display_link = 1, ':AFF_LINK', '')                                                                                                             AS features,
         currency_id AS currency_id,
@@ -542,8 +542,9 @@ GROUP BY
   }
 
   measure: total_revenue {
-    type: string
-    sql: CONCAT(${currency_symbol},FORMAT(SUM(${total_rev}), 2)) ;;
+    type: sum
+    html: {{ currency_symbol._value }}{{ rendered_value }};;
+    sql: ${total_rev} ;;
     #sql_distinct_key: ${group_by_val} ;;
     drill_fields: [detail*]
   }
