@@ -7,6 +7,8 @@ include: "*.view"
 include: "*.dashboard"
 explore: campaigns{}
 
+explore: mysql_stats {}
+
 explore: countries{}
 
 explore: gateway{}
