@@ -1273,7 +1273,7 @@ view: orders {
       field: order_report.upsell_flag
       value: "0"
     }
-    drill_fields: [detail*]
+    drill_fields: [orders_id, t_stamp_date]
   }
 
   measure: order_count {
@@ -1287,7 +1287,7 @@ view: orders {
       field: order_report.upsell_flag
       value: "0"
     }
-    drill_fields: [detail*]
+    drill_fields: [orders_id, t_stamp_date]
   }
 
 
@@ -1302,7 +1302,7 @@ view: orders {
       field: order_report.upsell_flag
       value: "0"
     }
-    drill_fields: [detail*]
+    drill_fields: [orders_id, t_stamp_date]
   }
 
   measure:  declined_orders {
@@ -1317,7 +1317,7 @@ view: orders {
       value: "no"
     }
     sql: CONCAT(${campaign_order_id}, ${customers_email_address}, ${t_stamp_date}) ;;
-    drill_fields: [detail*]
+    drill_fields: [orders_id, t_stamp_date]
   }
 
   measure:  subscription_orders {
@@ -1339,7 +1339,7 @@ view: orders {
       field: order_report.upsell_flag
       value: "0"
     }
-    drill_fields: [detail*]
+    drill_fields: [orders_id, t_stamp_date]
   }
 
 
@@ -1354,7 +1354,7 @@ view: orders {
       field: order_report.upsell_flag
       value: "0"
     }
-    drill_fields: [orders_id, orders_status,order_status_name, order_total]
+    drill_fields: [orders_id, t_stamp_date]
   }
 
   measure:  hold_cancel_orders_date {
@@ -1368,7 +1368,7 @@ view: orders {
       field: is_hold
       value: "1"
     }
-    drill_fields: [detail*]
+    drill_fields: [orders_id, t_stamp_date]
   }
 
   measure: decline_revenue {
@@ -1386,6 +1386,7 @@ view: orders {
     value_format_name: decimal_2
     sql: (${v_main_order_total.main_product_amount_shipping_tax} + ${order_report.upsell_amt}) ;;
     #sql_distinct_key: CONCAT(${campaign_order_id}, ${customers_email_address}, ${t_stamp_date}) ;;
+    drill_fields: [orders_id, t_stamp_date]
   }
 
   measure: decline_distinct_ratio_date {
@@ -1539,6 +1540,50 @@ view: orders {
     sql: ${v_main_order_total.refunded_amount} ;;
   }
 
+
+  measure: affiliate_breakdown_date {
+    sql: "Affiliate ID" ;;
+    description: "Sales by Date"
+    label: "Affiliate Breakdown"
+    drill_fields: [sales_date_drill*]
+  }
+
+  measure: sub_affiliate_breakdown_date {
+    sql: "Sub-Affiliate ID" ;;
+    description: "Sales by Date"
+    label: "Sub-Affiliate Breakdown"
+    drill_fields: [sales_date_drill_1*]
+  }
+
+  measure: sub_affiliate_breakdown_date_2 {
+    sql: "Sub-Affiliate ID" ;;
+    description: "Sales by Date"
+    label: "Sub-Affiliate Breakdown"
+    drill_fields: [sales_date_drill_2*]
+  }
+
+  measure: sub_affiliate_breakdown_date_3 {
+    sql: "Sub-Affiliate ID" ;;
+    description: "Sales by Date"
+    label: "Sub-Affiliate Breakdown"
+    drill_fields: [sales_date_drill_3*]
+  }
+
+  set: sales_date_drill {
+    fields: [affiliate_id,initial_orders,initial_revenue, subscription_orders, subscription_revenue, count_shipped , shipping_revenue ,order_count, total_revenue, pending_orders, pending_revenue, tax_revenue, declined_orders,decline_hold_pdt.decline_revenue, void_refund_orders, void_refund_revenue, hold_pdt.count_hold, hold_pdt.sum_hold   ,sub_affiliate_breakdown_date]
+  }
+
+  set: sales_date_drill_1 {
+    fields: [sub_affiliate_id, initial_orders,initial_revenue, subscription_orders, subscription_revenue, count_shipped , shipping_revenue ,order_count, total_revenue, pending_orders, pending_revenue, tax_revenue, declined_orders,decline_hold_pdt.decline_revenue, void_refund_orders, void_refund_revenue, hold_pdt.count_hold, hold_pdt.sum_hold   ,sub_affiliate_breakdown_date_2]
+  }
+
+  set: sales_date_drill_2 {
+    fields: [sub_affiliate_2, initial_orders,initial_revenue, subscription_orders, subscription_revenue, count_shipped , shipping_revenue ,order_count, total_revenue, pending_orders, pending_revenue, tax_revenue, declined_orders,decline_hold_pdt.decline_revenue, void_refund_orders, void_refund_revenue, hold_pdt.count_hold, hold_pdt.sum_hold   ,sub_affiliate_breakdown_date_3]
+  }
+
+  set: sales_date_drill_3 {
+    fields: [sub_affiliate_3, initial_orders,initial_revenue, subscription_orders, subscription_revenue, count_shipped , shipping_revenue ,order_count, total_revenue, pending_orders, pending_revenue, tax_revenue, declined_orders,decline_hold_pdt.decline_revenue, void_refund_orders, void_refund_revenue, hold_pdt.count_hold, hold_pdt.sum_hold]
+  }
 
 
    # ------- Sales By Date End------
