@@ -2138,6 +2138,11 @@ view: orders {
       field: rebill_depth
       value: "<1"
     }
+    html: {% if value > 0 %}
+          <a href="{{ link }}" style="color: blue;">{{ value }}</a>
+          {% else %}
+          <a href="{{ link }}">0</a>
+          {% endif %} ;;
     sql: ${orders_id} ;;
     drill_fields: [orders_id, is_subscription, t_stamp_date, decline_reason]
   }
@@ -2145,6 +2150,9 @@ view: orders {
   measure: subscription_decline_reason {
     label: "Subscription"
     type: number
+    html:{% if value > 0 %}
+          <a href="{{ link }}" style="color: blue;">{{ value }}</a>
+          {% endif %} ;;
     description: "Separate measure for Decline Reasons Report"
     sql: ${count_decl_reas} - ${initial_orders_decline_reasons} ;;
     drill_fields: [orders_id, is_subscription, t_stamp_date, decline_reason]
@@ -2154,6 +2162,9 @@ view: orders {
     type: count_distinct
     label: "All"
     sql: ${orders_id} ;;
+    html:{% if value > 0 %}
+          <a href="{{ link }}" style="color: blue;">{{ value }}</a>
+          {% endif %} ;;
     description: "Separate measure for Decline Reasons Report"
     drill_fields: [orders_id, is_subscription, t_stamp_date, decline_reason]
   }
@@ -2180,6 +2191,10 @@ view: orders {
     sql: "Sub-Affiliate ID" ;;
     label: "Sub-Affiliate Breakdown"
     drill_fields: [decline_reason_3*]
+  }
+
+  set: decl {
+    fields: [orders_id, is_subscription, t_stamp_date, decline_reason]
   }
 
   set: decline_reason {
