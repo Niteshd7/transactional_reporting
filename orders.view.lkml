@@ -1344,7 +1344,7 @@ view: orders {
 
 
   measure:  void_refund_orders {
-    type: count
+    type: count_distinct
     label: "Void/Refund Orders"
     filters: {
       field: refund_type
@@ -1354,7 +1354,7 @@ view: orders {
       field: order_report.upsell_flag
       value: "0"
     }
-    drill_fields: [orders_id, t_stamp_date]
+    sql: ${orders_id} ;;
   }
 
   measure:  hold_cancel_orders_date {
@@ -1529,7 +1529,7 @@ view: orders {
   }
 
   measure:  void_refund_revenue {
-    type: sum
+    type: sum_distinct
     label: "Void/Refunded Revenue"
     filters: {
       field: order_report.upsell_flag
@@ -1538,6 +1538,7 @@ view: orders {
     html: {{ currency_symbol._value }}{{ rendered_value }};;
     value_format_name: decimal_2
     sql: ${v_main_order_total.refunded_amount} ;;
+    sql_distinct_key: ${orders_id} ;;
   }
 
 
