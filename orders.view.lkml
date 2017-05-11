@@ -1205,7 +1205,7 @@ view: orders {
   }
 
   measure: count_shipped {
-    type: count
+    type: count_distinct
     label: "Shipping"
     filters: {
       field: orders_status
@@ -1219,6 +1219,8 @@ view: orders {
       field: order_report.upsell_flag
       value: "0"
     }
+    sql: ${orders_id}  ;;
+    sql_distinct_key: ${orders_id} ;;
     drill_fields: [detail*]
   }
 
@@ -1259,7 +1261,7 @@ view: orders {
  # ------- Sales By Date ------
 
   measure:  initial_orders {
-    type: count
+    type: count_distinct
     label: "Initial Orders"
     filters: {
       field: rebill_depth
@@ -1273,11 +1275,13 @@ view: orders {
       field: order_report.upsell_flag
       value: "0"
     }
+    sql: ${orders_id}  ;;
+    sql_distinct_key: ${orders_id} ;;
     drill_fields: [orders_id, t_stamp_date]
   }
 
   measure: order_count {
-    type: count
+    type: count_distinct
     label: "Total"
     filters: {
       field: orders_status
@@ -1287,12 +1291,14 @@ view: orders {
       field: order_report.upsell_flag
       value: "0"
     }
+    sql: ${orders_id}  ;;
+    sql_distinct_key: ${orders_id} ;;
     drill_fields: [orders_id, t_stamp_date]
   }
 
 
   measure:  pending_orders {
-    type: count
+    type: count_distinct
     label: "Pending Orders"
     filters: {
       field: orders_status
@@ -1302,6 +1308,8 @@ view: orders {
       field: order_report.upsell_flag
       value: "0"
     }
+    sql: ${orders_id}  ;;
+    sql_distinct_key: ${orders_id} ;;
     drill_fields: [orders_id, t_stamp_date]
   }
 
@@ -1321,7 +1329,7 @@ view: orders {
   }
 
   measure:  subscription_orders {
-    type: count
+    type: count_distinct
     label: "Subscriptions"
     filters: {
       field: rebill_depth
@@ -1339,6 +1347,8 @@ view: orders {
       field: order_report.upsell_flag
       value: "0"
     }
+    sql: ${orders_id}  ;;
+    sql_distinct_key: ${orders_id} ;;
     drill_fields: [orders_id, t_stamp_date]
   }
 
@@ -1354,11 +1364,12 @@ view: orders {
       field: order_report.upsell_flag
       value: "0"
     }
-    sql: ${orders_id} ;;
+    sql: ${orders_id}  ;;
+    sql_distinct_key: ${orders_id} ;;
   }
 
   measure:  hold_cancel_orders_date {
-    type: count
+    type: count_distinct
     label: "Holds/Cancels - Sales by Date"
     filters: {
       field: deleted
@@ -1368,6 +1379,8 @@ view: orders {
       field: is_hold
       value: "1"
     }
+    sql: ${orders_id}  ;;
+    sql_distinct_key: ${orders_id} ;;
     drill_fields: [orders_id, t_stamp_date]
   }
 
@@ -1405,7 +1418,7 @@ view: orders {
   }
 
   measure:  hold_cancel_revenue {
-    type: sum
+    type: sum_distinct
     label: "Holds/Cancels Revenue"
     filters: {
       field: is_archived
@@ -1429,7 +1442,7 @@ view: orders {
   }
 
   measure:  initial_revenue {
-    type: sum
+    type: sum_distinct
     label: "Initial Revenue"
     filters: {
       field: rebill_depth
@@ -1446,10 +1459,11 @@ view: orders {
     html: {{ currency_symbol._value }}{{ rendered_value }};;
     value_format_name: decimal_2
     sql: (${v_main_order_total.current_total} + ${order_report.upsell_amt});;
+    sql_distinct_key: ${orders_id} ;;
   }
 
   measure: pending_revenue {
-    type: sum
+    type: sum_distinct
     label: "Pending Revenue"
     filters: {
       field: orders_status
@@ -1462,10 +1476,11 @@ view: orders {
     html: {{ currency_symbol._value }}{{ rendered_value }};;
     value_format_name: decimal_2
     sql:(${v_main_order_total.current_total} + ${order_report.upsell_amt}) ;;
+    sql_distinct_key: ${orders_id} ;;
   }
 
   measure:  subscription_revenue {
-    type: sum
+    type: sum_distinct
     label: "Subscription Revenue"
     filters: {
       field: rebill_depth
@@ -1486,10 +1501,11 @@ view: orders {
     html: {{ currency_symbol._value }}{{ rendered_value }};;
     value_format_name: decimal_2
     sql: (${v_main_order_total.current_total} + ${order_report.upsell_amt}) ;;
+    sql_distinct_key: ${orders_id} ;;
   }
 
   measure:  shipping_revenue {
-    type: sum
+    type: sum_distinct
     label: "Shipping Revenue"
     filters: {
       field: payment_module_code
@@ -1510,10 +1526,11 @@ view: orders {
     html: {{ currency_symbol._value }}{{ rendered_value }};;
     value_format_name: decimal_2
     sql: (${order_report.shipping_amt}) ;;
+    sql_distinct_key: ${orders_id} ;;
   }
 
   measure:  total_revenue {
-    type: sum
+    type: sum_distinct
     label: "Total Revenue"
     filters: {
       field: orders_status
@@ -1526,6 +1543,7 @@ view: orders {
     html: {{ currency_symbol._value }}{{ rendered_value }};;
     value_format_name: decimal_2
     sql: (${v_main_order_total.current_total} + ${order_report.upsell_amt}) ;;
+    sql_distinct_key: ${orders_id} ;;
   }
 
   measure:  void_refund_revenue {
@@ -2335,6 +2353,7 @@ view: orders {
       value: "0"
     }
     sql: ${orders_products.products_quantity} ;;
+    sql_distinct_key: ${orders_id} ;;
     drill_fields: [detail*]
   }
 
