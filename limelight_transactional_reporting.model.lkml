@@ -27,15 +27,6 @@ explore: pdt_employee_activity {}
 
 explore: subscr_mgmt{}
 
-explore: orders_decline_salvage{
-
-  join: declined_ccs {
-    type: left_outer
-    relationship: many_to_one
-    sql_on: ${declined_ccs.orders_id} = ${orders_decline_salvage.orders_id};;
-  }
-}
-
 explore: order_report {}
 
 explore: orders_history{}
@@ -52,18 +43,6 @@ explore: orders {
     relationship: many_to_one
     sql_on: ${upsell_orders.main_orders_id} = ${orders.common_ancestor_order_id}
       AND ${upsell_orders_products.upsell_orders_products_id} = ${upsell_orders.upsell_orders_id};;
-  }
-
-  join: upsell_orders_first_try {
-    type: left_outer
-    relationship: many_to_one
-    sql_on: ${upsell_orders_first_try.main_orders_id} = ${orders.common_ancestor_order_id};;
-  }
-
-  join: upsell_orders_decline_salvage {
-    type: left_outer
-    relationship: many_to_one
-    sql_on: ${upsell_orders_decline_salvage.main_orders_id}.main_orders_id} = ${orders.common_ancestor_order_id};;
   }
 
   join: orders_history {
@@ -174,12 +153,6 @@ explore: orders {
     sql_on: ${orders_first_try.parent_order_id} = ${orders.common_ancestor_order_id};;
   }
 
-  join: orders_decline_salvage {
-    type: left_outer
-    relationship: many_to_one
-    sql_on: ${orders_decline_salvage.parent_order_id} = ${orders.orders_id};;
-  }
-
   join: declined_ccs {
     type: left_outer
     relationship: many_to_one
@@ -229,7 +202,3 @@ explore:  tlkp_orders_history_type {
 explore: upsell_orders{}
 
 explore: prospect_pdt {}
-
-explore: upsell_orders_first_try{}
-
-explore: upsell_orders_decline_salvage{}
