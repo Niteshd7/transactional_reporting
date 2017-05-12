@@ -358,7 +358,7 @@ view: orders {
 
   dimension: currency_symbol {
     type: string
-    sql: ${order_report.currency_symbol} ;;
+    sql: CASE WHEN ${order_report.currency_symbol} IS NULL THEN '$' ELSE  ${order_report.currency_symbol} END ;;
   }
 
   dimension: customers_address_format_id {
