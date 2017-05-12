@@ -307,7 +307,7 @@ view: order_report {
 
   dimension: currency_symbol {
     type: string
-    sql: ${TABLE}.currency_symbol ;;
+    sql: CASE WHEN ${TABLE}.currency_symbol= ' ' THEN '$' ELSE  ${TABLE}.currency_symbol END ;;
   }
 
   dimension: fulfillment_id {
