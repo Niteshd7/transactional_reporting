@@ -2,8 +2,10 @@ view: prospect_pdt {
   derived_table: {
     sql: SELECT  * FROM (  SELECT
         IF(LENGTH(group_by_val) = 0, 1, 2)                                                                                                                AS order_val,
-        IF(LENGTH(group_by_type) = 0, '', group_by_type)                                                                                                  AS group_by_type,
-        IF(LENGTH(sub_group_by_type) = 0, '', sub_group_by_type)                                                                                          AS sub_group_by_type,
+        affiliate_id                                                          AS affiliate_id,
+        sub_affiliate_id                                                      AS sub_affiliate_id,
+        sub_aff_2                                                             AS sub_aff_2,
+        sub_aff_3                                                             AS sub_aff_3,
         IF(LENGTH(IFNULL(group_by_val, '')) = 0, 'BLANK', group_by_val)                                                                                   AS group_by_val,
         IF(LENGTH(IFNULL(group_by_val, '')) = 0, 'BLANK', group_by_disp)                                                                                  AS group_by_disp,
         SUM(prospect_cnt)                                                                                                                                 AS prospect_cnt,
@@ -24,55 +26,29 @@ view: prospect_pdt {
            SELECT
                  r.currency_id    AS currency_id,
                 r.currency_symbol  AS currency_symbol,
-                 CASE 'BASE'
-                    WHEN 'ALL' THEN
-                       CASE
-                          WHEN LENGTH(o.AFID)  > 0 THEN 'AFID'
-                          WHEN LENGTH(o.AID)   > 0 THEN 'AID'
-                          WHEN LENGTH(o.AFFID) > 0 THEN 'AFFID'
+                 CASE
+                          WHEN LENGTH(o.AFID)  > 0 THEN  o.AFID
+                          WHEN LENGTH(o.AID)   > 0 THEN  o.AID
+                          WHEN LENGTH(o.AFFID) > 0 THEN  o.AFFID
                           ELSE ''
-                       END
-                    ELSE 'BASE'
-                 END group_by_type,
-                 CASE 'BASE'
-                    WHEN 'ALL' THEN
-                       CASE
-                          WHEN LENGTH(o.AFID)  > 0 THEN 'AFID'
-                          WHEN LENGTH(o.AID)   > 0 THEN 'AID'
-                          WHEN LENGTH(o.AFFID) > 0 THEN 'AFFID'
-                          ELSE ''
-                       END
-                    WHEN 'BASE' THEN
-                       CASE
-                          WHEN LENGTH(o.AFID)  > 0 THEN 'AFID'
-                          WHEN LENGTH(o.AID)   > 0 THEN 'AID'
-                          WHEN LENGTH(o.AFFID) > 0 THEN 'AFFID'
-                          ELSE ''
-                       END
-                    WHEN 'ALL_SUB' THEN
-                       CASE
-                          WHEN LENGTH(o.AFID) > 0 AND LENGTH(o.SID) > 0 THEN 'SID'
-                          WHEN LENGTH(o.AFFID) > 0 AND LENGTH(o.C1) > 0 THEN 'C1'
-                          WHEN LENGTH(o.AID) > 0 AND LENGTH(o.OPT) > 0 THEN  'OPT'
-                          ELSE ''
-                       END
-                    WHEN 'ALL_SUB2' THEN
-                       CASE
-                          WHEN LENGTH(o.AFFID) > 0 AND LENGTH(o.C1) > 0 AND LENGTH(o.C2) > 0 THEN 'C2'
-                          ELSE ''
-                       END
-                    WHEN 'ALL_SUB3' THEN
-                       CASE
-                          WHEN LENGTH(o.AFFID) > 0 AND LENGTH(o.C1) > 0 AND LENGTH(o.C2) > 0 AND LENGTH(o.C3) > 0 THEN 'C3'
-                          ELSE ''
-                       END
-                    WHEN 'AFID'  THEN 'SID'
-                    WHEN 'AID'   THEN 'OPT'
-                    WHEN 'AFFID' THEN 'C1'
-                    WHEN 'C1'    THEN 'C2'
-                    WHEN 'C2'    THEN 'C3'
-                    ELSE ''
-                 END sub_group_by_type,
+                    END  affiliate_id,
+
+                   CASE
+                      WHEN LENGTH(o.AFID) > 0 AND LENGTH(o.SID) > 0 THEN o.SID
+                      WHEN LENGTH(o.AFFID) > 0 AND LENGTH(o.C1) > 0 THEN o.C1
+                      WHEN LENGTH(o.AID) > 0 AND LENGTH(o.OPT) > 0 THEN  o.OPT
+                      ELSE ''
+                   END sub_affiliate_id,
+
+                   CASE
+                      WHEN LENGTH(o.AFFID) > 0 AND LENGTH(o.C1) > 0 AND LENGTH(o.C2) > 0 THEN o.C2
+                      ELSE ''
+                   END sub_aff_2,
+
+                   CASE
+                      WHEN LENGTH(o.AFFID) > 0 AND LENGTH(o.C1) > 0 AND LENGTH(o.C2) > 0 AND LENGTH(o.C3) > 0 THEN o.C3
+                      ELSE ''
+                   END sub_aff_3,
                  CASE 'BASE'
                     WHEN 'ALL' THEN
                        CASE
@@ -229,45 +205,14 @@ view: prospect_pdt {
            SELECT
                  0  AS currency_id,
                  0  AS currency_symbol,
-                 CASE 'BASE'
-                    WHEN 'ALL' THEN
-                       CASE
-                          WHEN LENGTH(IFNULL(p.pAFID, ''))  > 0 THEN 'AFID'
-                          WHEN LENGTH(IFNULL(p.pAID, ''))   > 0 THEN 'AID'
-                          WHEN LENGTH(IFNULL(p.pAFFID, '')) > 0 THEN 'AFFID'
-                          ELSE ''
-                       END
-                    WHEN 'ALL_SUB' THEN
-                       CASE
-                          WHEN LENGTH(p.pAFID)  > 0 AND LENGTH(p.pSID) > 0 THEN 'SID'
-                          WHEN LENGTH(p.pAFFID) > 0 AND LENGTH(p.pC1)  > 0 THEN 'C1'
-                          WHEN LENGTH(p.pAID)   > 0 AND LENGTH(p.pOPT) > 0 THEN 'OPT'
-                          ELSE ''
-                       END
-                    WHEN 'ALL_SUB2' THEN
-                       CASE
-                          WHEN LENGTH(p.pAFFID) > 0 AND LENGTH(p.pC1) > 0 AND LENGTH(p.pC2) > 0 THEN 'C2'
-                          ELSE ''
-                       END
-                    WHEN 'ALL_SUB3' THEN
-                       CASE
-                          WHEN LENGTH(p.pAFFID) > 0 AND LENGTH(p.pC1) > 0 AND LENGTH(p.pC2) > 0 AND LENGTH(p.pC3) > 0 THEN 'C3'
-                          ELSE ''
-                       END
-                    ELSE 'BASE'
-                 END group_by_type,
-                 CASE 'BASE'
-                    WHEN 'ALL' THEN
-                       CASE
-                          WHEN LENGTH(IFNULL(p.pAFID, ''))  > 0 THEN 'AFID'
-                          WHEN LENGTH(IFNULL(p.pAID, ''))   > 0 THEN 'AID'
-                          WHEN LENGTH(IFNULL(p.pAFFID, '')) > 0 THEN 'AFFID'
-                          ELSE ''
-                       END
-                    WHEN 'AFFID' THEN 'C1'
-                    WHEN 'C1'    THEN 'C2'
-                    ELSE ''
-                 END sub_group_by_type,
+                0 AS  affiliate_id,
+
+                  0 AS sub_affiliate_id,
+
+                  0 AS sub_aff_2,
+
+                  0 AS sub_aff_3,
+
                  CASE 'BASE'
                     WHEN 'ALL' THEN
                        CASE
@@ -398,6 +343,26 @@ GROUP BY
   filter: is_test {
     type: string
     default_value: "0,1"
+  }
+
+  dimension: affiliate_id {
+    type: string
+    sql: ${TABLE}.affiliate_id ;;
+  }
+
+  dimension: sub_affiliate_id {
+    type: string
+    sql: ${TABLE}.sub_affiliate_id ;;
+  }
+
+  dimension: sub_aff_2 {
+    type: string
+    sql: ${TABLE}.sub_aff_2 ;;
+  }
+
+  dimension: sub_aff_3 {
+    type: string
+    sql: ${TABLE}.sub_aff_3 ;;
   }
 
   dimension: currency_id {
@@ -554,6 +519,50 @@ GROUP BY
     value_format_name: percent_1
     sql: ${count_customers}/NULLIF((${count_customers}+${count_prospects}),0) ;;
     drill_fields: [detail*]
+  }
+
+  measure: affiliate_breakdown {
+    sql: "Affiliate ID" ;;
+    description: "Sales by Prospect"
+    label: "Affiliate Breakdown"
+    drill_fields: [prospect_drill*]
+  }
+
+  measure: sub_affiliate_breakdown {
+    sql: "Sub-Affiliate ID" ;;
+    description: "Sales by Prospect"
+    label: "Sub-Affiliate Breakdown"
+    drill_fields: [prospect_drill_1*]
+  }
+
+  measure: sub_affiliate_breakdown_2 {
+    sql: "Sub-Affiliate ID" ;;
+    description: "Sales by Prospect"
+    label: "Sub-Affiliate Breakdown"
+    drill_fields: [prospect_drill_2*]
+  }
+
+  measure: sub_affiliate_breakdown_3 {
+    sql: "Sub-Affiliate ID" ;;
+    description: "Sales by Prospect"
+    label: "Sub-Affiliate Breakdown"
+    drill_fields: [prospect_drill_3*]
+  }
+
+  set: prospect_drill {
+    fields: [affiliate_id,count_prospects, count_customers, conversion_percent, total_revenue, average_revenue, sub_affiliate_breakdown]
+  }
+
+  set: prospect_drill_1 {
+    fields: [sub_affiliate_id, count_prospects, count_customers, conversion_percent, total_revenue, average_revenue,sub_affiliate_breakdown_2]
+  }
+
+  set: prospect_drill_2 {
+    fields: [sub_aff_2,count_prospects, count_customers, conversion_percent, total_revenue, average_revenue,sub_affiliate_breakdown_3]
+  }
+
+  set: prospect_drill_3 {
+    fields: [sub_aff_3, count_prospects, count_customers, conversion_percent, total_revenue, average_revenue]
   }
 
   set: detail {
