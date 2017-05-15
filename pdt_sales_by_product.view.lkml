@@ -3,9 +3,11 @@ view: pdt_sales_by_product {
       sql: SELECT  * FROM (  SELECT
         currency_id                                                           AS currency_id,
         currency_symbol                                                           AS currency_symbol,
+        affiliate_id                                                          AS affiliate_id,
+        sub_affiliate_id                                                          AS sub_affiliate_id,
+        sub_aff_2                                                          AS sub_aff_2,
+        sub_aff_3                                                          AS sub_aff_3,
         IF(LENGTH(group_by_val) = 0, 1, 2)                                    AS order_val,
-        IF(LENGTH(group_by_type) = 0, '', group_by_type)                      AS group_by_type,
-        IF(LENGTH(sub_group_by_type) = 0, '', sub_group_by_type)              AS sub_group_by_type,
         IF(IFNULL(LENGTH(group_by_val), '') = 0, 'BLANK', group_by_val_disp)  AS group_by_disp,
         IF(IFNULL(LENGTH(group_by_val), '') = 0, 'BLANK', group_by_val)       AS group_by_val,
         IF(LENGTH(IFNULL(group_by_val, '')) = 0, 0, MAX(display_link))        AS display_link,
@@ -40,66 +42,30 @@ view: pdt_sales_by_product {
     FROM
         (
            SELECT
-                 CASE 'PROD'
-                    WHEN 'ALL' THEN
-                       CASE
-                          WHEN LENGTH(o.AFID)  > 0 THEN 'AFID'
-                          WHEN LENGTH(o.AID)   > 0 THEN 'AID'
-                          WHEN LENGTH(o.AFFID) > 0 THEN 'AFFID'
+                    CASE
+                          WHEN LENGTH(o.AFID)  > 0 THEN  o.AFID
+                          WHEN LENGTH(o.AID)   > 0 THEN  o.AID
+                          WHEN LENGTH(o.AFFID) > 0 THEN  o.AFFID
                           ELSE ''
-                       END
-                    WHEN 'ALL_SUB' THEN
-                       CASE
-                          WHEN LENGTH(o.AFID) > 0 AND LENGTH(o.SID) > 0 THEN 'SID'
-                          WHEN LENGTH(o.AFFID) > 0 AND LENGTH(o.C1) > 0 THEN 'C1'
-                          WHEN LENGTH(o.AID) > 0 AND LENGTH(o.OPT) > 0 THEN  'OPT'
-                          ELSE ''
-                       END
-                    WHEN 'ALL_SUB2' THEN
-                       CASE
-                          WHEN LENGTH(o.AFFID) > 0 AND LENGTH(o.C1) > 0 AND LENGTH(o.C2) > 0 THEN 'C2'
-                          ELSE ''
-                       END
-                    WHEN 'ALL_SUB3' THEN
-                       CASE
-                          WHEN LENGTH(o.AFFID) > 0 AND LENGTH(o.C1) > 0 AND LENGTH(o.C2) > 0 AND LENGTH(o.C3) > 0 THEN 'C3'
-                          ELSE ''
-                       END
-                    ELSE 'PROD'
-                 END group_by_type,
-                 CASE 'PROD'
-                    WHEN 'ALL' THEN
-                       CASE
-                          WHEN LENGTH(o.AFID)  > 0 THEN 'AFID'
-                          WHEN LENGTH(o.AID)   > 0 THEN 'AID'
-                          WHEN LENGTH(o.AFFID) > 0 THEN 'AFFID'
-                          ELSE ''
-                       END
-                    WHEN 'ALL_SUB' THEN
-                       CASE
-                          WHEN LENGTH(o.AFID) > 0 AND LENGTH(o.SID) > 0 THEN 'SID'
-                          WHEN LENGTH(o.AFFID) > 0 AND LENGTH(o.C1) > 0 THEN 'C1'
-                          WHEN LENGTH(o.AID) > 0 AND LENGTH(o.OPT) > 0 THEN  'OPT'
-                          ELSE ''
-                       END
-                    WHEN 'ALL_SUB2' THEN
-                       CASE
-                          WHEN LENGTH(o.AFFID) > 0 AND LENGTH(o.C1) > 0 AND LENGTH(o.C2) > 0 THEN 'C2'
-                          ELSE ''
-                       END
-                    WHEN 'ALL_SUB3' THEN
-                       CASE
-                          WHEN LENGTH(o.AFFID) > 0 AND LENGTH(o.C1) > 0 AND LENGTH(o.C2) > 0 AND LENGTH(o.C3) > 0 THEN 'C3'
-                          ELSE ''
-                       END
-                    WHEN 'AFID'  THEN 'SID'
-                    WHEN 'AID'   THEN 'OPT'
-                    WHEN 'AFFID' THEN 'C1'
-                    WHEN 'C1'    THEN 'C2'
-                    WHEN 'C2'    THEN 'C3'
-                    WHEN 'PROD'  THEN 'ALL'
-                    ELSE ''
-                 END sub_group_by_type,
+                    END  affiliate_id,
+
+                   CASE
+                      WHEN LENGTH(o.AFID) > 0 AND LENGTH(o.SID) > 0 THEN o.SID
+                      WHEN LENGTH(o.AFFID) > 0 AND LENGTH(o.C1) > 0 THEN o.C1
+                      WHEN LENGTH(o.AID) > 0 AND LENGTH(o.OPT) > 0 THEN  o.OPT
+                      ELSE ''
+                   END sub_affiliate_id,
+
+                   CASE
+                      WHEN LENGTH(o.AFFID) > 0 AND LENGTH(o.C1) > 0 AND LENGTH(o.C2) > 0 THEN o.C2
+                      ELSE ''
+                   END sub_aff_2,
+
+                   CASE
+                      WHEN LENGTH(o.AFFID) > 0 AND LENGTH(o.C1) > 0 AND LENGTH(o.C2) > 0 AND LENGTH(o.C3) > 0 THEN o.C3
+                      ELSE ''
+                   END sub_aff_3,
+
                  CASE 'PROD'
                     WHEN 'ALL' THEN
                        CASE
@@ -547,15 +513,26 @@ GROUP BY
       sql: ${TABLE}.order_val ;;
     }
 
-    dimension: group_by_type {
+    dimension: affiliate_id {
       type: string
-      sql: ${TABLE}.group_by_type ;;
+      sql: ${TABLE}.affiliate_id ;;
     }
 
-    dimension: sub_group_by_type {
+    dimension: sub_affiliate_id {
       type: string
-      sql: ${TABLE}.sub_group_by_type ;;
+      sql: ${TABLE}.sub_affiliate_id ;;
     }
+
+    dimension: sub_aff_2 {
+      type: string
+      sql: ${TABLE}.sub_aff_2 ;;
+    }
+
+    dimension: sub_aff_3 {
+      type: string
+      sql: ${TABLE}.sub_aff_3 ;;
+    }
+
 
     dimension: product {
       type: string
@@ -785,6 +762,50 @@ GROUP BY
       #sql_distinct_key: ${orders_id} ;;
       drill_fields: [detail*]
     }
+
+    measure: affiliate_breakdown {
+      sql: "Affiliate ID" ;;
+      description: "Sales by Date"
+      label: "Affiliate Breakdown"
+      drill_fields: [product_drill*]
+    }
+
+    measure: sub_affiliate_breakdown {
+      sql: "Sub-Affiliate ID" ;;
+      description: "Sales by Date"
+      label: "Sub-Affiliate Breakdown"
+      drill_fields: [product_drill_1*]
+    }
+
+    measure: sub_affiliate_breakdown_2 {
+      sql: "Sub-Affiliate ID" ;;
+      description: "Sales by Date"
+      label: "Sub-Affiliate Breakdown"
+      drill_fields: [product_drill_2*]
+    }
+
+    measure: sub_affiliate_breakdown_3 {
+      sql: "Sub-Affiliate ID" ;;
+      description: "Sales by Date"
+      label: "Sub-Affiliate Breakdown"
+      drill_fields: [product_drill_3*]
+    }
+
+  set: product_drill {
+    fields: [affiliate_id,initial ,initial_revenue, subscription , subscription_revenue, total, total_revenue, pending, pending_revenue, count_hold, count_prior_hold, holds_cancel_revenue, sub_affiliate_breakdown]
+  }
+
+  set: product_drill_1 {
+    fields: [sub_affiliate_id, initial ,initial_revenue, subscription , subscription_revenue, total, total_revenue, pending, pending_revenue, count_hold, count_prior_hold, holds_cancel_revenue,sub_affiliate_breakdown_2]
+  }
+
+  set: product_drill_2 {
+    fields: [sub_aff_2, initial ,initial_revenue, subscription , subscription_revenue, total, total_revenue, pending, pending_revenue, count_hold, count_prior_hold, holds_cancel_revenue,sub_affiliate_breakdown_3]
+  }
+
+  set: product_drill_3 {
+    fields: [sub_aff_3, initial ,initial_revenue, subscription , subscription_revenue, total, total_revenue, pending, pending_revenue, count_hold, count_prior_hold, holds_cancel_revenue]
+  }
 
     set: detail {
       fields: [
