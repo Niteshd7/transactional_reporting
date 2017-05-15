@@ -1965,6 +1965,50 @@ view: orders {
     sql: ${declined_orders_gateway} / NULLIF(${gross_order_gateway},0) ;;
   }
 
+  measure: affiliate_breakdown_gateway {
+    sql: "Affiliate ID" ;;
+    description: "Sales by Gateway"
+    label: "Affiliate Breakdown"
+    drill_fields: [gateway_drill*]
+  }
+
+  measure: sub_affiliate_breakdown_gateway {
+    sql: "Sub-Affiliate ID" ;;
+    description: "Sales by Gateway"
+    label: "Sub-Affiliate Breakdown"
+    drill_fields: [gateway_drill_1*]
+  }
+
+  measure: sub_affiliate_breakdown_gateway_2 {
+    sql: "Sub-Affiliate ID" ;;
+    description: "Sales by Gateway"
+    label: "Sub-Affiliate Breakdown"
+    drill_fields: [gateway_drill_2*]
+  }
+
+  measure: sub_affiliate_breakdown_gateway_3 {
+    sql: "Sub-Affiliate ID" ;;
+    description: "Sales by Gateway"
+    label: "Sub-Affiliate Breakdown"
+    drill_fields: [gateway_drill_3*]
+  }
+
+  set: gateway_drill {
+    fields: [affiliate_id, cc_type_fmt, currency_fmt, gateway.global_monthly_cap_fmt, gross_order_gateway, gross_revenue_gateway, void_refund_orders_gateway, void_refund_revenue_gateway, net_order_total_gateway, chargeback_count, chargeback_percentage_gateway, declined_orders_gateway, decline_percent_gateway, sub_affiliate_breakdown_subscription]
+  }
+
+  set: gateway_drill_1 {
+    fields: [sub_affiliate_id, cc_type_fmt, currency_fmt, gateway.global_monthly_cap_fmt, gross_order_gateway, gross_revenue_gateway, void_refund_orders_gateway, void_refund_revenue_gateway, net_order_total_gateway, chargeback_count, chargeback_percentage_gateway, declined_orders_gateway, decline_percent_gateway, sub_affiliate_breakdown_subscription_2]
+  }
+
+  set: gateway_drill_2 {
+    fields: [sub_affiliate_2, cc_type_fmt, currency_fmt, gateway.global_monthly_cap_fmt, gross_order_gateway, gross_revenue_gateway, void_refund_orders_gateway, void_refund_revenue_gateway, net_order_total_gateway, chargeback_count, chargeback_percentage_gateway, declined_orders_gateway, decline_percent_gateway, sub_affiliate_breakdown_subscription_3]
+  }
+
+  set: gateway_drill_3 {
+    fields: [sub_affiliate_3, cc_type_fmt, currency_fmt, gateway.global_monthly_cap_fmt, gross_order_gateway, gross_revenue_gateway, void_refund_orders_gateway, void_refund_revenue_gateway, net_order_total_gateway, chargeback_count, chargeback_percentage_gateway, declined_orders_gateway, decline_percent_gateway,]
+  }
+
  # ------- Sales By Gateway End------
 
 
@@ -2621,6 +2665,50 @@ view: orders {
     html: {{ currency_symbol._value }}{{ rendered_value }};;
     value_format_name: decimal_2
     sql: ${order_total};;
+  }
+
+  measure: affiliate_breakdown_retention {
+    sql: "Affiliate ID" ;;
+    description: "Sales by Retention"
+    label: "Affiliate Breakdown"
+    drill_fields: [retention_drill*]
+  }
+
+  measure: sub_affiliate_breakdown_retention {
+    sql: "Sub-Affiliate ID" ;;
+    description: "Sales by Retention"
+    label: "Sub-Affiliate Breakdown"
+    drill_fields: [retention_drill_1*]
+  }
+
+  measure: sub_affiliate_breakdown_retention_2 {
+    sql: "Sub-Affiliate ID" ;;
+    description: "Sales by Retention"
+    label: "Sub-Affiliate Breakdown"
+    drill_fields: [retention_drill_2*]
+  }
+
+  measure: sub_affiliate_breakdown_retention_3 {
+    sql: "Sub-Affiliate ID" ;;
+    description: "Sales by Retention"
+    label: "Sub-Affiliate Breakdown"
+    drill_fields: [retention_drill_3*]
+  }
+
+  set: retention_drill {
+    fields: [affiliate_id, order_count_retention, approved_order_count_retention, approved_subscriptions_count, declined_orders_retention, void_full_refund_orders, partial_refund_orders, void_refund_revenue, canceled_orders, hold_orders, pending_count_retention, approval_rate_retention, net_revenue_retention, sub_affiliate_breakdown_subscription]
+  }
+
+  set: retention_drill_1 {
+    fields: [sub_affiliate_id, order_count_retention, approved_order_count_retention, approved_subscriptions_count, declined_orders_retention, void_full_refund_orders, partial_refund_orders, void_refund_revenue, canceled_orders, hold_orders, pending_count_retention, approval_rate_retention, net_revenue_retention, sub_affiliate_breakdown_subscription_2]
+  }
+
+  set: retention_drill_2 {
+    fields: [sub_affiliate_2, order_count_retention, approved_order_count_retention, approved_subscriptions_count, declined_orders_retention, void_full_refund_orders, partial_refund_orders, void_refund_revenue, canceled_orders, hold_orders, pending_count_retention, approval_rate_retention, net_revenue_retention, sub_affiliate_breakdown_subscription_3]
+  }
+
+  set: retention_drill_3 {
+    fields: [sub_affiliate_3, order_count_retention, approved_order_count_retention, approved_subscriptions_count, declined_orders_retention, void_full_refund_orders, partial_refund_orders, void_refund_revenue, canceled_orders, hold_orders, pending_count_retention, approval_rate_retention, net_revenue_retention]
   }
 
  # ------- Sales By Retention Ends ------
