@@ -65,7 +65,7 @@ view: orders {
                           WHEN LENGTH(${affid})  > 0 THEN ${affid}
                           WHEN LENGTH(${aid})  > 0 THEN ${aid}
                           WHEN LENGTH(${afid})  > 0 THEN ${afid}
-                          ELSE ''
+                          ELSE 'BLANK'
                  END ;;
   }
 
@@ -75,7 +75,7 @@ view: orders {
                           WHEN LENGTH(${afid}) > 0 AND LENGTH(${sid}) > 0 THEN ${sid}
                           WHEN LENGTH(${affid}) > 0 AND LENGTH(${c1}) > 0 THEN ${c1}
                           WHEN LENGTH(${aid}) > 0 AND LENGTH(${opt}) > 0 THEN  ${opt}
-                          ELSE ''
+                          ELSE 'BLANK'
                        END;;
   }
 
@@ -83,7 +83,7 @@ view: orders {
     type: string
     sql: CASE
                           WHEN LENGTH(${affid}) > 0 AND LENGTH(${c1}) > 0 AND LENGTH(${c2}) > 0 THEN ${c2}
-                          ELSE ''
+                          ELSE 'BLANK'
                        END;;
   }
 
@@ -91,7 +91,7 @@ view: orders {
     type: string
     sql: CASE
                           WHEN LENGTH(${affid}) > 0 AND LENGTH(${c1}) > 0 AND LENGTH(${c2}) > 0 AND LENGTH(${c3}) > 0 THEN ${c3}
-                          ELSE ''
+                          ELSE 'BLANK'
                        END;;
   }
 
