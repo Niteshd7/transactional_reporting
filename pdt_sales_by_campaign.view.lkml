@@ -4,6 +4,10 @@ view: pdt_sales_by_campaign {
         IF(LENGTH(group_by_val) = 0, 1, 2)                                                                                                     AS order_val,
         IF(LENGTH(IFNULL(group_by_val, '')) = 0, 'BLANK', group_by_val)                                                                        AS campaign_id,
         IF(LENGTH(IFNULL(group_by_val, '')) = 0, 'BLANK', group_by_val_disp)                                                                   AS campaign,
+        affiliate_id                                                          AS affiliate_id,
+        sub_affiliate_id                                                      AS sub_affiliate_id,
+        sub_aff_2                                                             AS sub_aff_2,
+        sub_aff_3                                                             AS sub_aff_3,
         SUM(new_order_cnt)                                                                                                                     AS new_order_cnt,
         FORMAT(SUM(new_order_cnt), 0)                                                                                                          AS new_order_cnt_fmt,
         SUM(new_order_rev)                                                                                             AS new_order_rev,
@@ -62,6 +66,30 @@ view: pdt_sales_by_campaign {
         (
            SELECT
                  o.orders_id AS orders_id,
+
+                   CASE
+                          WHEN LENGTH(o.AFID)  > 0 THEN  o.AFID
+                          WHEN LENGTH(o.AID)   > 0 THEN  o.AID
+                          WHEN LENGTH(o.AFFID) > 0 THEN  o.AFFID
+                          ELSE ''
+                    END  affiliate_id,
+
+                   CASE
+                      WHEN LENGTH(o.AFID) > 0 AND LENGTH(o.SID) > 0 THEN o.SID
+                      WHEN LENGTH(o.AFFID) > 0 AND LENGTH(o.C1) > 0 THEN o.C1
+                      WHEN LENGTH(o.AID) > 0 AND LENGTH(o.OPT) > 0 THEN  o.OPT
+                      ELSE ''
+                   END sub_affiliate_id,
+
+                   CASE
+                      WHEN LENGTH(o.AFFID) > 0 AND LENGTH(o.C1) > 0 AND LENGTH(o.C2) > 0 THEN o.C2
+                      ELSE ''
+                   END sub_aff_2,
+
+                   CASE
+                      WHEN LENGTH(o.AFFID) > 0 AND LENGTH(o.C1) > 0 AND LENGTH(o.C2) > 0 AND LENGTH(o.C3) > 0 THEN o.C3
+                      ELSE ''
+                   END sub_aff_3,
 
                  CASE 'CID'
                     WHEN 'ALL' THEN
@@ -430,6 +458,26 @@ GROUP BY
   filter: is_test {
     type: string
     default_value: "0,1"
+  }
+
+  dimension: affiliate_id {
+    type: string
+    sql: ${TABLE}.affiliate_id ;;
+  }
+
+  dimension: sub_affiliate_id {
+    type: string
+    sql: ${TABLE}.sub_affiliate_id ;;
+  }
+
+  dimension: sub_aff_2 {
+    type: string
+    sql: ${TABLE}.sub_aff_2 ;;
+  }
+
+  dimension: sub_aff_3 {
+    type: string
+    sql: ${TABLE}.sub_aff_3 ;;
   }
 
   dimension: currency_id {
@@ -856,6 +904,50 @@ GROUP BY
     sql: ${hold_cnt_outside} ;;
     #sql_distinct_key: ${orders_id} ;;
     drill_fields: [detail*]
+  }
+
+  measure: affiliate_breakdown {
+    sql: "Affiliate ID" ;;
+    description: "Sales by Campaign"
+    label: "Affiliate Breakdown"
+    drill_fields: [product_drill*]
+  }
+
+  measure: sub_affiliate_breakdown {
+    sql: "Sub-Affiliate ID" ;;
+    description: "Sales by Campaign"
+    label: "Sub-Affiliate Breakdown"
+    drill_fields: [product_drill_1*]
+  }
+
+  measure: sub_affiliate_breakdown_2 {
+    sql: "Sub-Affiliate ID" ;;
+    description: "Sales by Campaign"
+    label: "Sub-Affiliate Breakdown"
+    drill_fields: [product_drill_2*]
+  }
+
+  measure: sub_affiliate_breakdown_3 {
+    sql: "Sub-Affiliate ID" ;;
+    description: "Sales by Campaign"
+    label: "Sub-Affiliate Breakdown"
+    drill_fields: [product_drill_3*]
+  }
+
+  set: product_drill {
+    fields: [affiliate_id,initial ,initial_revenue, subscription , subscription_revenue, shipping, shipping_revenue,total, total_revenue, pending, pending_revenue, tax_revenue, declines, decline_revenue,void_refund, void_refund_revenue,count_hold, count_prior_hold, holds_cancel_revenue, chargebacks, chargeback_percent, active_subscriptions, avg_order, sub_affiliate_breakdown]
+  }
+
+  set: product_drill_1 {
+    fields: [sub_affiliate_id, initial ,initial_revenue, subscription , subscription_revenue, shipping, shipping_revenue,total, total_revenue, pending, pending_revenue, tax_revenue, declines, decline_revenue,void_refund, void_refund_revenue,count_hold, count_prior_hold, holds_cancel_revenue, chargebacks, chargeback_percent, active_subscriptions, avg_order,sub_affiliate_breakdown_2]
+  }
+
+  set: product_drill_2 {
+    fields: [sub_aff_2,initial ,initial_revenue, subscription , subscription_revenue, shipping, shipping_revenue,total, total_revenue, pending, pending_revenue, tax_revenue, declines, decline_revenue,void_refund, void_refund_revenue,count_hold, count_prior_hold, holds_cancel_revenue, chargebacks, chargeback_percent, active_subscriptions, avg_order,sub_affiliate_breakdown_3]
+  }
+
+  set: product_drill_3 {
+    fields: [sub_aff_3, initial ,initial_revenue, subscription , subscription_revenue, shipping, shipping_revenue,total, total_revenue, pending, pending_revenue, tax_revenue, declines, decline_revenue,void_refund, void_refund_revenue,count_hold, count_prior_hold, holds_cancel_revenue, chargebacks, chargeback_percent, active_subscriptions, avg_order]
   }
 
   set: detail {
