@@ -1,7 +1,7 @@
 view: pdt_employee_activity {
   derived_table: {
     sql: SELECT  * FROM (         SELECT
-               CONCAT('<a href="index.php?r=2&f=', IF('Employee' = 'Activity', MD5(IFNULL(ohg.name, oht.name)), oh.user), '">', FORMAT(COUNT(1), 0), '</a>') AS cnt_link,
+               oh.orders_id AS order_id,
                oh.user,
                a.admin_fullname,
                IFNULL(ohg.name, oht.name)          AS activity,
@@ -39,10 +39,10 @@ LEFT OUTER JOIN
                AND ({% condition date_select %} oh.t_stamp {% endcondition %})
 
        GROUP BY
-               IF('Employee' = 'Activity', activity, user)
+               order_id
       UNION ALL
          SELECT
-               CONCAT('<a href="index.php?r=2&f=', IF('Employee' = 'Activity', MD5(IFNULL(ohg.name, oht.name)), oh.user), '">', COUNT(1), '</a>') AS cnt_link,
+               oh.orders_id AS order_id,
                oh.user,
                a.admin_fullname,
                IFNULL(ohg.name, oht.name)          AS activity,
@@ -73,7 +73,7 @@ LEFT OUTER JOIN
                AND ({% condition date_select %} oh.t_stamp {% endcondition %})
 
        GROUP BY
-               IF('Employee' = 'Activity', activity, user)) a    ORDER BY admin_fullname ASC
+               order_id) a    ORDER BY admin_fullname ASC
  ;;
   }
 
@@ -87,9 +87,9 @@ LEFT OUTER JOIN
     default_value: "today"
   }
 
-  dimension: cnt_link {
-    type: string
-    sql: ${TABLE}.cnt_link ;;
+  dimension: order_id {
+    type: number
+    sql: ${TABLE}.order_id ;;
   }
 
   dimension: user {
@@ -126,12 +126,11 @@ LEFT OUTER JOIN
 
   set: detail {
     fields: [
-      cnt_link,
+      order_id,
       user,
       admin_fullname,
       activity,
-      t_stamp,
-      cnt
+      t_stamp
     ]
   }
 }
