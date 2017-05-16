@@ -2079,7 +2079,7 @@ view: orders {
     }
     filters: {
       field: orders_status
-      value: "2,8"
+      value: "2,6,8"
     }
     filters: {
       field: order_report.upsell_flag
@@ -2099,10 +2099,6 @@ view: orders {
     filters: {
       field: shipping_module_code
       value: "1"
-    }
-    filters: {
-      field: parent_order_id
-      value: "0"
     }
     label: "Shipped Orders - Fufil"
     drill_fields: [detail*]
@@ -2135,7 +2131,7 @@ view: orders {
     }
     filters: {
       field: orders_status
-      value: "2,8"
+      value: "2,6,8"
     }
     filters: {
       field: order_report.upsell_flag
@@ -2150,7 +2146,7 @@ view: orders {
     sql: ${order_report.shippable_prod_cnt} ;;
     filters: {
       field: orders_status
-      value: "2,8"
+      value: "2,6,8"
     }
     drill_fields: [detail*]
   }
