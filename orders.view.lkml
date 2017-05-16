@@ -789,6 +789,12 @@ view: orders {
     sql: ${TABLE}.prospects_id ;;
   }
 
+  dimension: provider_id {
+    type: string
+    # hidden: true
+    sql: ${order_report.provider_id} ;;
+  }
+
   dimension: products_id {
     type: number
     # hidden: true
@@ -1684,6 +1690,13 @@ view: orders {
     label: "Attempt"
     type: string
     sql: CASE WHEN ${int_2} > 0 THEN CONCAT('Attempt', ${int_2}) ELSE 'Initial' END ;;
+    html:
+    {% if value != 'Initial' %}
+    {{ rendered_value }}
+    {% else %}
+    {{ linked_value }}
+    {% endif %}
+    ;;
     drill_fields: [subscription*]
   }
 
