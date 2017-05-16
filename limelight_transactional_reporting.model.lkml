@@ -123,13 +123,6 @@ explore: orders {
     sql_on: ${pdt_retention.order_id} = ${orders.orders_id} ;;
   }
 
-  join: pdt_fulfillment_drill {
-    type: left_outer
-    relationship: one_to_one
-    sql_on: ${pdt_fulfillment_drill.order_id} = ${orders.orders_id} ;;
-  }
-
-
   join: products_description {
     type: left_outer
     relationship: one_to_one
