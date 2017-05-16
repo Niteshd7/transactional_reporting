@@ -1917,7 +1917,6 @@ view: orders {
       value: ">0"
     }
     type: count
-    drill_fields: [detail*]
   }
 
   measure: net_approved_total {
