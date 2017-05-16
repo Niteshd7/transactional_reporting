@@ -1,6 +1,7 @@
 view: pdt_fulfillment_reconciliation {
   derived_table: {
     sql: SELECT  * FROM (SELECT
+      order_id,
       IF (fulfillment_id > 0, fulfillment_id, '-') AS fulfillment_id_fmt,
       fulfillment_id,
       fulfillment_name,
@@ -17,6 +18,7 @@ view: pdt_fulfillment_reconciliation {
   FROM
       (
          SELECT
+               order_id,
                fulfillment_id,
                fulfillment_name,
                fulfillment_alias,
@@ -38,6 +40,7 @@ view: pdt_fulfillment_reconciliation {
            FROM
                (
                   SELECT
+                        o.orders_id                               AS order_id,
                         IFNULL(c.fulfillmentId, 0)                AS fulfillment_id,
                         IFNULL(c.fulfillment_name, 'In House')    AS fulfillment_name,
                         IFNULL(c.fulfillment_alias, 'N/A')        AS fulfillment_alias,
@@ -246,10 +249,11 @@ view: pdt_fulfillment_reconciliation {
                         AND {% condition is_test %} o.is_test_cc {% endcondition %}
 
                 GROUP BY
-                        c.fulfillmentId
+                        order_id
                UNION ALL
                   -- Include orders shipped within date range
                   SELECT
+                        o.orders_id                               AS order_id,
                         IFNULL(c.fulfillmentId, 0)                AS fulfillment_id,
                         IFNULL(c.fulfillment_name, 'In House')    AS fulfillment_name,
                         IFNULL(c.fulfillment_alias, 'N/A')        AS fulfillment_alias,
@@ -313,13 +317,13 @@ view: pdt_fulfillment_reconciliation {
                         AND {% condition is_test %} o.is_test_cc {% endcondition %}
 
                 GROUP BY
-                        c.fulfillmentId
+                        order_id
 
                ) x
        GROUP BY
-               fulfillment_id
+               order_id
       ) z) a    ORDER BY fulfillment_id DESC
- ;;
+ ;; indexes: ["order_id"]
   }
 
   measure: count {
@@ -339,6 +343,11 @@ view: pdt_fulfillment_reconciliation {
   dimension: fulfillment_id_fmt {
     type: string
     sql: ${TABLE}.fulfillment_id_fmt ;;
+  }
+
+  dimension: order_id {
+    type: number
+    sql: ${TABLE}.order_id ;;
   }
 
   dimension: fulfillment_id {
