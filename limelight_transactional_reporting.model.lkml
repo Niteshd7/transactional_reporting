@@ -15,8 +15,6 @@ explore: gateway{}
 
 explore: pdt_sales_by_product {}
 
-explore: pdt_sales_by_date {}
-
 explore: pdt_sales_by_campaign {}
 
 explore: pdt_fulfillment_reconciliation {
@@ -83,26 +81,6 @@ explore: orders {
         AND ${decline_hold_pdt.orders_id} > '0';;
   }
 
-  join: hold_pdt {
-    type: left_outer
-    relationship: one_to_one
-    sql_on: ${hold_pdt.orders_id} = ${orders.orders_id}
-      AND ${hold_pdt.orders_id} > '0';;
-  }
-
-  join: prod_hold_pdt {
-    type: left_outer
-    relationship: one_to_one
-    sql_on: ${prod_hold_pdt.product_id} = ${orders.products_id}
-      AND ${prod_hold_pdt.product_id} IS NOT NULL;;
-  }
-
-  join: decline_hold_pdt_campaign {
-    type: left_outer
-    relationship: one_to_one
-    sql_on: ${decline_hold_pdt_campaign.orders_id} = ${orders.orders_id}
-      AND ${decline_hold_pdt_campaign.orders_id} > '0';;
-  }
 
   join: decline_hold_data{
     type: left_outer

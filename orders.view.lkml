@@ -1164,7 +1164,7 @@ view: orders {
 
   measure: count_prior_hold {
     type: sum
-    sql: ${hold_pdt.hold_cnt_outside} ;;
+    sql: ${decline_hold_pdt.hold_cnt_outside} ;;
     #sql_distinct_key: ${orders_id} ;;
     drill_fields: [detail*]
   }
