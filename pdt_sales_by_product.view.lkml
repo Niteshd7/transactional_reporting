@@ -1,6 +1,7 @@
 view: pdt_sales_by_product {
     derived_table: {
       sql: SELECT  * FROM (  SELECT
+        order_id,
         currency_id                                                           AS currency_id,
         currency_symbol                                                           AS currency_symbol,
         affiliate_id                                                          AS affiliate_id,
@@ -42,28 +43,29 @@ view: pdt_sales_by_product {
     FROM
         (
            SELECT
+                    o.orders_id as order_id,
                     CASE
                           WHEN LENGTH(o.AFID)  > 0 THEN  o.AFID
                           WHEN LENGTH(o.AID)   > 0 THEN  o.AID
                           WHEN LENGTH(o.AFFID) > 0 THEN  o.AFFID
-                          ELSE ''
+                          ELSE 'BLANK'
                     END  affiliate_id,
 
                    CASE
                       WHEN LENGTH(o.AFID) > 0 AND LENGTH(o.SID) > 0 THEN o.SID
                       WHEN LENGTH(o.AFFID) > 0 AND LENGTH(o.C1) > 0 THEN o.C1
                       WHEN LENGTH(o.AID) > 0 AND LENGTH(o.OPT) > 0 THEN  o.OPT
-                      ELSE ''
+                      ELSE 'BLANK'
                    END sub_affiliate_id,
 
                    CASE
                       WHEN LENGTH(o.AFFID) > 0 AND LENGTH(o.C1) > 0 AND LENGTH(o.C2) > 0 THEN o.C2
-                      ELSE ''
+                      ELSE 'BLANK'
                    END sub_aff_2,
 
                    CASE
                       WHEN LENGTH(o.AFFID) > 0 AND LENGTH(o.C1) > 0 AND LENGTH(o.C2) > 0 AND LENGTH(o.C3) > 0 THEN o.C3
-                      ELSE ''
+                      ELSE 'BLANK'
                    END sub_aff_3,
 
                  CASE 'PROD'
@@ -442,10 +444,10 @@ view: pdt_sales_by_product {
                  AND
                            o.gatewayId IS NOT NULL
          GROUP BY
-                 group_by_val
+                 order_id
         ) o
 GROUP BY
-        group_by_val
+        order_id
   HAVING
         (
            IFNULL(new_products_cnt, 0) +
@@ -457,7 +459,7 @@ GROUP BY
            IFNULL(prod_hold_cnt, 0) +
            IFNULL(prod_hold_cnt_outside, 0)
         ) > 0) a    ORDER BY order_val ASC, CAST(group_by_val AS signed) ASC
- ;; indexes: ["group_by_val"]
+ ;; indexes: ["order_id"]
     }
 
     filter: date_select {
@@ -469,6 +471,11 @@ GROUP BY
       type: string
       default_value: "0,1"
     }
+
+  dimension: order_id {
+    type: number
+    sql: ${TABLE}.order_id ;;
+  }
 
     dimension: currency_id {
       type: number
