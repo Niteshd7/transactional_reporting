@@ -19,7 +19,13 @@ explore: pdt_sales_by_date {}
 
 explore: pdt_sales_by_campaign {}
 
-explore: pdt_fulfillment_reconciliation {}
+explore: pdt_fulfillment_reconciliation {
+  join: v_orders {
+    type: left_outer
+    relationship: one_to_one
+    sql_on: ${v_orders.orders_id} = ${pdt_fulfillment_reconciliation.order_id} ;;
+  }
+}
 
 explore: pdt_user_activity {}
 

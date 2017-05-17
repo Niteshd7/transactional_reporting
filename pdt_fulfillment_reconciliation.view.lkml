@@ -413,6 +413,7 @@ view: pdt_fulfillment_reconciliation {
   measure: shippable_orders {
     type: sum
     sql: ${shippable_order_cnt} ;;
+    drill_fields: [order_id]
   }
 
   measure: shippable_products {
@@ -457,19 +458,13 @@ view: pdt_fulfillment_reconciliation {
 
   set: detail {
     fields: [
-      fulfillment_id_fmt,
-      fulfillment_id,
-      fulfillment_name,
-      fulfillment_alias,
-      shippable_order_cnt,
-      shippable_prod_cnt,
-      shipped_cnt,
-      sent_cnt,
-      pending_tracking_cnt,
-      pending_post_cnt,
-      pending_avg,
-      return_cnt,
-      pending_return_cnt
+      order_id,
+      v_orders.t_stamp_time,
+      v_orders.shipped_date_time,
+      shippable_orders,
+      v_orders.rma_reason_code_id,
+      v_orders.rma_return_date_time,
+      v_orders.orders_status
     ]
   }
 }

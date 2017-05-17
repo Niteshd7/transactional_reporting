@@ -30,24 +30,24 @@ view: prospect_pdt {
                           WHEN LENGTH(o.AFID)  > 0 THEN  o.AFID
                           WHEN LENGTH(o.AID)   > 0 THEN  o.AID
                           WHEN LENGTH(o.AFFID) > 0 THEN  o.AFFID
-                          ELSE ''
+                          ELSE 'BLANK'
                     END  affiliate_id,
 
                    CASE
                       WHEN LENGTH(o.AFID) > 0 AND LENGTH(o.SID) > 0 THEN o.SID
                       WHEN LENGTH(o.AFFID) > 0 AND LENGTH(o.C1) > 0 THEN o.C1
                       WHEN LENGTH(o.AID) > 0 AND LENGTH(o.OPT) > 0 THEN  o.OPT
-                      ELSE ''
+                      ELSE 'BLANK'
                    END sub_affiliate_id,
 
                    CASE
                       WHEN LENGTH(o.AFFID) > 0 AND LENGTH(o.C1) > 0 AND LENGTH(o.C2) > 0 THEN o.C2
-                      ELSE ''
+                      ELSE 'BLANK'
                    END sub_aff_2,
 
                    CASE
                       WHEN LENGTH(o.AFFID) > 0 AND LENGTH(o.C1) > 0 AND LENGTH(o.C2) > 0 AND LENGTH(o.C3) > 0 THEN o.C3
-                      ELSE ''
+                      ELSE 'BLANK'
                    END sub_aff_3,
                  CASE 'BASE'
                     WHEN 'ALL' THEN
@@ -205,38 +205,54 @@ view: prospect_pdt {
            SELECT
                  0  AS currency_id,
                  0  AS currency_symbol,
-                0 AS  affiliate_id,
+                CASE
+                          WHEN LENGTH(IFNULL(p.pAFID, ''))  > 0 THEN IFNULL(p.pAFID, '')
+                          WHEN LENGTH(IFNULL(p.pAID, ''))   > 0 THEN p.pAID
+                          WHEN LENGTH(IFNULL(p.pAFFID, '')) > 0 THEN p.pAFFID
+                          ELSE 'BLANK'
+                       END AS  affiliate_id,
 
-                  0 AS sub_affiliate_id,
+                  CASE
+                          WHEN LENGTH(p.pAFID)  > 0 AND LENGTH(p.pSID) > 0 THEN p.pSID
+                          WHEN LENGTH(p.pAFFID) > 0 AND LENGTH(p.pC1)  > 0 THEN p.pC1
+                          WHEN LENGTH(p.pAID)   > 0 AND LENGTH(p.pOPT) > 0 THEN p.pOPT
+                          ELSE 'BLANK'
+                       END AS sub_affiliate_id,
 
-                  0 AS sub_aff_2,
+                  CASE
+                          WHEN LENGTH(p.pAFFID) > 0 AND LENGTH(p.pC1) > 0 AND LENGTH(p.pC2) > 0 THEN p.pC2
+                          ELSE 'BLANK'
+                       END AS sub_aff_2,
 
-                  0 AS sub_aff_3,
+                  CASE
+                          WHEN LENGTH(p.pAFFID) > 0 AND LENGTH(p.pC1) > 0 AND LENGTH(p.pC2) > 0 AND LENGTH(p.pC3) > 0 THEN p.pC3
+                          ELSE 'BLANK'
+                       END AS sub_aff_3,
 
                  CASE 'BASE'
                     WHEN 'ALL' THEN
                        CASE
-                          WHEN LENGTH(IFNULL(p.pAFID, ''))  > 0 THEN IFNULL(p.pAFID, '')
+                          WHEN LENGTH(IFNULL(p.pAFID, ''))  > 0 THEN IFNULL(p.pAFID, 'BLANK')
                           WHEN LENGTH(IFNULL(p.pAID, ''))   > 0 THEN p.pAID
                           WHEN LENGTH(IFNULL(p.pAFFID, '')) > 0 THEN p.pAFFID
-                          ELSE ''
+                          ELSE 'BLANK'
                        END
                     WHEN 'ALL_SUB' THEN
                        CASE
                           WHEN LENGTH(p.pAFID)  > 0 AND LENGTH(p.pSID) > 0 THEN 'SID'
                           WHEN LENGTH(p.pAFFID) > 0 AND LENGTH(p.pC1)  > 0 THEN 'C1'
                           WHEN LENGTH(p.pAID)   > 0 AND LENGTH(p.pOPT) > 0 THEN 'OPT'
-                          ELSE ''
+                          ELSE 'BLANK'
                        END
                     WHEN 'ALL_SUB2' THEN
                        CASE
                           WHEN LENGTH(p.pAFFID) > 0 AND LENGTH(p.pC1) > 0 AND LENGTH(p.pC2) > 0 THEN 'C2'
-                          ELSE ''
+                          ELSE 'BLANK'
                        END
                     WHEN 'ALL_SUB3' THEN
                        CASE
                           WHEN LENGTH(p.pAFFID) > 0 AND LENGTH(p.pC1) > 0 AND LENGTH(p.pC2) > 0 AND LENGTH(p.pC3) > 0 THEN 'C3'
-                          ELSE ''
+                          ELSE 'BLANK'
                        END
                     WHEN 'AFID'  THEN IFNULL(p.pSID, '')
                     WHEN 'AFFID' THEN IFNULL(p.pC1, '')
