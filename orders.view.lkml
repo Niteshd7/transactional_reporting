@@ -2638,14 +2638,6 @@ view: orders {
       field: cancellation_flag
       value: "yes"
     }
-    filters: {
-      field: refund_type
-      value: "<2"
-    }
-    filters: {
-      field: order_report.straight_sale_flag
-      value: "0"
-    }
     sql: ${order_report.subscription_cnt} ;;
     drill_fields: [subscription*]
   }
