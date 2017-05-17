@@ -1,6 +1,7 @@
 view: pdt_sales_by_campaign {
   derived_table: {
     sql: SELECT  * FROM (  SELECT
+    order_id,
         IF(LENGTH(group_by_val) = 0, 1, 2)                                                                                                     AS order_val,
         IF(LENGTH(IFNULL(group_by_val, '')) = 0, 'BLANK', group_by_val)                                                                        AS campaign_id,
         IF(LENGTH(IFNULL(group_by_val, '')) = 0, 'BLANK', group_by_val_disp)                                                                   AS campaign,
@@ -65,30 +66,30 @@ view: pdt_sales_by_campaign {
     FROM
         (
            SELECT
-                 o.orders_id AS orders_id,
+                 o.orders_id AS order_id,
 
                    CASE
                           WHEN LENGTH(o.AFID)  > 0 THEN  o.AFID
                           WHEN LENGTH(o.AID)   > 0 THEN  o.AID
                           WHEN LENGTH(o.AFFID) > 0 THEN  o.AFFID
-                          ELSE ''
+                          ELSE 'BLANK'
                     END  affiliate_id,
 
                    CASE
                       WHEN LENGTH(o.AFID) > 0 AND LENGTH(o.SID) > 0 THEN o.SID
                       WHEN LENGTH(o.AFFID) > 0 AND LENGTH(o.C1) > 0 THEN o.C1
                       WHEN LENGTH(o.AID) > 0 AND LENGTH(o.OPT) > 0 THEN  o.OPT
-                      ELSE ''
+                      ELSE 'BLANK'
                    END sub_affiliate_id,
 
                    CASE
                       WHEN LENGTH(o.AFFID) > 0 AND LENGTH(o.C1) > 0 AND LENGTH(o.C2) > 0 THEN o.C2
-                      ELSE ''
+                      ELSE 'BLANK'
                    END sub_aff_2,
 
                    CASE
                       WHEN LENGTH(o.AFFID) > 0 AND LENGTH(o.C1) > 0 AND LENGTH(o.C2) > 0 AND LENGTH(o.C3) > 0 THEN o.C3
-                      ELSE ''
+                      ELSE 'BLANK'
                    END sub_aff_3,
 
                  CASE 'CID'
@@ -441,8 +442,8 @@ view: pdt_sales_by_campaign {
                  o.orders_id
         ) o
 GROUP BY
-        campaign_id) a    ORDER BY order_val ASC, CAST(campaign_id AS signed) ASC
- ;;  indexes: ["campaign_id"]
+        order_id) a    ORDER BY order_val ASC, CAST(campaign_id AS signed) ASC
+ ;;  indexes: ["order_id"]
   }
 
   measure: count {
@@ -458,6 +459,11 @@ GROUP BY
   filter: is_test {
     type: string
     default_value: "0,1"
+  }
+
+  dimension: order_id {
+    type: number
+    sql: ${TABLE}.order_id ;;
   }
 
   dimension: affiliate_id {
