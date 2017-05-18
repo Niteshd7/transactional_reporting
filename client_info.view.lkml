@@ -1,8 +1,5 @@
-view: clients {
-  derived_table: {
-    sql: SELECT * FROM all_clients_limelight.client_info;
-      ;;
-  }
+view: client_info {
+  sql_table_name: all_clients_limelight.client_info;;
 
   measure: count {
     type: count
@@ -17,6 +14,11 @@ view: clients {
   dimension: name {
     type: string
     sql: ${TABLE}.name ;;
+  }
+
+  dimension: domain {
+    type: string
+    sql: SUBSTRING(${name},5) ;;
   }
 
   dimension: host_name {

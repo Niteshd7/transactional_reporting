@@ -61,6 +61,12 @@ explore: orders {
     sql_on: ${admin.admin_id} = ${orders.user_id};;
   }
 
+  join: client_info {
+    type: left_outer
+    relationship: many_to_one
+    sql_on: ${client_info.domain} = ${orders.domain};;
+  }
+
   join: order_report {
     type: left_outer
     relationship: many_to_one

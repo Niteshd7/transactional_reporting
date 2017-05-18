@@ -140,6 +140,11 @@ view: orders {
     sql: (select concat(`value`,'.limelightcrm.com') as client_domain from config_settings where `key` = 'APPLICATION_KEY') ;;
   }
 
+  dimension: domain {
+    type: string
+    sql: (select concat(`value`,'.com') as client_domain from config_settings where `key` = 'APPLICATION_KEY') ;;
+  }
+
   dimension: billing_address_format_id {
     type: number
     sql: ${TABLE}.billing_address_format_id ;;
