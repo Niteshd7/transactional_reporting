@@ -231,11 +231,11 @@ view: pdt_sales_by_product {
                           0 AS hold_rev_o,
                           0 AS prod_hold_cnt,
                           0 AS prod_hold_cnt_outside,
-                          r.currency_id AS currency_id,
-                          r.currency_symbol AS currency_symbol
+                          v.currency_id    AS currency_id,
+                          v.html_entity_name  AS currency_symbol
                       FROM
                           orders               o,
-                          order_report           r,
+                          v_campaign_currencies v,
                           orders_products      p,
                           orders_total         ot,
                           products_description pd
@@ -244,9 +244,7 @@ view: pdt_sales_by_product {
                        AND
                           p.orders_id   = o.orders_id
                        AND
-                           r.upsell_flag = 0
-                       AND
-                          o.orders_id         = r.order_id
+                          v.c_id = o.campaign_order_id
                        AND
                           ot.orders_id  = o.orders_id
                        AND
@@ -307,11 +305,11 @@ view: pdt_sales_by_product {
                           0 AS hold_rev_o,
                           0 AS prod_hold_cnt,
                           0 AS prod_hold_cnt_outside,
-                          r.currency_id AS currency_id,
+                          v.currency_id AS currency_id,
                           0                       AS currency_symbol
                       FROM
                           orders                 o,
-                          order_report           r,
+                          v_campaign_currencies v,
                           upsell_orders_products p,
                           upsell_orders          uo,
                           upsell_orders_total    uot,
@@ -321,9 +319,7 @@ view: pdt_sales_by_product {
                        AND
                           o.orders_id         = uo.main_orders_id
                        AND
-                          o.orders_id         = r.order_id
-                       AND
-                           r.upsell_flag = 0
+                          v.c_id = o.campaign_order_id
                        AND
                           p.upsell_orders_id  = uo.upsell_orders_id
                        AND
