@@ -127,7 +127,7 @@ explore: orders {
   join: v_campaign_currencies {
     type: left_outer
     relationship: many_to_one
-    sql_on: ${orders.campaign_order_id} = ${campaigns.c_id};;
+    sql_on: ${orders.campaign_order_id} = ${v_campaign_currencies.c_id};;
   }
 
   join: orders_products {
