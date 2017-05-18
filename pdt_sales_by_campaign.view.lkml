@@ -264,14 +264,14 @@ view: pdt_sales_by_campaign {
                           0                                                                                                                                          AS hold_cnt_outside,
                           0                                                                                                                                          AS hold_rev_o,
                           COUNT(IF(o.isChargeback = 1, 1, NULL))                                                                                                     AS chargeback_cnt,
-                          r.currency_id AS currency_id,
-                          r.currency_symbol AS currency_symbol
+                          v.currency_id AS currency_id,
+                          v.html_entity_name AS currency_symbol
                        FROM
                            v_main_order_total   ot,
                            orders_products op,
                            campaigns       c,
                            orders          o,
-                           order_report    r
+                           v_campaign_currencies v
                       WHERE
                            o.deleted           = 0
                         AND
@@ -281,9 +281,7 @@ view: pdt_sales_by_campaign {
                         AND
                            o.orders_id         = op.orders_id
                         AND
-                           o.orders_id         = r.order_id
-                        AND
-                           r.upsell_flag = 0
+                           v.c_id = o.campaign_order_id
                         AND
                            {% condition date_select %} o.t_stamp {% endcondition %}
                            AND {% condition is_test %} o.is_test_cc {% endcondition %}
