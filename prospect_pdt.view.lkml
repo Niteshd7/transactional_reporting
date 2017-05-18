@@ -24,8 +24,8 @@ view: prospect_pdt {
     FROM
         (
            SELECT
-                 r.currency_id    AS currency_id,
-                r.currency_symbol  AS currency_symbol,
+                 v.currency_id    AS currency_id,
+                v.html_entity_name  AS currency_symbol,
                  CASE
                           WHEN LENGTH(o.AFID)  > 0 THEN  o.AFID
                           WHEN LENGTH(o.AID)   > 0 THEN  o.AID
@@ -176,16 +176,14 @@ view: prospect_pdt {
              FROM
                  campaigns          c,
                  orders             o,
-                 order_report       r,
+                 v_campaign_currencies v,
                  v_main_order_total ot
             WHERE
                  o.orders_status NOT IN (7, 10, 11)
               AND
                  o.orders_id = ot.orders_id
               AND
-                 r.upsell_flag = 0
-              AND
-                 o.orders_id         = r.order_id
+                 v.c_id = o.campaign_order_id
               AND
                  o.campaign_order_id = c.c_id
               AND
