@@ -13,6 +13,8 @@ explore: countries{}
 
 explore: gateway{}
 
+explore: pdt_retention {}
+
 explore: pdt_sales_by_product {}
 
 explore: pdt_sales_by_campaign {}
@@ -105,12 +107,6 @@ explore: orders {
     type: left_outer
     relationship: many_to_one
     sql_on: ${tlkp_orders_history_group.id} = ${orders.oht_group_id};;
-  }
-
-  join: pdt_retention {
-    type: left_outer
-    relationship: one_to_one
-    sql_on: ${pdt_retention.order_id} = ${orders.orders_id} ;;
   }
 
   join: products_description {

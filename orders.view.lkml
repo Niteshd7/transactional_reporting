@@ -2494,14 +2494,6 @@ view: orders {
 
  # ------- Sales By Retention ------
 
-  measure: order_count_retention {
-    type: number
-    label: "Gross Orders - Retention"
-    #sql: CONCAT(${campaign_order_id}, ${customers_email_address}) ;;
-    sql: ${pdt_retention.gross_orders} ;;
-    drill_fields: [subscription*]
-  }
-
   measure: approved_subscriptions_count {
     label: "Subscriptions Approved SbR"
     filters: {
@@ -2562,29 +2554,6 @@ view: orders {
     drill_fields: [subscription*]
   }
 
-  measure: approval_rate_retention {
-    type: number
-    label: "Approval Rate"
-    value_format_name: percent_1
-    sql: ${approved_order_count_retention} / NULLIF(${order_count_retention},0) ;;
-  }
-
-
-  measure:  void_full_refund_orders {
-    type: sum
-    label: "Void/Full Refund"
-    filters: {
-      field: refund_type
-      value: "2,3"
-    }
-    filters: {
-      field: order_report.upsell_flag
-      value: "0"
-    }
-    sql: ${pdt_retention.gross} ;;
-    drill_fields: [orders_id, orders_status,order_status_name, order_total]
-  }
-
   measure:  partial_refund_orders {
     type: count
     label: "Partial Refund"
@@ -2597,12 +2566,6 @@ view: orders {
       value: "0"
     }
     drill_fields: [orders_id, orders_status,order_status_name, order_total]
-  }
-
-  measure:  declined_orders_retention {
-    type: number
-    sql: (${order_count_retention} - ${approved_order_count_retention} - ${void_full_refund_orders}) ;;
-    drill_fields: [detail*]
   }
 
   measure:  hold_orders {
@@ -2670,50 +2633,6 @@ view: orders {
     html: {{ currency_symbol._value }}{{ rendered_value }};;
     value_format_name: decimal_2
     sql: ${order_total};;
-  }
-
-  measure: affiliate_breakdown_retention {
-    sql: "Affiliate ID" ;;
-    description: "Sales by Retention"
-    label: "Affiliate Breakdown"
-    drill_fields: [retention_drill*]
-  }
-
-  measure: sub_affiliate_breakdown_retention {
-    sql: "Sub-Affiliate ID" ;;
-    description: "Sales by Retention"
-    label: "Sub-Affiliate Breakdown"
-    drill_fields: [retention_drill_1*]
-  }
-
-  measure: sub_affiliate_breakdown_retention_2 {
-    sql: "Sub-Affiliate ID" ;;
-    description: "Sales by Retention"
-    label: "Sub-Affiliate Breakdown"
-    drill_fields: [retention_drill_2*]
-  }
-
-  measure: sub_affiliate_breakdown_retention_3 {
-    sql: "Sub-Affiliate ID" ;;
-    description: "Sales by Retention"
-    label: "Sub-Affiliate Breakdown"
-    drill_fields: [retention_drill_3*]
-  }
-
-  set: retention_drill {
-    fields: [affiliate_id, order_count_retention, approved_order_count_retention, approved_subscriptions_count, declined_orders_retention, void_full_refund_orders, partial_refund_orders, void_refund_revenue, canceled_orders, hold_orders, pending_count_retention, approval_rate_retention, net_revenue_retention, sub_affiliate_breakdown_subscription]
-  }
-
-  set: retention_drill_1 {
-    fields: [sub_affiliate_id, order_count_retention, approved_order_count_retention, approved_subscriptions_count, declined_orders_retention, void_full_refund_orders, partial_refund_orders, void_refund_revenue, canceled_orders, hold_orders, pending_count_retention, approval_rate_retention, net_revenue_retention, sub_affiliate_breakdown_subscription_2]
-  }
-
-  set: retention_drill_2 {
-    fields: [sub_affiliate_2, order_count_retention, approved_order_count_retention, approved_subscriptions_count, declined_orders_retention, void_full_refund_orders, partial_refund_orders, void_refund_revenue, canceled_orders, hold_orders, pending_count_retention, approval_rate_retention, net_revenue_retention, sub_affiliate_breakdown_subscription_3]
-  }
-
-  set: retention_drill_3 {
-    fields: [sub_affiliate_3, order_count_retention, approved_order_count_retention, approved_subscriptions_count, declined_orders_retention, void_full_refund_orders, partial_refund_orders, void_refund_revenue, canceled_orders, hold_orders, pending_count_retention, approval_rate_retention, net_revenue_retention]
   }
 
  # ------- Sales By Retention Ends ------
