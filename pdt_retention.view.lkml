@@ -423,16 +423,16 @@ GROUP BY
   }
 
   measure: void_refund_revenue{
-    type: string
+    type: sum
     value_format_name: decimal_2
-    sql: CONCAT(${currency_symbol},FORMAT(SUM(${void_ref_amt}), 2)) ;;
+    sql: ${void_ref_amt} ;;
     drill_fields: [detail*]
   }
 
   measure: net_revenue{
-    type: string
+    type: sum
     value_format_name: decimal_2
-    sql: CONCAT(${currency_symbol},FORMAT(SUM(${total_amt}), 2)) ;;
+    sql: ${total_amt} ;;
     drill_fields: [detail*]
   }
 
