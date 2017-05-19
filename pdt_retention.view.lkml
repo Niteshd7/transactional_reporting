@@ -13,7 +13,7 @@ view: pdt_retention {
       subscription_cnt                                                                              AS subscription_cnt,
       active_subscription_cnt                                                                       AS active_subscription_cnt,
       IF(approved_flag = 1 AND refund_type < 2, 1, NULL)                                     AS approve_cnt,
-      gross_cnt - COUNT(IF(approved_flag = 1, 1, NULL))                                             AS decline_cnt,
+      gross_cnt - IF(approved_flag = 1, 1, NULL)                                             AS decline_cnt,
       IF(cancellation_flag = 1, subscription_cnt, 0)                                                AS cancel_cnt,
       IF(hold_flag = 1 AND cancellation_flag = 0, subscription_cnt, 0)                              AS hold_cnt,
       IF(refund_type IN (2,3), gross_cnt, NULL)                                                     AS void_ref_cnt,
@@ -210,7 +210,7 @@ view: pdt_retention {
       ) x
 GROUP BY
         order_id) a    ORDER BY CAST(campaign_id AS signed) ASC
- ;; indexes: ["order_id"]
+ ;;
   }
 
   measure: count {
