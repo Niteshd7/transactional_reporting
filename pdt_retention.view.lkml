@@ -217,7 +217,7 @@ view: pdt_retention {
             ) x
       GROUP BY
               order_id) a    ORDER BY CAST(group_by_val AS signed) ASC
-       ;;
+       ;; indexes: ["order_id"]
   }
 
   filter: date_select {
