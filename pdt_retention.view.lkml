@@ -298,7 +298,7 @@ view: pdt_retention {
   }
 
   dimension: campaign_id {
-    type: number
+    type: string
     sql: ${TABLE}.campaign_id ;;
   }
 
@@ -439,7 +439,7 @@ view: pdt_retention {
   }
 
   set: detail {
-      fields: [campaign_id, gross_cnt, order_id
+      fields: [order_id, campaign
     ]
   }
 }
