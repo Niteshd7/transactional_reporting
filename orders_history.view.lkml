@@ -9,6 +9,10 @@ view: orders_history {
 
   dimension: orders_id {
     type: number
+    link: {
+      label: "Navigate to Order"
+      url: "https://{{client_domain._value}}/admin/orders.php?show_details=show_details&show_folder=view_all&fromPost=1&act=&sequence=1&show_by_id={{value}}"
+    }
     sql: ${TABLE}.orders_id ;;
   }
 
