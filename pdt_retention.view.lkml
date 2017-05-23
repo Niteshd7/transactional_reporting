@@ -5,6 +5,10 @@ view: pdt_retention {
             campaign_name,
             currency_id,
             currency_symbol,
+            affiliate_id                                                          AS affiliate_id,
+            sub_affiliate_id                                                          AS sub_affiliate_id,
+            sub_aff_2                                                          AS sub_aff_2,
+            sub_aff_3                                                          AS sub_aff_3,
             rebill_depth,
             order_id,
             IF (MAX(affiliate_depth) = 0, 1, 2) AS order_val,
@@ -32,6 +36,29 @@ view: pdt_retention {
             (
                SELECT
                      IF ('BASE' = 'PROD' AND c.upsell_flag = 1, NULL, 1) AS gross_cnt,
+                                        CASE
+                          WHEN LENGTH(o.AFID)  > 0 THEN  o.AFID
+                          WHEN LENGTH(o.AID)   > 0 THEN  o.AID
+                          WHEN LENGTH(o.AFFID) > 0 THEN  o.AFFID
+                          ELSE 'BLANK'
+                    END  affiliate_id,
+
+                   CASE
+                      WHEN LENGTH(o.AFID) > 0 AND LENGTH(o.SID) > 0 THEN o.SID
+                      WHEN LENGTH(o.AFFID) > 0 AND LENGTH(o.C1) > 0 THEN o.C1
+                      WHEN LENGTH(o.AID) > 0 AND LENGTH(o.OPT) > 0 THEN  o.OPT
+                      ELSE 'BLANK'
+                   END sub_affiliate_id,
+
+                   CASE
+                      WHEN LENGTH(o.AFFID) > 0 AND LENGTH(o.C1) > 0 AND LENGTH(o.C2) > 0 THEN o.C2
+                      ELSE 'BLANK'
+                   END sub_aff_2,
+
+                   CASE
+                      WHEN LENGTH(o.AFFID) > 0 AND LENGTH(o.C1) > 0 AND LENGTH(o.C2) > 0 AND LENGTH(o.C3) > 0 THEN o.C3
+                      ELSE 'BLANK'
+                   END sub_aff_3,
                      c.upsell_flag,
                     c.order_id as order_id,
                      c.subscription_bundle_flag,
@@ -86,7 +113,8 @@ view: pdt_retention {
                      c.aff_val_4
                  FROM
                      v_order_report p,
-                     v_order_report c
+                     v_order_report c,
+                     orders o
                 WHERE
                      {% condition date_select %} p.t_stamp {% endcondition %}
                   AND
@@ -95,6 +123,8 @@ view: pdt_retention {
                      p.deleted_flag = 0
                   AND
                      p.rebill_depth = 0
+                  AND
+                     c.order_id = o.orders_id
                   AND
                      p.currency_id = 1
                   AND
@@ -113,6 +143,29 @@ view: pdt_retention {
                SELECT
                      IF ('BASE' = 'PROD' AND c.upsell_flag = 1, 0, 1) AS gross_cnt,
                      c.upsell_flag,
+                    CASE
+                          WHEN LENGTH(o.AFID)  > 0 THEN  o.AFID
+                          WHEN LENGTH(o.AID)   > 0 THEN  o.AID
+                          WHEN LENGTH(o.AFFID) > 0 THEN  o.AFFID
+                          ELSE 'BLANK'
+                    END  affiliate_id,
+
+                   CASE
+                      WHEN LENGTH(o.AFID) > 0 AND LENGTH(o.SID) > 0 THEN o.SID
+                      WHEN LENGTH(o.AFFID) > 0 AND LENGTH(o.C1) > 0 THEN o.C1
+                      WHEN LENGTH(o.AID) > 0 AND LENGTH(o.OPT) > 0 THEN  o.OPT
+                      ELSE 'BLANK'
+                   END sub_affiliate_id,
+
+                   CASE
+                      WHEN LENGTH(o.AFFID) > 0 AND LENGTH(o.C1) > 0 AND LENGTH(o.C2) > 0 THEN o.C2
+                      ELSE 'BLANK'
+                   END sub_aff_2,
+
+                   CASE
+                      WHEN LENGTH(o.AFFID) > 0 AND LENGTH(o.C1) > 0 AND LENGTH(o.C2) > 0 AND LENGTH(o.C3) > 0 THEN o.C3
+                      ELSE 'BLANK'
+                   END sub_aff_3,
                     c.order_id as order_id,
                      c.subscription_bundle_flag,
                      c.subscription_id,
@@ -161,6 +214,7 @@ view: pdt_retention {
                  FROM
                      v_order_report p,
                      v_order_report c,
+                     orders o,
                      (
                         SELECT
                               MAX(orders_id) AS order_id
@@ -204,6 +258,8 @@ view: pdt_retention {
                      p.order_id = c.subscription_id
                   AND
                      c.order_id = d.order_id
+                  AND
+                     c.order_id = o.orders_id
                   AND
                      c.t_stamp > TIMESTAMP({% date_start date_select %})
                   AND
@@ -316,6 +372,26 @@ view: pdt_retention {
   dimension: sub_cnt {
     type: number
     sql: ${TABLE}.sub_cnt ;;
+  }
+
+  dimension: affiliate_id {
+    type: string
+    sql: ${TABLE}.affiliate_id ;;
+  }
+
+  dimension: sub_affiliate_id {
+    type: string
+    sql: ${TABLE}.sub_affiliate_id ;;
+  }
+
+  dimension: sub_aff_2 {
+    type: string
+    sql: ${TABLE}.sub_aff_2 ;;
+  }
+
+  dimension: sub_aff_3 {
+    type: string
+    sql: ${TABLE}.sub_aff_3 ;;
   }
 
   dimension: approve_cnt {
@@ -437,6 +513,47 @@ view: pdt_retention {
     value_format_name: percent_2
     sql: ${net_approved} / NULLIF(${gross_orders},0) ;;
   }
+
+  measure: affiliate_breakdown {
+    sql: "Affiliate ID" ;;
+    label: "Affiliate Breakdown"
+    drill_fields: [retention*]
+  }
+
+  measure: sub_affiliate_breakdown {
+    sql: "Sub-Affiliate ID" ;;
+    label: "Sub-Affiliate Breakdown"
+    drill_fields: [retention_1*]
+  }
+
+  measure: sub_affiliate_breakdown_2 {
+    sql: "Sub-Affiliate ID" ;;
+    label: "Sub-Affiliate Breakdown"
+    drill_fields: [retention_2*]
+  }
+
+  measure: sub_affiliate_breakdown_3 {
+    sql: "Sub-Affiliate ID" ;;
+    label: "Sub-Affiliate Breakdown"
+    drill_fields: [retention_3*]
+  }
+
+  set: retention {
+    fields: [affiliate_id, gross_orders, net_approved, subscriptions_approved, declined, void_full_refund, partial_refund, void_refund_revenue, canceled, hold, pending, approval_rate_retention, net_revenue,sub_affiliate_breakdown]
+  }
+
+  set: retention_1 {
+    fields: [sub_affiliate_id, gross_orders, net_approved, subscriptions_approved, declined, void_full_refund, partial_refund, void_refund_revenue, canceled, hold, pending, approval_rate_retention, net_revenue, sub_affiliate_breakdown_2]
+  }
+
+  set: retention_2 {
+    fields: [sub_aff_2, gross_orders, net_approved, subscriptions_approved, declined, void_full_refund, partial_refund, void_refund_revenue, canceled, hold, pending, approval_rate_retention, net_revenue, sub_affiliate_breakdown_3]
+  }
+
+  set: retention_3 {
+    fields: [sub_aff_3,gross_orders, net_approved, subscriptions_approved, declined, void_full_refund, partial_refund, void_refund_revenue, canceled, hold, pending, approval_rate_retention, net_revenue,]
+  }
+
 
   set: detail {
       fields: [order_id, campaign
