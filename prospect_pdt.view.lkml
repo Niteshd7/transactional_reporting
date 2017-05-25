@@ -498,16 +498,16 @@ GROUP BY
   }
 
   measure: count_prospects {
-    type: sum_distinct
+    type: sum
     sql: ${prospect_cnt} ;;
-    sql_distinct_key: ${campaign} ;;
+    #sql_distinct_key: ${campaign} ;;
     drill_fields: [detail*]
   }
 
   measure: count_customers {
-    type: sum_distinct
+    type: sum
     sql: ${customer_cnt} ;;
-    sql_distinct_key: ${campaign} ;;
+    #sql_distinct_key: ${campaign} ;;
     drill_fields: [detail*]
   }
 
