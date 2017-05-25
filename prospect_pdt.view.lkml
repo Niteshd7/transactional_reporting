@@ -194,7 +194,7 @@ view: prospect_pdt {
                  AND {% condition is_test %} o.is_test_cc {% endcondition %}
 
          GROUP BY
-                 group_by_val
+                 group_by_val,affiliate_id
             UNION
            SELECT
                  0  AS currency_id,
@@ -334,10 +334,10 @@ view: prospect_pdt {
                  {% condition date_select %} p.pDate {% endcondition %}
 
          GROUP BY
-                 group_by_val
+                 group_by_val,affiliate_id
         ) p
 GROUP BY
-        group_by_val) a    ORDER BY order_val ASC, CAST(group_by_val AS signed) ASC
+        group_by_val,affiliate_id) a    ORDER BY order_val ASC, CAST(group_by_val AS signed) ASC
  ;; indexes: ["group_by_val"]
   }
 
