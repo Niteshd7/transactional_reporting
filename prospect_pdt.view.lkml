@@ -12,10 +12,6 @@ view: prospect_pdt {
         FORMAT(SUM(prospect_cnt), 0)                                                                                                                      AS prospect_cnt_fmt,
         SUM(customer_cnt)                                                                                                                                 AS customer_cnt,
         FORMAT(SUM(customer_cnt), 0)                                                                                                                      AS customer_cnt_fmt,
-        IF(SUM(customer_cnt) > 0 OR SUM(prospect_cnt) > 0, ROUND((SUM(customer_cnt) / SUM(customer_cnt + prospect_cnt)) * 100, 2), 0)                     AS conversion_pct,
-        CONCAT(IF(SUM(customer_cnt) > 0 OR SUM(prospect_cnt) > 0, ROUND((SUM(customer_cnt) / SUM(customer_cnt + prospect_cnt)) * 100, 2), 0), '%') AS conversion_pct_fmt,
-        FORMAT(avg_rev, 2)                                                                                                                   AS avg_rev,
-        CONCAT('$', FORMAT(avg_rev, 2), '')                                                                     AS avg_rev_fmt,
         IF(total_rev IS NOT NULL, total_rev,0)                                                                                                                                         AS total_rev,
         CONCAT('$', FORMAT(total_rev, 2), '')                                                                   AS total_rev_fmt,
         IF(display_link = 1, ':AFF_LINK', '')                                                                                                             AS features,
@@ -204,7 +200,7 @@ view: prospect_pdt {
                  0  AS currency_id,
                  0  AS currency_symbol,
                 CASE
-                          WHEN LENGTH(IFNULL(p.pAFID, ''))  > 0 THEN IFNULL(p.pAFID, '')
+                          WHEN LENGTH(IFNULL(p.pAFID, ''))  > 0 THEN p.pAFID
                           WHEN LENGTH(IFNULL(p.pAID, ''))   > 0 THEN p.pAID
                           WHEN LENGTH(IFNULL(p.pAFFID, '')) > 0 THEN p.pAFFID
                           ELSE 'BLANK'
