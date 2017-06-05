@@ -523,6 +523,7 @@ GROUP BY
 
   dimension: campaign_id {
     type: string
+    suggestable: no
     sql: ${TABLE}.campaign_id ;;
   }
 
@@ -908,6 +909,12 @@ GROUP BY
     sql: ${hold_cnt_outside} ;;
     #sql_distinct_key: ${orders_id} ;;
     drill_fields: [detail*]
+  }
+
+  measure: product_id_list {
+    label: "Product Ids Included"
+    type: string
+    sql: SUBSTRING(GROUP_CONCAT(DISTINCT(${prod_ids})),1,20) ;;
   }
 
   measure: affiliate_breakdown {
