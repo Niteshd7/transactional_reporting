@@ -235,7 +235,7 @@ view: pdt_sales_by_campaign {
                  (
                     SELECT
                           o.orders_id,
-                          GROUP_CONCAT(DISTINCT(op.products_id)) AS products_id,
+                          op.products_id AS products_id,
                           COUNT(IF(o.orders_status IN (2,8) AND o.rebillDepth = 0, 1, NULL))                                                                         AS new_order_cnt,
                           SUM(IF(o.orders_status IN (2,8) AND o.rebillDepth = 0, ot.current_total + f_upsell_order_total(o.orders_id), 0))                           AS new_order_rev,
                           COUNT(IF(o.orders_status IN (2,8) AND o.parent_order_id > 0 AND o.rebillDepth > 0, 1, NULL))                                               AS recurring_order_cnt,
@@ -291,7 +291,7 @@ view: pdt_sales_by_campaign {
                   UNION ALL
                      SELECT
                            o.orders_id,
-                           0 AS products_id,
+                           "" AS products_id,
                            0                                                    AS new_order_cnt,
                            0                                                    AS new_order_rev,
                            0                                                    AS recurring_order_cnt,
@@ -364,7 +364,7 @@ view: pdt_sales_by_campaign {
                   UNION ALL
                      SELECT
                            d.orders_id,
-                           0 AS products_id,
+                           "" AS products_id,
                            0                                         AS new_order_cnt,
                            0                                         AS new_order_rev,
                            0                                         AS recurring_order_cnt,
@@ -914,7 +914,7 @@ GROUP BY
   measure: product_id_list {
     label: "Product Ids Included"
     type: string
-    sql: SUBSTRING(GROUP_CONCAT(DISTINCT(${prod_ids})),1,20) ;;
+    sql: SUBSTRING(GROUP_CONCAT(DISTINCT(${prod_ids})),2,20) ;;
   }
 
   measure: affiliate_breakdown {
