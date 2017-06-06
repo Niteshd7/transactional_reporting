@@ -429,7 +429,7 @@ GROUP BY
 
   dimension: campaign {
     type: string
-    full_suggestions: yes
+    suggestable: no
     sql: ${TABLE}.group_by_val ;;
   }
 

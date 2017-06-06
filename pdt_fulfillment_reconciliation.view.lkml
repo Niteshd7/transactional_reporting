@@ -352,16 +352,19 @@ view: pdt_fulfillment_reconciliation {
 
   dimension: fulfillment_id {
     type: number
+    suggestable: no
     sql: ${TABLE}.fulfillment_id ;;
   }
 
   dimension: fulfillment_name {
     type: string
+    suggestable: no
     sql: ${TABLE}.fulfillment_name ;;
   }
 
   dimension: fulfillment_alias {
     type: string
+    suggestable: no
     sql: ${TABLE}.fulfillment_alias ;;
   }
 
