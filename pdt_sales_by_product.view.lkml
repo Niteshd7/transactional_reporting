@@ -2,6 +2,7 @@ view: pdt_sales_by_product {
     derived_table: {
       sql: SELECT  * FROM (  SELECT
         order_id,
+        is_test_cc,
         currency_id                                                           AS currency_id,
         currency_symbol                                                           AS currency_symbol,
         affiliate_id                                                          AS affiliate_id,
@@ -44,6 +45,7 @@ view: pdt_sales_by_product {
         (
            SELECT
                     o.orders_id as order_id,
+                    o.is_test_cc as is_test_cc,
                     CASE
                           WHEN LENGTH(o.AFID)  > 0 THEN  o.AFID
                           WHEN LENGTH(o.AID)   > 0 THEN  o.AID
@@ -255,7 +257,6 @@ view: pdt_sales_by_product {
                           ot.class      = 'ot_subtotal'
                        AND
                           {% condition date_select %} o.t_stamp {% endcondition %}
-                          AND {% condition is_test %} o.is_test_cc {% endcondition %}
 
                   GROUP BY
                           p.products_id,
@@ -332,7 +333,6 @@ view: pdt_sales_by_product {
                           uot.class           = 'ot_subtotal'
                        AND
                           {% condition date_select %} uo.t_stamp {% endcondition %}
-                          AND {% condition is_test %} o.is_test_cc {% endcondition %}
 
                   GROUP BY
                           p.products_id,
@@ -388,7 +388,6 @@ view: pdt_sales_by_product {
                                         OR
                                                   {% condition date_select %} o.hold_date {% endcondition %}
                                    )
-                                   AND {% condition is_test %} o.is_test_cc {% endcondition %}
 
                           UNION ALL
                              SELECT
@@ -420,7 +419,6 @@ view: pdt_sales_by_product {
                                         OR
                                                   {% condition date_select %} uo.hold_date {% endcondition %}
                                    )
-                                   AND {% condition is_test %} o.is_test_cc {% endcondition %}
 
                            ) oh
                       WHERE
@@ -436,7 +434,6 @@ view: pdt_sales_by_product {
                  o.deleted   = 0
               AND
                  c.c_id = o.campaign_order_id
-                 AND {% condition is_test %} o.is_test_cc {% endcondition %}
                  AND
                            o.gatewayId IS NOT NULL
          GROUP BY
@@ -463,10 +460,10 @@ GROUP BY
       default_value: "today"
     }
 
-    filter: is_test {
-      type: string
-      default_value: "0,1"
-    }
+  dimension: is_test_cc {
+    type: yesno
+    sql: ${TABLE}.is_test_cc = 1 ;;
+  }
 
   dimension: order_id {
     type: number
