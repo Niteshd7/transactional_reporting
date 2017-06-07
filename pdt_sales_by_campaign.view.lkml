@@ -2,6 +2,7 @@ view: pdt_sales_by_campaign {
   derived_table: {
     sql: SELECT  * FROM (  SELECT
     order_id,
+    is_test_cc,
         IF(LENGTH(group_by_val) = 0, 1, 2)                                                                                                     AS order_val,
         IF(LENGTH(IFNULL(group_by_val, '')) = 0, 'BLANK', group_by_val)                                                                        AS campaign_id,
         IF(LENGTH(IFNULL(group_by_val, '')) = 0, 'BLANK', group_by_val_disp)                                                                   AS campaign,
@@ -67,6 +68,7 @@ view: pdt_sales_by_campaign {
         (
            SELECT
                  o.orders_id AS order_id,
+                 o.is_test_cc as is_test_cc,
 
                    CASE
                           WHEN LENGTH(o.AFID)  > 0 THEN  o.AFID
@@ -284,7 +286,6 @@ view: pdt_sales_by_campaign {
                            v.c_id = o.campaign_order_id
                         AND
                            {% condition date_select %} o.t_stamp {% endcondition %}
-                           AND {% condition is_test %} o.is_test_cc {% endcondition %}
 
                    GROUP BY
                            o.orders_id
@@ -352,7 +353,6 @@ view: pdt_sales_by_campaign {
                                                   {% condition date_select %} uo.hold_date {% endcondition %}
 
                                     )
-                                    AND {% condition is_test %} o.is_test_cc {% endcondition %}
 
                            ) oh
                       WHERE
@@ -414,7 +414,6 @@ view: pdt_sales_by_campaign {
                                              o.wasSalvaged   = 0
                                           AND
                                              {% condition date_select %} o.t_stamp {% endcondition %}
-                                             AND {% condition is_test %} o.is_test_cc {% endcondition %}
 
                                      GROUP BY
                                              CONCAT(o.campaign_order_id, o.customers_email_address),
@@ -434,7 +433,6 @@ view: pdt_sales_by_campaign {
                 o.gatewayId IS NOT NULL
               AND
                  o.campaign_order_id = c.c_id
-                 AND {% condition is_test %} o.is_test_cc {% endcondition %}
 
          GROUP BY
                  o.orders_id
@@ -454,9 +452,9 @@ GROUP BY
     default_value: "today"
   }
 
-  filter: is_test {
-    type: string
-    default_value: "0,1"
+  dimension: is_test_cc {
+    type: yesno
+    sql: ${TABLE}.is_test_cc = 1 ;;
   }
 
   dimension: order_id {
