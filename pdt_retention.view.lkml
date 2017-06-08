@@ -4,6 +4,7 @@ view: pdt_retention {
             campaign_id AS group_by_val,
             campaign_name,
             currency_id,
+            is_test_cc,
             currency_symbol,
             affiliate_id                                                          AS affiliate_id,
             sub_affiliate_id                                                          AS sub_affiliate_id,
@@ -60,6 +61,7 @@ view: pdt_retention {
                       ELSE 'BLANK'
                    END sub_aff_3,
                      c.upsell_flag,
+                    o.is_test_cc AS is_test_cc,
                     c.order_id as order_id,
                      c.subscription_bundle_flag,
                      c.subscription_id,
@@ -137,7 +139,7 @@ view: pdt_retention {
                      c.approved_flag = 1
                   AND
                      p.order_id = c.subscription_id
-                     AND {% condition is_test %} p.test_card_flag {% endcondition %}
+
 
             UNION ALL
                SELECT
@@ -169,6 +171,7 @@ view: pdt_retention {
                     c.order_id as order_id,
                      c.subscription_bundle_flag,
                      c.subscription_id,
+                    o.is_test_cc AS is_test_cc,
                      c.campaign_name,
               c.currency_id,
               c.currency_symbol,
@@ -231,7 +234,7 @@ view: pdt_retention {
                               o.wasSalvaged   = 0
                            AND
                               o.t_stamp > TIMESTAMP({% date_start date_select %})
-                        AND {% condition is_test %} p.test_card_flag {% endcondition %}
+
 
                       GROUP BY
                               CONCAT(o.campaign_order_id, o.customers_email_address)
@@ -268,7 +271,7 @@ view: pdt_retention {
                      c.deleted_flag = 0
                   AND
                      p.order_id = c.subscription_id
-                     AND {% condition is_test %} p.test_card_flag {% endcondition %}
+
 
             ) x
       GROUP BY
@@ -281,9 +284,9 @@ view: pdt_retention {
     default_value: "today"
   }
 
-  filter: is_test {
-    type: string
-    default_value: "0,1"
+  dimension: is_test_cc {
+    type: yesno
+    sql: ${TABLE}.is_test_cc = 1 ;;
   }
 
   measure: count {
