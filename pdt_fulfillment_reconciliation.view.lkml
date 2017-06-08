@@ -2,6 +2,7 @@ view: pdt_fulfillment_reconciliation {
   derived_table: {
     sql: SELECT  * FROM (SELECT
       order_id,
+      is_test_cc,
       IF (fulfillment_id > 0, fulfillment_id, '-') AS fulfillment_id_fmt,
       fulfillment_id,
       fulfillment_name,
@@ -19,6 +20,7 @@ view: pdt_fulfillment_reconciliation {
       (
          SELECT
                order_id,
+              is_test_cc,
                fulfillment_id,
                fulfillment_name,
                fulfillment_alias,
@@ -41,6 +43,7 @@ view: pdt_fulfillment_reconciliation {
                (
                   SELECT
                         o.orders_id                               AS order_id,
+                        o.is_test_cc                              AS is_test_cc,
                         IFNULL(c.fulfillmentId, 0)                AS fulfillment_id,
                         IFNULL(c.fulfillment_name, 'In House')    AS fulfillment_name,
                         IFNULL(c.fulfillment_alias, 'N/A')        AS fulfillment_alias,
@@ -131,7 +134,7 @@ view: pdt_fulfillment_reconciliation {
                                        AND
                                           o.payment_module_code = 1
                                           AND ({% condition date_select %} o.t_stamp {% endcondition %})
-                                          AND {% condition is_test %} o.is_test_cc {% endcondition %}
+
 
                                   GROUP BY
                                           orders_id
@@ -152,7 +155,6 @@ view: pdt_fulfillment_reconciliation {
                                        AND
                                           uo.payment_module_code = 1
                                           AND ({% condition date_select %} o.t_stamp {% endcondition %})
-                                          AND {% condition is_test %} o.is_test_cc {% endcondition %}
 
                                   GROUP BY
                                           o.orders_id
@@ -181,7 +183,6 @@ view: pdt_fulfillment_reconciliation {
                                       AND
                                          oh.type IN ('order_fulfillment-success', 'history-note-genftp-fulfillment-success')
                                          AND ({% condition date_select %} o.t_stamp {% endcondition %})
-                                         AND {% condition is_test %} o.is_test_cc {% endcondition %}
 
                                    ) post
                           LEFT JOIN
@@ -199,7 +200,6 @@ view: pdt_fulfillment_reconciliation {
                                          AND
                                             oh.type = 'order-tracking-success'
                                             AND ({% condition date_select %} o.t_stamp {% endcondition %})
-                                            AND {% condition is_test %} o.is_test_cc {% endcondition %}
 
                                    ) track
                                  ON
@@ -246,7 +246,6 @@ view: pdt_fulfillment_reconciliation {
                      AND
                         o.orders_status IN(2,6,8)
                         AND ({% condition date_select %} o.t_stamp {% endcondition %})
-                        AND {% condition is_test %} o.is_test_cc {% endcondition %}
 
                 GROUP BY
                         order_id
@@ -254,6 +253,7 @@ view: pdt_fulfillment_reconciliation {
                   -- Include orders shipped within date range
                   SELECT
                         o.orders_id                               AS order_id,
+                        o.is_test_cc AS is_test_cc,
                         IFNULL(c.fulfillmentId, 0)                AS fulfillment_id,
                         IFNULL(c.fulfillment_name, 'In House')    AS fulfillment_name,
                         IFNULL(c.fulfillment_alias, 'N/A')        AS fulfillment_alias,
@@ -314,7 +314,6 @@ view: pdt_fulfillment_reconciliation {
                         o.orders_status IN(2,6,8)
                      AND
                         (o.t_stamp NOT BETWEEN (SELECT ({% date_start date_select %})) AND (SELECT ({% date_end date_select %})))
-                        AND {% condition is_test %} o.is_test_cc {% endcondition %}
 
                 GROUP BY
                         order_id
@@ -335,9 +334,9 @@ view: pdt_fulfillment_reconciliation {
     type: date
   }
 
-  filter: is_test {
-    type: string
-    default_value: "0,1"
+  dimension: is_test_cc {
+    type: yesno
+    sql: ${TABLE}.is_test_cc = 1 ;;
   }
 
   dimension: fulfillment_id_fmt {
