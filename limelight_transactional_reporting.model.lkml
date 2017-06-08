@@ -9,6 +9,8 @@ explore: campaigns{}
 
 explore: mysql_stats {}
 
+explore: ad_hoc_page_access_by_order {}
+
 explore: countries{}
 
 explore: gateway{}
