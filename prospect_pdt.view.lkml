@@ -2,6 +2,7 @@ view: prospect_pdt {
   derived_table: {
     sql: SELECT  * FROM (  SELECT
         IF(LENGTH(group_by_val) = 0, 1, 2)                                                                                                                AS order_val,
+        is_test_cc,
         affiliate_id                                                          AS affiliate_id,
         sub_affiliate_id                                                      AS sub_affiliate_id,
         sub_aff_2                                                             AS sub_aff_2,
@@ -22,6 +23,7 @@ view: prospect_pdt {
            SELECT
                  v.currency_id    AS currency_id,
                 v.html_entity_name  AS currency_symbol,
+                o.is_test_cc AS is_test_cc,
                  CASE
                           WHEN LENGTH(o.AFID)  > 0 THEN  o.AFID
                           WHEN LENGTH(o.AID)   > 0 THEN  o.AID
@@ -191,14 +193,13 @@ view: prospect_pdt {
               AND
                  {% condition date_select %} o.t_stamp {% endcondition %}
 
-                 AND {% condition is_test %} o.is_test_cc {% endcondition %}
-
          GROUP BY
                  group_by_val,affiliate_id
             UNION
            SELECT
                  0  AS currency_id,
                  0  AS currency_symbol,
+                 "" AS is_test_cc,
                 CASE
                           WHEN LENGTH(IFNULL(p.pAFID, ''))  > 0 THEN p.pAFID
                           WHEN LENGTH(IFNULL(p.pAID, ''))   > 0 THEN p.pAID
@@ -350,9 +351,9 @@ GROUP BY
     type: date
   }
 
-  filter: is_test {
-    type: string
-    default_value: "0,1"
+  dimension: is_test_cc {
+    type: yesno
+    sql: ${TABLE}.is_test_cc = 1 ;;
   }
 
   dimension: affiliate_id {
