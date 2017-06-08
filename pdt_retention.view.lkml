@@ -309,6 +309,11 @@ view: pdt_retention {
     sql: ${TABLE}.order_id ;;
   }
 
+  dimension: rebill_depth {
+    type: number
+    sql: ${TABLE}.rebill_depth ;;
+  }
+
   dimension: currency_id {
     type: string
     sql: ${TABLE}.currency_id ;;
@@ -515,6 +520,24 @@ view: pdt_retention {
     label: "Approval Rate"
     value_format_name: percent_2
     sql: ${net_approved} / NULLIF(${gross_orders},0) ;;
+  }
+
+  measure: conversion_rate {
+    type: number
+    label: "Conversion"
+    value_format_name: percent_2
+    sql: ${net_approved}
+         /
+         NULLIF(SUM(
+            IF(${rebill_depth} = IF(${rebill_depth} = 0, 0, (${rebill_depth} - 1)),
+               CASE
+                  WHEN ${rebill_depth} = 0 THEN ${gross_cnt}
+                  WHEN ${rebill_depth} = 1 THEN ${sub_cnt}
+                  ELSE ${approve_cnt}
+               END,
+               0
+            )
+         ),0) ;;
   }
 
   measure: affiliate_breakdown {
