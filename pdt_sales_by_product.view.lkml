@@ -2,6 +2,7 @@ view: pdt_sales_by_product {
     derived_table: {
       sql: SELECT  * FROM (  SELECT
         order_id,
+        campaign_id,
         is_test_cc,
         currency_id                                                           AS currency_id,
         currency_symbol                                                           AS currency_symbol,
@@ -45,6 +46,7 @@ view: pdt_sales_by_product {
         (
            SELECT
                     o.orders_id as order_id,
+                    o.campaign_order_id as campaign_id,
                     o.is_test_cc as is_test_cc,
                     CASE
                           WHEN LENGTH(o.AFID)  > 0 THEN  o.AFID
@@ -468,6 +470,11 @@ GROUP BY
   dimension: order_id {
     type: number
     sql: ${TABLE}.order_id ;;
+  }
+
+  dimension: campaign_id {
+    type: number
+    sql: ${TABLE}.campaign_id ;;
   }
 
     dimension: currency_id {

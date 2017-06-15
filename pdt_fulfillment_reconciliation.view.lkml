@@ -2,6 +2,7 @@ view: pdt_fulfillment_reconciliation {
   derived_table: {
     sql: SELECT  * FROM (SELECT
       order_id,
+      campaign_id,
       is_test_cc,
       IF (fulfillment_id > 0, fulfillment_id, '-') AS fulfillment_id_fmt,
       fulfillment_id,
@@ -20,6 +21,7 @@ view: pdt_fulfillment_reconciliation {
       (
          SELECT
                order_id,
+              campaign_id,
               is_test_cc,
                fulfillment_id,
                fulfillment_name,
@@ -43,6 +45,7 @@ view: pdt_fulfillment_reconciliation {
                (
                   SELECT
                         o.orders_id                               AS order_id,
+                        o.campaign_order_id                               AS campaign_id,
                         o.is_test_cc                              AS is_test_cc,
                         IFNULL(c.fulfillmentId, 0)                AS fulfillment_id,
                         IFNULL(c.fulfillment_name, 'In House')    AS fulfillment_name,
@@ -253,6 +256,7 @@ view: pdt_fulfillment_reconciliation {
                   -- Include orders shipped within date range
                   SELECT
                         o.orders_id                               AS order_id,
+                        o.campaign_order_id                               AS campaign_id,
                         o.is_test_cc AS is_test_cc,
                         IFNULL(c.fulfillmentId, 0)                AS fulfillment_id,
                         IFNULL(c.fulfillment_name, 'In House')    AS fulfillment_name,
@@ -347,6 +351,11 @@ view: pdt_fulfillment_reconciliation {
   dimension: order_id {
     type: number
     sql: ${TABLE}.order_id ;;
+  }
+
+  dimension: campaign_id {
+    type: number
+    sql: ${TABLE}.campaign_id ;;
   }
 
   dimension: fulfillment_id {

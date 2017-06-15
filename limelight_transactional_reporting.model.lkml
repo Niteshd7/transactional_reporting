@@ -22,7 +22,16 @@ explore: pdt_retention {
   }
 }
 
-explore: pdt_sales_by_product {}
+explore: pdt_sales_by_product {
+  access_filter: {
+    field: pdt_sales_by_product.campaign_id
+    user_attribute: campaign_id
+  }
+}
+
+explore: pdt_user_activity {}
+
+explore: pdt_employee_activity {}
 
 explore: pdt_sales_by_campaign {
   access_filter: {
@@ -32,6 +41,12 @@ explore: pdt_sales_by_campaign {
 }
 
 explore: pdt_fulfillment_reconciliation {
+
+  access_filter: {
+    field: pdt_fulfillment_reconciliation.campaign_id
+    user_attribute: campaign_id
+  }
+
   join: v_orders {
     type: left_outer
     relationship: one_to_one
@@ -39,10 +54,6 @@ explore: pdt_fulfillment_reconciliation {
   }
 }
 
-
-explore: pdt_user_activity {}
-
-explore: pdt_employee_activity {}
 
 explore: subscr_mgmt{}
 
