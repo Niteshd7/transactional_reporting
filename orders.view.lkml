@@ -226,6 +226,11 @@ view: orders {
     sql: ${TABLE}.campaign_order_id ;;
   }
 
+  dimension: campaign_id {
+    type: number
+    sql: ${TABLE}.campaign_order_id ;;
+  }
+
   dimension: campaign {
     full_suggestions: yes
     label: "Campaign"

@@ -520,8 +520,7 @@ GROUP BY
   }
 
   dimension: campaign_id {
-    type: string
-    suggestable: no
+    type: number
     sql: ${TABLE}.campaign_id ;;
   }
 

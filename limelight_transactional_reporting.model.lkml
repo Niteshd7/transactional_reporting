@@ -15,11 +15,21 @@ explore: countries{}
 
 explore: gateway{}
 
-explore: pdt_retention {}
+explore: pdt_retention {
+  access_filter: {
+    field: pdt_retention.campaign_id
+    user_attribute: campaign_id
+  }
+}
 
 explore: pdt_sales_by_product {}
 
-explore: pdt_sales_by_campaign {}
+explore: pdt_sales_by_campaign {
+  access_filter: {
+    field: pdt_sales_by_campaign.campaign_id
+    user_attribute: campaign_id
+  }
+}
 
 explore: pdt_fulfillment_reconciliation {
   join: v_orders {
@@ -28,6 +38,7 @@ explore: pdt_fulfillment_reconciliation {
     sql_on: ${v_orders.orders_id} = ${pdt_fulfillment_reconciliation.order_id} ;;
   }
 }
+
 
 explore: pdt_user_activity {}
 
@@ -40,6 +51,11 @@ explore: order_report {}
 explore: orders_history{}
 
 explore: orders {
+  access_filter: {
+    field: orders.campaign_id
+    user_attribute: campaign_id
+  }
+
   join: upsell_orders {
     type: left_outer
     relationship: many_to_one
@@ -188,4 +204,9 @@ explore:  tlkp_orders_history_type {
 
 explore: upsell_orders{}
 
-explore: prospect_pdt {}
+explore: prospect_pdt {
+  access_filter: {
+    field: campaign
+    user_attribute: campaign_id
+  }
+}
