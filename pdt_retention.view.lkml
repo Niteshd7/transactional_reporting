@@ -275,7 +275,7 @@ view: pdt_retention {
 
             ) x
       GROUP BY
-              order_id) a    ORDER BY CAST(group_by_val AS signed) ASC
+              order_id,group_by_val) a    ORDER BY CAST(group_by_val AS signed) ASC
        ;; indexes: ["order_id"]
   }
 
