@@ -496,14 +496,12 @@ GROUP BY
     type: sum
     sql: ${prospect_cnt} ;;
     #sql_distinct_key: ${campaign} ;;
-    drill_fields: [detail*]
   }
 
   measure: count_customers {
     type: sum
     sql: ${customer_cnt} ;;
     #sql_distinct_key: ${campaign} ;;
-    drill_fields: [detail*]
   }
 
   measure: average_revenue {
@@ -512,7 +510,6 @@ GROUP BY
     sql: ${total_revenue}/NULLIF(${count_customers},0) ;;
     value_format_name: decimal_2
     #sql_distinct_key: ${group_by_val} ;;
-    drill_fields: [detail*]
   }
 
   measure: total_revenue {
@@ -520,14 +517,12 @@ GROUP BY
     html: {{ currency_symbol._value }}{{ rendered_value }};;
     sql: ${total_rev} ;;
     #sql_distinct_key: ${group_by_val} ;;
-    drill_fields: [detail*]
   }
 
   measure: conversion_percent {
     type: number
     value_format_name: percent_1
     sql: ${count_customers}/NULLIF((${count_customers}+${count_prospects}),0) ;;
-    drill_fields: [detail*]
   }
 
   measure: affiliate_breakdown {
