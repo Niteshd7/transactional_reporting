@@ -9,6 +9,8 @@ explore: campaigns{}
 
 explore: mysql_stats {}
 
+explore: 3d_verify_enrollment {}
+
 explore: ad_hoc_page_access_by_order {}
 
 explore: countries{}
