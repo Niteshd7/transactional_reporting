@@ -1,7 +1,10 @@
 view: pdt_retention {
   derived_table: {
     sql: SELECT  * FROM (SELECT
-            campaign_id AS group_by_val,
+                  CASE 'BASE'
+         WHEN 'PROD'     THEN CONCAT(product_id, ':', variant_id, ':', campaign_id)
+         ELSE campaign_id
+      END group_by_val,
             campaign_name,
             currency_id,
             is_test_cc,
@@ -247,8 +250,6 @@ view: pdt_retention {
                      IF ('BASE' = 'PROD' OR '' = 'PROD', c.upsell_flag IN(0,1), c.upsell_flag = 0)
                   AND
                      c.deleted_flag = 0
-                  AND
-                     c.currency_id = 1
                   AND
                      p.order_id = c.subscription_id
                   AND
