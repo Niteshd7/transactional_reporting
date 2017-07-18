@@ -361,63 +361,53 @@ GROUP BY
   measure: subscriptions_approved {
     type: sum
     sql: ${sub_cnt} ;;
-    drill_fields: [detail*]
   }
 
   measure: pending {
     type: sum
     sql: ${pending_cnt} ;;
-    drill_fields: [detail*]
   }
 
   measure: net_approved{
     type: sum
     sql: ${approve_cnt} ;;
-    drill_fields: [detail*]
   }
 
   measure: declined{
     type: sum
     sql: ${decline_cnt} ;;
-    drill_fields: [detail*]
   }
 
   measure: void_full_refund{
     type: sum
     sql: ${void_ref_cnt} ;;
-    drill_fields: [detail*]
   }
 
   measure: partial_refund{
     type: sum
     sql: ${partial_ref_cnt} ;;
-    drill_fields: [detail*]
   }
 
   measure: canceled{
     type: sum
     sql: ${cancel_cnt} ;;
-    drill_fields: [detail*]
   }
 
   measure: hold{
     type: sum
     sql: ${hold_cnt} ;;
-    drill_fields: [detail*]
   }
 
   measure: void_refund_revenue{
     type: sum
     value_format_name: decimal_2
     sql: ${void_ref_amt} ;;
-    drill_fields: [detail*]
   }
 
   measure: net_revenue{
     type: sum
     value_format_name: decimal_2
     sql: ${total_amt} ;;
-    drill_fields: [detail*]
   }
 
   measure: approval_rate_retention {
