@@ -14,7 +14,7 @@ view: pdt_retention {
             order_id,
             IF (MAX(affiliate_depth) = 0, 1, 2) AS order_val,
             campaign_id,
-            IF ('BASE' = 'PROD', '-', COUNT(IF(1<3, gross_cnt, NULL)))                                                                                         AS gross_cnt,
+            SUM(gross_cnt)                                                                                         AS gross_cnt,
             SUM(IF(refund_type < 2, subscription_cnt, 0))                                                                                               AS sub_cnt,
             COUNT(IF(approved_flag = 1 AND refund_type < 2, 1, NULL))                                                                                   AS approve_cnt,
             COUNT(IF(1<2, 1, NULL)) - COUNT(IF(approved_flag = 1, 1, NULL))                                                   AS decline_cnt,
@@ -23,11 +23,11 @@ view: pdt_retention {
             IF ('BASE' = 'PROD' AND upsell_flag = 1,
                '-',
                COUNT(IF(refund_type IN (2,3), gross_cnt, NULL))
-            )                                                                                                                                                                             AS void_ref_cnt,
+            )                                                                                                                                          AS void_ref_cnt,
             IF ('BASE' = 'PROD' AND upsell_flag = 1,
                '-',
                COUNT(IF(refund_type = 1, gross_cnt, NULL))
-            )                                                                                                                                                                             AS partial_ref_cnt,
+            )                                                                                                                                          AS partial_ref_cnt,
             SUM(IF(refund_type > 0, refund_amt, 0))                           AS void_ref_amt,
             SUM(IF(approved_flag, grand_total_amt - refund_amt, 0))           AS total_amt,
 
@@ -36,7 +36,7 @@ view: pdt_retention {
         FROM
             (
                SELECT
-                     IF ('BASE' = 'PROD' AND c.upsell_flag = 1, NULL, 1) AS gross_cnt,
+                     IF (c.upsell_flag = 1, NULL, 1) AS gross_cnt,
                                         CASE
                           WHEN LENGTH(o.AFID)  > 0 THEN  o.AFID
                           WHEN LENGTH(o.AID)   > 0 THEN  o.AID
@@ -124,11 +124,7 @@ view: pdt_retention {
                   AND
                      p.deleted_flag = 0
                   AND
-                     p.rebill_depth = 0
-                  AND
                      c.order_id = o.orders_id
-                  AND
-                     p.currency_id = 1
                   AND
                      c.t_stamp > TIMESTAMP({% date_start date_select %})
                   AND
@@ -143,7 +139,7 @@ view: pdt_retention {
 
             UNION ALL
                SELECT
-                     IF ('BASE' = 'PROD' AND c.upsell_flag = 1, 0, 1) AS gross_cnt,
+                     IF (c.upsell_flag = 1, 0, 1) AS gross_cnt,
                      c.upsell_flag,
                     CASE
                           WHEN LENGTH(o.AFID)  > 0 THEN  o.AFID
@@ -245,10 +241,6 @@ view: pdt_retention {
                      p.upsell_flag = 0
                   AND
                      p.deleted_flag = 0
-                  AND
-                     p.rebill_depth = 0
-                  AND
-                     p.currency_id = 1
                   AND
                      c.t_stamp > TIMESTAMP({% date_start date_select %})
                   AND
