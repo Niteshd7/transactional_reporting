@@ -24,6 +24,13 @@ explore: pdt_retention {
   }
 }
 
+explore: pdt_retention_new {
+  access_filter: {
+    field: pdt_retention_new.campaign_id
+    user_attribute: campaign_id
+  }
+}
+
 explore: pdt_sales_by_product {
   access_filter: {
     field: pdt_sales_by_product.campaign_id
