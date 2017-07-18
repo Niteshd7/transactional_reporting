@@ -507,25 +507,11 @@ GROUP BY
 
   set: detail {
     fields: [
-      group_by_val,
-      order_val,
       order_id,
       campaign_id,
       campaign_name,
       currency_id,
-      currency_symbol,
-      is_test,
-      gross_cnt,
-      sub_cnt,
-      approve_cnt,
-      decline_cnt,
-      cancel_cnt,
-      hold_cnt,
-      void_ref_cnt,
-      partial_ref_cnt,
-      void_ref_amt,
-      total_amt,
-      pending_cnt
+      currency
     ]
   }
 }
