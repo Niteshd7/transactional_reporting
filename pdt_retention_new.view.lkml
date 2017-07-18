@@ -13,6 +13,10 @@ view: pdt_retention_new {
       campaign_name,
       currency_id,
       currency_symbol,
+      aff_val_1                                                          AS affiliate_id,
+      aff_val_2                                                      AS sub_affiliate_id,
+      aff_val_3                                                             AS sub_aff_2,
+      aff_val_4                                                             AS sub_aff_3,
       test_card_flag,
       COUNT(gross_cnt)                                                                                         AS gross_cnt,
       SUM(IF(refund_type < 2, subscription_cnt, 0))                                                                                               AS sub_cnt,
@@ -441,6 +445,26 @@ GROUP BY
          ),0) ;;
   }
 
+  dimension: affiliate_id {
+    type: string
+    sql: ${TABLE}.affiliate_id ;;
+  }
+
+  dimension: sub_affiliate_id {
+    type: string
+    sql: ${TABLE}.sub_affiliate_id ;;
+  }
+
+  dimension: sub_aff_2 {
+    type: string
+    sql: ${TABLE}.sub_aff_2 ;;
+  }
+
+  dimension: sub_aff_3 {
+    type: string
+    sql: ${TABLE}.sub_aff_3 ;;
+  }
+
   measure: affiliate_breakdown {
     sql: "Affiliate ID" ;;
     label: "Affiliate Breakdown"
@@ -466,19 +490,19 @@ GROUP BY
   }
 
   set: retention {
-    fields: [gross_orders, net_approved, subscriptions_approved, declined, void_full_refund, partial_refund, void_refund_revenue, canceled, hold, pending, approval_rate_retention, net_revenue,sub_affiliate_breakdown]
+    fields: [affiliate_id, gross_orders, net_approved, subscriptions_approved, declined, void_full_refund, partial_refund, void_refund_revenue, canceled, hold, pending, approval_rate_retention, net_revenue,sub_affiliate_breakdown]
   }
 
   set: retention_1 {
-    fields: [gross_orders, net_approved, subscriptions_approved, declined, void_full_refund, partial_refund, void_refund_revenue, canceled, hold, pending, approval_rate_retention, net_revenue, sub_affiliate_breakdown_2]
+    fields: [sub_affiliate_id, gross_orders, net_approved, subscriptions_approved, declined, void_full_refund, partial_refund, void_refund_revenue, canceled, hold, pending, approval_rate_retention, net_revenue, sub_affiliate_breakdown_2]
   }
 
   set: retention_2 {
-    fields: [gross_orders, net_approved, subscriptions_approved, declined, void_full_refund, partial_refund, void_refund_revenue, canceled, hold, pending, approval_rate_retention, net_revenue, sub_affiliate_breakdown_3]
+    fields: [sub_aff_2, gross_orders, net_approved, subscriptions_approved, declined, void_full_refund, partial_refund, void_refund_revenue, canceled, hold, pending, approval_rate_retention, net_revenue, sub_affiliate_breakdown_3]
   }
 
   set: retention_3 {
-    fields: [gross_orders, net_approved, subscriptions_approved, declined, void_full_refund, partial_refund, void_refund_revenue, canceled, hold, pending, approval_rate_retention, net_revenue,]
+    fields: [sub_aff_3,gross_orders, net_approved, subscriptions_approved, declined, void_full_refund, partial_refund, void_refund_revenue, canceled, hold, pending, approval_rate_retention, net_revenue,]
   }
 
   set: detail {
