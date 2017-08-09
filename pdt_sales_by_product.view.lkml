@@ -29,7 +29,8 @@ view: pdt_sales_by_product {
         SUM(pending_products_cnt)                                             AS pending_products_cnt,
         FORMAT(SUM(pending_products_cnt), 0)                                  AS pending_products_cnt_fmt,
         pending_products_rev                     AS pending_products_rev,
-
+        SUM(refund_void_cnt)                                                                                                                   AS refund_void_cnt,
+        SUM(refund_void_rev)                                                                                           AS refund_void_rev,
         SUM(hold_cnt)                                                         AS hold_cnt,
         FORMAT(SUM(hold_cnt), 0)                                              AS hold_cnt_fmt,
         hold_rev                                AS hold_rev,
@@ -182,6 +183,8 @@ view: pdt_sales_by_product {
                  SUM(IFNULL(hold_cnt,0))              AS hold_cnt,
                  SUM(hold_rev)                        AS hold_rev,
                  SUM(hold_rev_o)                      AS hold_rev_o,
+                 SUM(refund_void_cnt)                                                                                                                   AS refund_void_cnt,
+                 SUM(refund_void_rev)                                                                                           AS refund_void_rev,
                  SUM(IFNULL(hold_cnt_outside,0))      AS hold_cnt_outside,
                  SUM(prod_hold_cnt)                   AS prod_hold_cnt,
                  SUM(prod_hold_cnt_outside)           AS prod_hold_cnt_outside,
@@ -229,6 +232,8 @@ view: pdt_sales_by_product {
                           SUM(IF(o.orders_status != 7, ot.value, 0))                                                               AS all_products_rev,
                           SUM(IF(o.orders_status IN(10, 11), p.products_quantity, NULL))                                           AS pending_products_cnt,
                           SUM(IF(o.orders_status IN (10, 11), ot.value, 0))                                                        AS pending_products_rev,
+                          COUNT(IF(o.refundType > 1, p.products_quantity, NULL))                                                   AS refund_void_cnt,
+                          SUM(o.amountrefundedsofar)                                                                                  AS refund_void_rev,
                           0 AS hold_cnt,
                           0 AS hold_rev,
                           0 AS hold_cnt_outside,
@@ -302,6 +307,8 @@ view: pdt_sales_by_product {
                           SUM(IF(o.orders_status != 7, uot.value, 0))                                                              AS all_products_rev,
                           SUM(IF(o.orders_status IN(10, 11), p.products_quantity, NULL))                                           AS pending_products_cnt,
                           SUM(IF(o.orders_status IN(10, 11), uot.value, 0))                                                        AS pending_products_rev,
+                          0                                                   AS refund_void_cnt,
+                          0                                                                                  AS refund_void_rev,
                           0 AS hold_cnt,
                           0 AS hold_rev,
                           0 AS hold_cnt_outside,
@@ -351,6 +358,8 @@ view: pdt_sales_by_product {
                           0                                         AS rec_products_rev,
                           0                                         AS all_products_cnt,
                           0                                         AS all_products_rev,
+                          0                                                   AS refund_void_cnt,
+                          0                                                                                  AS refund_void_rev,
                           0                                         AS pending_products_cnt,
                           0                                         AS pending_products_rev,
                           COUNT(IF(outside = 0, 1, NULL))           AS hold_cnt,
@@ -638,6 +647,16 @@ GROUP BY
       sql: ${TABLE}.pending_products_rev_fmt ;;
     }
 
+    dimension: refund_void_cnt {
+      type: number
+      sql: ${TABLE}.refund_void_cnt ;;
+    }
+
+    dimension: refund_void_rev {
+      type: number
+      sql: ${TABLE}.hold_rev ;;
+    }
+
     dimension: hold_cnt {
       type: number
       sql: ${TABLE}.hold_cnt ;;
@@ -737,11 +756,23 @@ GROUP BY
       sql: ${pending_products_cnt} ;;
     }
 
+  measure: void_refund {
+    label: "Voids/Refunds"
+    type: sum
+    sql: ${refund_void_cnt} ;;
+  }
+
     measure: pending_revenue {
       type: string
       value_format_name: decimal_2
       sql: CONCAT(${currency_symbol},FORMAT(SUM(${pending_products_rev}), 2)) ;;
     }
+
+  measure: void_refund_revenue {
+    type: string
+    value_format_name: decimal_2
+    sql: CONCAT(${currency_symbol},FORMAT(SUM(${refund_void_rev}), 2)) ;;
+  }
 
     measure: holds_cancel_revenue {
       type: string
@@ -799,19 +830,19 @@ GROUP BY
     }
 
   set: product_drill {
-    fields: [affiliate_id,initial ,initial_revenue, subscription , subscription_revenue, total, total_revenue, pending, pending_revenue, count_hold, count_prior_hold, holds_cancel_revenue, sub_affiliate_breakdown]
+    fields: [affiliate_id,initial ,initial_revenue, subscription , subscription_revenue, total, total_revenue, pending, pending_revenue, void_refund,void_refund_revenue, count_hold, count_prior_hold, holds_cancel_revenue, sub_affiliate_breakdown]
   }
 
   set: product_drill_1 {
-    fields: [sub_affiliate_id, initial ,initial_revenue, subscription , subscription_revenue, total, total_revenue, pending, pending_revenue, count_hold, count_prior_hold, holds_cancel_revenue,sub_affiliate_breakdown_2]
+    fields: [sub_affiliate_id, initial ,initial_revenue, subscription , subscription_revenue, total, total_revenue, pending, pending_revenue, void_refund,void_refund_revenue, count_hold, count_prior_hold, holds_cancel_revenue,sub_affiliate_breakdown_2]
   }
 
   set: product_drill_2 {
-    fields: [sub_aff_2, initial ,initial_revenue, subscription , subscription_revenue, total, total_revenue, pending, pending_revenue, count_hold, count_prior_hold, holds_cancel_revenue,sub_affiliate_breakdown_3]
+    fields: [sub_aff_2, initial ,initial_revenue, subscription , subscription_revenue, total, total_revenue, pending, pending_revenue, void_refund,void_refund_revenue,count_hold, count_prior_hold, holds_cancel_revenue,sub_affiliate_breakdown_3]
   }
 
   set: product_drill_3 {
-    fields: [sub_aff_3, initial ,initial_revenue, subscription , subscription_revenue, total, total_revenue, pending, pending_revenue, count_hold, count_prior_hold, holds_cancel_revenue]
+    fields: [sub_aff_3, initial ,initial_revenue, subscription , subscription_revenue, total, total_revenue, pending, pending_revenue, void_refund,void_refund_revenue,count_hold, count_prior_hold, holds_cancel_revenue]
   }
 
     set: detail {
