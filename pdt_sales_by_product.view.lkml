@@ -30,7 +30,7 @@ view: pdt_sales_by_product {
         FORMAT(SUM(pending_products_cnt), 0)                                  AS pending_products_cnt_fmt,
         pending_products_rev                     AS pending_products_rev,
         SUM(refund_void_cnt)                                                                                                                   AS refund_void_cnt,
-        SUM(refund_void_rev)                                                                                           AS refund_void_rev,
+        refund_void_rev                                                                                           AS refund_void_rev,
         SUM(hold_cnt)                                                         AS hold_cnt,
         FORMAT(SUM(hold_cnt), 0)                                              AS hold_cnt_fmt,
         hold_rev                                AS hold_rev,
@@ -184,7 +184,7 @@ view: pdt_sales_by_product {
                  SUM(hold_rev)                        AS hold_rev,
                  SUM(hold_rev_o)                      AS hold_rev_o,
                  SUM(refund_void_cnt)                                                                                                                   AS refund_void_cnt,
-                 SUM(refund_void_rev)                                                                                           AS refund_void_rev,
+                 SUM(IFNULL(refund_void_rev,0))                                                                                           AS refund_void_rev,
                  SUM(IFNULL(hold_cnt_outside,0))      AS hold_cnt_outside,
                  SUM(prod_hold_cnt)                   AS prod_hold_cnt,
                  SUM(prod_hold_cnt_outside)           AS prod_hold_cnt_outside,
@@ -233,7 +233,7 @@ view: pdt_sales_by_product {
                           SUM(IF(o.orders_status IN(10, 11), p.products_quantity, NULL))                                           AS pending_products_cnt,
                           SUM(IF(o.orders_status IN (10, 11), ot.value, 0))                                                        AS pending_products_rev,
                           COUNT(IF(o.refundType > 1, p.products_quantity, NULL))                                                   AS refund_void_cnt,
-                          SUM(o.amountrefundedsofar)                                                                                  AS refund_void_rev,
+                          SUM(IF(o.refundType > 1, vot.refunded_amount, NULL))                                                                                  AS refund_void_rev,
                           0 AS hold_cnt,
                           0 AS hold_rev,
                           0 AS hold_cnt_outside,
@@ -247,6 +247,7 @@ view: pdt_sales_by_product {
                           v_campaign_currencies v,
                           orders_products      p,
                           orders_total         ot,
+                          v_main_order_total   vot,
                           products_description pd
                      WHERE
                           o.deleted     = 0
@@ -256,6 +257,8 @@ view: pdt_sales_by_product {
                           v.c_id = o.campaign_order_id
                        AND
                           ot.orders_id  = o.orders_id
+                       AND
+                           o.orders_id         = vot.orders_id
                        AND
                           ot.orders_id  = p.orders_id
                        AND
@@ -654,7 +657,7 @@ GROUP BY
 
     dimension: refund_void_rev {
       type: number
-      sql: ${TABLE}.hold_rev ;;
+      sql: ${TABLE}.refund_void_rev ;;
     }
 
     dimension: hold_cnt {
