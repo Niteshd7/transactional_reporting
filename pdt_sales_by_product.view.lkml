@@ -833,19 +833,19 @@ GROUP BY
     }
 
   set: product_drill {
-    fields: [affiliate_id,initial ,initial_revenue, subscription , subscription_revenue, total, total_revenue, pending, pending_revenue, void_refund,void_refund_revenue, count_hold, count_prior_hold, holds_cancel_revenue, sub_affiliate_breakdown]
+    fields: [affiliate_id,initial ,initial_revenue, subscription , subscription_revenue, total, total_revenue, pending, pending_revenue, count_hold, count_prior_hold, holds_cancel_revenue, sub_affiliate_breakdown]
   }
 
   set: product_drill_1 {
-    fields: [sub_affiliate_id, initial ,initial_revenue, subscription , subscription_revenue, total, total_revenue, pending, pending_revenue, void_refund,void_refund_revenue, count_hold, count_prior_hold, holds_cancel_revenue,sub_affiliate_breakdown_2]
+    fields: [sub_affiliate_id, initial ,initial_revenue, subscription , subscription_revenue, total, total_revenue, pending, pending_revenue, count_hold, count_prior_hold, holds_cancel_revenue,sub_affiliate_breakdown_2]
   }
 
   set: product_drill_2 {
-    fields: [sub_aff_2, initial ,initial_revenue, subscription , subscription_revenue, total, total_revenue, pending, pending_revenue, void_refund,void_refund_revenue,count_hold, count_prior_hold, holds_cancel_revenue,sub_affiliate_breakdown_3]
+    fields: [sub_aff_2, initial ,initial_revenue, subscription , subscription_revenue, total, total_revenue, pending, pending_revenue, count_hold, count_prior_hold, holds_cancel_revenue,sub_affiliate_breakdown_3]
   }
 
   set: product_drill_3 {
-    fields: [sub_aff_3, initial ,initial_revenue, subscription , subscription_revenue, total, total_revenue, pending, pending_revenue, void_refund,void_refund_revenue,count_hold, count_prior_hold, holds_cancel_revenue]
+    fields: [sub_aff_3, initial ,initial_revenue, subscription , subscription_revenue, total, total_revenue, pending, pending_revenue, count_hold, count_prior_hold, holds_cancel_revenue]
   }
 
     set: detail {
