@@ -1012,6 +1012,7 @@ view: orders {
 
   measure: count {
     type: count
+    label: "Total Transactions"
     drill_fields: [detail*]
   }
 
@@ -1036,6 +1037,25 @@ view: orders {
       value: "0"
     }
     label: "Initial Customers"
+    sql: ${customers_email_address} ;;
+    drill_fields: [detail*]
+  }
+
+  measure:  count_customers_existing {
+    type: count_distinct
+    filters: {
+      field: customers_id
+      value: ">0"
+    }
+    filters: {
+      field: orders_status
+      value: "NOT 7, 10, 11"
+    }
+    filters: {
+      field: parent_order_id
+      value: ">0"
+    }
+    label: "Existing Customers"
     sql: ${customers_email_address} ;;
     drill_fields: [detail*]
   }
@@ -1105,6 +1125,85 @@ view: orders {
     label: "Decline Percentage"
     value_format_name: percent_2
     sql: ${declined_orders} / NULLIF(${gross_order_count},0) ;;
+  }
+
+  measure: void_refund_percent {
+    type: number
+    label: "Void/Refund %"
+    value_format_name: percent_2
+    sql: ${void_refund_orders_gateway} / NULLIF(${approved_order_count},0) ;;
+  }
+
+  measure: cancel_percent {
+    type: number
+    label: "Cancel %"
+    value_format_name: percent_2
+    sql: ${canceled_orders} / NULLIF(${approved_order_count},0) ;;
+  }
+
+  measure: new_subscription_cnt {
+    label: "New Subscriptions"
+    type: count
+    filters: {
+      field: orders_status
+      value: "2,8"
+    }
+    filters: {
+      field: is_recurring
+      value: "yes"
+    }
+    filters: {
+      field: rebill_depth
+      value: "0"
+    }
+    #sql: ${is_recurring} ;;
+    #sql: ${order_report.active_subscription_cnt} ;;
+    drill_fields: [orders_id]
+  }
+
+  measure: existing_subscription_cnt {
+    label: "Existing Subscriptions"
+    type: count
+    filters: {
+      field: orders_status
+      value: "2,8"
+    }
+    filters: {
+      field: is_recurring
+      value: "yes"
+    }
+    filters: {
+      field: rebill_depth
+      value: ">0"
+    }
+    #sql: ${is_recurring} ;;
+    #sql: ${order_report.active_subscription_cnt} ;;
+    drill_fields: [orders_id]
+  }
+
+  measure: non_subscription_cnt {
+    label: "Non Subscriptions"
+    type: count
+    filters: {
+      field: orders_status
+      value: "2,8"
+    }
+    filters: {
+      field: is_recurring
+      value: "no"
+    }
+    #sql: ${order_report.active_subscription_cnt} ;;
+    drill_fields: [orders_id]
+  }
+
+  measure: count_customers_blacklist {
+    type: count_distinct
+    label: "Blacklisted Customers"
+    filters: {
+      field: blacklist_id
+      value: "NOT NULL"
+    }
+    sql: ${customers_email_address} ;;
   }
 
   measure:  holds_orders {
