@@ -1192,6 +1192,11 @@ view: orders {
       field: is_recurring
       value: "no"
     }
+    filters: {
+      field: is_hold
+      value: "0"
+    }
+
     #sql: ${order_report.active_subscription_cnt} ;;
     drill_fields: [orders_id]
   }
