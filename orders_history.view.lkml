@@ -70,6 +70,16 @@ view: orders_history {
     convert_tz: no
   }
 
+  measure: shipped_count {
+    type: count
+    filters: {
+      field: type
+      value: "order-tracking-success,shipped"
+    }
+    label: "Shipped Orders"
+    drill_fields: [detail*]
+  }
+
   set: detail {
     fields: [h_id, orders_id, user, type, status, t_stamp_time, deleted, campaign_id]
   }
