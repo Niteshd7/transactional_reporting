@@ -2694,7 +2694,7 @@ view: orders {
   }
 
   measure:  canceled_orders {
-    type: sum
+    type: count
     label: "Canceled"
     filters: {
       field: is_archived
@@ -2704,7 +2704,7 @@ view: orders {
       field: cancellation_flag
       value: "yes"
     }
-    sql: ${order_report.subscription_cnt} ;;
+    #sql: ${order_report.subscription_cnt} ;;
     drill_fields: [subscription*]
   }
 

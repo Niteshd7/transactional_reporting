@@ -200,7 +200,7 @@ view: prospects {
     sql: ${TABLE}.sent_to_autoresponder ;;
   }
 
-  measure: count_prospects {
+  measure: new_prospects {
     type: count_distinct
     sql: ${prospects_id} ;;
     drill_fields: [detail*]
