@@ -1146,7 +1146,7 @@ view: orders {
     type: count
     filters: {
       field: orders_status
-      value: "2,8"
+      value: "NOT 7"
     }
     filters: {
       field: is_recurring
@@ -1158,7 +1158,7 @@ view: orders {
     }
     #sql: ${is_recurring} ;;
     #sql: ${order_report.active_subscription_cnt} ;;
-    drill_fields: [orders_id]
+    drill_fields: [detail*]
   }
 
   measure: existing_subscription_cnt {
@@ -1166,11 +1166,7 @@ view: orders {
     type: count
     filters: {
       field: orders_status
-      value: "2,8"
-    }
-    filters: {
-      field: is_recurring
-      value: "yes"
+      value: "NOT 7"
     }
     filters: {
       field: rebill_depth
@@ -1178,7 +1174,7 @@ view: orders {
     }
     #sql: ${is_recurring} ;;
     #sql: ${order_report.active_subscription_cnt} ;;
-    drill_fields: [orders_id]
+    drill_fields: [detail*]
   }
 
   measure: non_subscription_cnt {
@@ -1186,7 +1182,7 @@ view: orders {
     type: count
     filters: {
       field: orders_status
-      value: "2,8"
+      value: "NOT 7"
     }
     filters: {
       field: is_recurring
@@ -1198,7 +1194,7 @@ view: orders {
     }
 
     #sql: ${order_report.active_subscription_cnt} ;;
-    drill_fields: [orders_id]
+    drill_fields: [detail*]
   }
 
   measure: count_customers_blacklist {
@@ -2219,14 +2215,10 @@ view: orders {
   measure: shipped_count {
     type: count
     filters: {
-      field: orders_status
-      value: "2,6,8"
+      field: orders_history.type
+      value: "order-tracking-success,shipped"
     }
-    filters: {
-      field: shipping_module_code
-      value: "1"
-    }
-    label: "Shipped Orders - Fufil"
+    label: "Shipped Orders"
     drill_fields: [detail*]
   }
 
