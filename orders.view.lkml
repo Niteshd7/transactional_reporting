@@ -1036,7 +1036,7 @@ view: orders {
       field: parent_order_id
       value: "0"
     }
-    label: "Initial Customers"
+    label: "New Customers"
     sql: ${customers_email_address} ;;
     drill_fields: [detail*]
   }
