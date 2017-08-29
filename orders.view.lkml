@@ -1771,7 +1771,7 @@ view: orders {
   }
 
   measure: active_subscription_cnt {
-    label: "Active Subscription Count"
+    label: "Active Subscriptions"
     type: sum
     filters: {
       field: orders_status
@@ -1781,14 +1781,11 @@ view: orders {
       field: is_recurring
       value: "yes"
     }
-    filters: {
-      field: order_report.upsell_flag
-      value: "0"
-    }
     sql: ${is_recurring} ;;
     drill_fields: [detail*]
     #sql: ${order_report.active_subscription_cnt} ;;
   }
+
 
 
 

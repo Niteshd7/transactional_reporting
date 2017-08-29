@@ -80,6 +80,41 @@ view: orders_history {
     drill_fields: [detail*]
   }
 
+  measure: cancel_count {
+    type: count
+    label: "Cancelled"
+    filters: {
+      field: type
+      value: "recurring"
+    }
+    filters: {
+      field: status
+      value: "stop"
+    }
+    drill_fields: [detail*]
+  }
+
+  measure: hold_cancel_count {
+    type: count
+    label: "Holds/Cancels"
+    filters: {
+      field: type
+      value: "recurring"
+    }
+    filters: {
+      field: status
+      value: "hold"
+    }
+    drill_fields: [detail*]
+  }
+
+  measure: hold_count {
+    type: number
+    label: "Holds"
+    sql: ${hold_cancel_count} - ${cancel_count} ;;
+    drill_fields: [detail*]
+  }
+
   set: detail {
     fields: [h_id, orders_id, user, type, status, t_stamp_time, deleted, campaign_id]
   }
