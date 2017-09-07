@@ -1482,6 +1482,7 @@ view: orders {
     }
     sql: ${orders_id}  ;;
     sql_distinct_key: ${orders_id} ;;
+    drill_fields: [orders_id, t_stamp_date]
   }
 
   measure:  hold_cancel_orders_date {
