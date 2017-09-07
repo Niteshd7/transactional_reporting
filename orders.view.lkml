@@ -1264,7 +1264,7 @@ view: orders {
       field: order_report.upsell_flag
       value: "0"
     }
-    drill_fields: [detail*]
+    drill_fields: [orders_id]
   }
 
   filter: prior_date_select {
@@ -2706,7 +2706,7 @@ view: orders {
       value: "yes"
     }
     #sql: ${order_report.subscription_cnt} ;;
-    drill_fields: [subscription*]
+    drill_fields: [orders_id, t_stamp_date]
   }
 
   measure: net_revenue_retention {
