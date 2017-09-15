@@ -63,6 +63,9 @@ explore: pdt_fulfillment_reconciliation {
   }
 }
 
+explore: pdt_fulfillment_drill {
+}
+
 
 explore: subscr_mgmt{}
 
